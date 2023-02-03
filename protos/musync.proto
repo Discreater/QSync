@@ -1,23 +1,8 @@
-# Local Music Player
+syntax = "proto3";
 
-- Feature Name: Music Player
-- Start Date: 2023-01-28
+package musync;
+import "google/protobuf/timestamp.proto";
 
-## Summary
-
-First of all, QSync should be able to build a local music library from the local device, and manage the user's playlist. Of course, it should also be able to play music from the local library. Besides the playlist manager, we will also build the user manager. Although this is an initial model, we will be preparing other features such as playing music from the cloud.
-
-## Motivation
-
-The music player is one of the core parts of QSync. In the future we will add other features to QSync like playlist sync, video sync and others. Besides the playlist manager we will also build the user manager.
-
-## Guide-level Explanation
-
-### Server interface
-
-We would use gRPC as the service interface. Below is the proto definition:
-
-```proto
 message Playlist {
   int64 id = 1;
   int64 owner_id = 2;
@@ -178,70 +163,3 @@ service MusyncService {
   rpc updateUser(UpdateUserRequest) returns (UpdateUserResponse);
   rpc deleteUsers(DeleteUsersRequest) returns (stream User);
 }
-```
-
-### Database schema
-
-We use sqlite as the database. Below is the schema:
-
-```sql
-CREATE TABLE playlists (
-  id uuid NOT NULL DEFAULT uuid_generate_v4(),
-  owner_id uuid NOT NULL,
-  name varchar(255) NOT NULL,
-  description text,
-  created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE INDEX playlists_owner_id_idx ON playlists (owner_id);
-CREATE INDEX playlists_name_id_idx ON playlists (name);
-
-CREATE TABLE playlists_tracks (
-  playlist_id uuid NOT NULL,
-  track_id uuid NOT NULL,
-  PRIMARY KEY (playlist_id, track_id)
-);
-CREATE INDEX playlists_tracks_playlist_id_idx ON playlists_tracks (playlist_id);
-CREATE INDEX playlists_tracks_track_id_idx ON playlists_tracks (track_id);
-
-CREATE TABLE current_playlists (
-  id uuid NOT NULL DEFAULT uuid_generate_v4(),
-  playlist_id uuid NOT NULL,
-  user_id uuid NOT NULL,
-  current_track_id uuid NOT NULL,
-  playing boolean NOT NULL,
-  started_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-CREATE INDEX current_playlists_playlist_id_idx ON current_playlists (playlist_id);
-CREATE INDEX current_playlists_user_id_idx ON current_playlists (user_id);
-CREATE INDEX current_playlists_current_track_id_idx ON current_playlists (current_track_id);
-
-CREATE TABLE tracks (
-  id uuid NOT NULL DEFAULT uuid_generate_v4(),
-  name text NOT NULL,
-  artist text NOT NULL,
-  album text NOT NULL,
-  local_src_id uuid,
-  netease_src_id uuid
-);
-CREATE INDEX tracks_name_idx ON tracks (name);
-CREATE INDEX tracks_artist_idx ON tracks (artist);
-create INDEX tracks_album_idx ON tracks (album);
-
-CREATE TABLE local_srouces (
-  id uuid NOT NULL DEFAULT uuid_generate_v4(),
-  path text NOT NULL
-);
-
-CREATE TABLE netease_srouces (
-  id uuid NOT NULL DEFAULT uuid_generate_v4()
-);
-
-CREATE TABLE users (
-  id uuid NOT NULL DEFAULT uuid_generate_v4(),
-  name varchar(255) NOT NULL,
-  current_playlist_id uuid
-);
-create INDEX users_name_idx ON users (name);
-```

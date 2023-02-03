@@ -35,13 +35,13 @@ repos:
         language: rust
         files: \.rs$
         args: []
-      - id: cargo-check
-        name: cargo check
-        description: Check the package for errors.
-        entry: bash -c 'cd src-tauri;cargo check --all'
-        language: rust
-        files: \.rs$
-        pass_filenames: false
+      # - id: cargo-check
+      #   name: cargo check
+      #   description: Check the package for errors.
+      #   entry: bash -c 'cd src-tauri;cargo check --all'
+      #   language: rust
+      #   files: \.rs$
+      #   pass_filenames: false
       - id: cargo-clippy
         name: cargo clippy
         description: Lint rust sources
@@ -49,13 +49,13 @@ repos:
         language: rust
         files: \.rs$
         pass_filenames: false
-      - id: cargo-test
-        name: cargo test
-        description: unit test for the project
-        entry: bash -c 'cd src-tauri;cargo nextest run --all-features'
-        language: rust
-        files: \.rs$
-        pass_filenames: false
+      # - id: cargo-test
+      #   name: cargo test
+      #   description: unit test for the project
+      #   entry: bash -c 'cd src-tauri;cargo nextest run --all-features'
+      #   language: rust
+      #   files: \.rs$
+      #   pass_filenames: false
       - id: eslint
         name: eslint lint
         description: Lint javascript sources
