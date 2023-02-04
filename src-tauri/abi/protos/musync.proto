@@ -3,156 +3,232 @@ syntax = "proto3";
 package musync;
 import "google/protobuf/timestamp.proto";
 
+// Playlist
 message Playlist {
+  // unique id for the playlist
   int64 id = 1;
+  // id of the owner of the playlist
   int64 owner_id = 2;
+  // ids of tracks in the playlist
   repeated int64 track_ids = 3;
+  // name of the playlist
   string name = 4;
+  // description of the playlist
   string description = 5;
+  // time when the playlist is created
   google.protobuf.Timestamp created_at = 6;
+  // time of the last update
   google.protobuf.Timestamp updated_at = 7;
 }
 
+// CurrentPlaylist controller
 message CurrentPlaylist {
+  // unique id for the current playlist
   int64 id = 1;
+  // id of the playlist
   int64 playlist_id = 2;
-  int64 user_id = 3;
-  int64 current_track_id = 4;
-  bool playing = 5;
-  google.protobuf.Timestamp started_at = 6;
+  // id of the current playing track
+  int64 current_track_id = 3;
+  // is the playlist playing
+  bool playing = 4;
+  // time when the current track started playing
+  google.protobuf.Timestamp started_at = 5;
 }
 
 // Track
 message Track {
+  // unique id for the track
   int64 id = 1;
+  // name of the track
   string name = 2;
+  // artist of the track
   string artist = 3;
+  // album of the track
   string album = 4;
+  // local source of the track
   optional LocalSource local_src = 5;
+  // netease source of the track
   optional NeteaseSource netease_src = 6;
 }
 
-// TODO: add fields
+// NeteaseSource, not implemented yet
 message NeteaseSource {
 }
 
+// LocalSource
 message LocalSource {
+  // path of the track
   string path = 1;
 }
 
+// User
 message User {
+  // unique id for the user
   int64 id = 1;
+  // name of the user
   string name = 2;
+  // id of the current playlist
   string current_playlist_id = 3;
 }
 
+// Create playlist request
 message CreatePlaylistRequest {
+  // Playlist to be created
   Playlist playlist = 1;
 }
 
+// Create playlist response
 message CreatePlaylistResponse {
+  // Created playlist
   Playlist playlist = 1;
 }
 
+// Delete playlist request
 message DeletePlaylistsRequest {
+  // Ids of playlists to be deleted
   repeated int64 ids = 1;
 }
 
 // Query playlist by user id and track id
 message PlaylistQuery {
-  // If empty, query all playlists
+  // which user has the playlist
   int64 user_id = 1;
-  // If empty, query all playlists
+  // Query by contained track id
   int64 track_id = 2;
+  // Query by name
   string name = 3;
 }
 
-message QueryPlaylistRequest {
+// Query playlist request
+message QueryPlaylistsRequest {
+  // Query
   PlaylistQuery query = 1;
 }
 
 // Update playlist: add/remove tracks, update name and description
 message UpdatePlaylistRequest {
+  // Id of the playlist to be updated
   int64 id = 1;
+  // Ids of tracks to be added
   repeated int64 added_track_ids = 2;
+  // Ids of tracks to be removed
   repeated int64 removed_track_ids = 3;
+  // New name of the playlist
   optional string name = 4;
+  // New description of the playlist
   optional string description = 5;
 }
 
 // Updated playlist will be returned in response
 message UpdatePlaylistResponse {
+  // Updated playlist
   Playlist playlist = 1;
 }
 
+// Create track request
 message CreateTrackRequest {
+  // Track to be created
   Track track = 1;
 }
 
+// Create track response
 message CreateTrackResponse {
+  // Created track
   Track track = 1;
 }
 
+// Query track
 message TrackQuery {
+  // Query by which playlist contains the track
   int64 playlist_id = 1;
+  // Query by name
   string name = 2;
+  // Query by artist
   string artist = 3;
-  string ablum = 4;
+  // Query by album
+  string album = 4;
 }
 
+// Query track request
 message QueryTracksRequest {
+  // Query
   TrackQuery query = 1;
 }
 
+// Update track request
 message UpdateTrackRequest {
+  // Id of the track to be updated
   int64 id = 1;
+  // New name of the track
   string name = 2;
+  // New artist of the track
   string artist = 3;
+  // New album of the track
   string album = 4;
+  // New local source of the track
   optional LocalSource local_src = 5;
+  // New netease source of the track
   optional NeteaseSource netease_src = 6;
 }
 
+// Update track response
 message UpdateTrackResponse {
+  // Updated track
   Track track = 1;
 }
 
+// Delete tracks request
 message DeleteTracksRequest {
+  // Ids of tracks to be deleted
   repeated int64 track_ids = 1;
 }
 
+// Create user request
 message CreateUserRequest {
+  // User to be created
   User user = 1;
 }
 
+// Create user response
 message CreateUserResponse {
+  // Created user
   User user = 1;
 }
 
-message QueryUserRequest {
-  int64 id = 1;
-  string name = 2;
+// Query user
+message QueryUsersRequest {
+  // Query by name
+  string name = 1;
 }
 
+// Update user request
 message UpdateUserRequest {
+  // Id of the user to be updated
   int64 id = 1;
+  // New name of the user
   string name = 2;
+  // New current playlist id of the user
   int64 current_playlist_id = 3;
 }
 
+// Update user response
 message UpdateUserResponse {
+  // Updated user
   User user = 1;
 }
 
+// Delete users request
 message DeleteUsersRequest {
+  // Ids of users to be deleted
   repeated int64 ids = 1;
 }
 
+// Musync service
 service MusyncService {
   rpc createPlaylist(CreatePlaylistRequest) returns (CreatePlaylistResponse);
-  rpc queryPlaylist(QueryPlaylistRequest) returns (stream Playlist);
-  rpc deletePlaylists(DeletePlaylistsRequest) returns (stream Playlist);
+  rpc queryPlaylists(QueryPlaylistsRequest) returns (stream Playlist);
   rpc updatePlaylist(UpdatePlaylistRequest) returns (UpdatePlaylistResponse);
+  rpc deletePlaylists(DeletePlaylistsRequest) returns (stream Playlist);
 
   rpc createTrack(CreateTrackRequest) returns (CreateTrackResponse);
   rpc queryTracks(QueryTracksRequest) returns (stream Track);
@@ -160,7 +236,7 @@ service MusyncService {
   rpc deleteTracks(DeleteTracksRequest) returns (stream Track);
 
   rpc createUser(CreateUserRequest) returns (CreateUserResponse);
-  rpc queryUser(QueryUserRequest) returns (stream User);
+  rpc queryUsers(QueryUsersRequest) returns (stream User);
   rpc updateUser(UpdateUserRequest) returns (UpdateUserResponse);
   rpc deleteUsers(DeleteUsersRequest) returns (stream User);
 }
