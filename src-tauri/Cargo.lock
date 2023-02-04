@@ -8,6 +8,7 @@ version = "0.1.0"
 dependencies = [
  "prost",
  "prost-types",
+ "sqlx",
  "tonic",
  "tonic-build",
 ]
@@ -1798,7 +1799,11 @@ checksum = "e5ce46fe64a9d73be07dcbe690a38ce1b293be448fd8ce1e6c1b8062c9f72c6a"
 name = "musync"
 version = "0.1.0"
 dependencies = [
+ "abi",
+ "anyhow",
+ "async-trait",
  "sqlx",
+ "thiserror",
 ]
 
 [[package]]

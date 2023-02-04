@@ -106,7 +106,7 @@ message QueryPlaylistsRequest {
 }
 
 // Update playlist: add/remove tracks, update name and description
-message UpdatePlaylistRequest {
+message PlaylistUpdate {
   // Id of the playlist to be updated
   int64 id = 1;
   // Ids of tracks to be added
@@ -118,6 +118,11 @@ message UpdatePlaylistRequest {
   // New description of the playlist
   optional string description = 5;
 }
+
+message UpdatePlaylistRequest {
+  PlaylistUpdate update = 1;
+}
+
 
 // Updated playlist will be returned in response
 message UpdatePlaylistResponse {
@@ -155,8 +160,7 @@ message QueryTracksRequest {
   TrackQuery query = 1;
 }
 
-// Update track request
-message UpdateTrackRequest {
+message TrackUpdate {
   // Id of the track to be updated
   int64 id = 1;
   // New name of the track
@@ -169,6 +173,11 @@ message UpdateTrackRequest {
   optional LocalSource local_src = 5;
   // New netease source of the track
   optional NeteaseSource netease_src = 6;
+}
+
+// Update track request
+message UpdateTrackRequest {
+  TrackUpdate update = 1;
 }
 
 // Update track response
@@ -195,20 +204,28 @@ message CreateUserResponse {
   User user = 1;
 }
 
-// Query user
-message QueryUsersRequest {
+message UserQuery {
   // Query by name
   string name = 1;
 }
 
-// Update user request
-message UpdateUserRequest {
+// Query user
+message QueryUsersRequest {
+  UserQuery query = 1;
+}
+
+message UserUpdate {
   // Id of the user to be updated
   int64 id = 1;
   // New name of the user
   string name = 2;
   // New current playlist id of the user
   int64 current_playlist_id = 3;
+}
+
+// Update user request
+message UpdateUserRequest {
+  UserUpdate update = 1;
 }
 
 // Update user response

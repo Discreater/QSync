@@ -142,7 +142,7 @@ pub struct QueryPlaylistsRequest {
 /// Update playlist: add/remove tracks, update name and description
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct UpdatePlaylistRequest {
+pub struct PlaylistUpdate {
   /// Id of the playlist to be updated
   #[prost(int64, tag = "1")]
   pub id: i64,
@@ -158,6 +158,12 @@ pub struct UpdatePlaylistRequest {
   /// New description of the playlist
   #[prost(string, optional, tag = "5")]
   pub description: ::core::option::Option<::prost::alloc::string::String>,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct UpdatePlaylistRequest {
+  #[prost(message, optional, tag = "1")]
+  pub update: ::core::option::Option<PlaylistUpdate>,
 }
 /// Updated playlist will be returned in response
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -208,10 +214,9 @@ pub struct QueryTracksRequest {
   #[prost(message, optional, tag = "1")]
   pub query: ::core::option::Option<TrackQuery>,
 }
-/// Update track request
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct UpdateTrackRequest {
+pub struct TrackUpdate {
   /// Id of the track to be updated
   #[prost(int64, tag = "1")]
   pub id: i64,
@@ -230,6 +235,13 @@ pub struct UpdateTrackRequest {
   /// New netease source of the track
   #[prost(message, optional, tag = "6")]
   pub netease_src: ::core::option::Option<NeteaseSource>,
+}
+/// Update track request
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct UpdateTrackRequest {
+  #[prost(message, optional, tag = "1")]
+  pub update: ::core::option::Option<TrackUpdate>,
 }
 /// Update track response
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -263,18 +275,23 @@ pub struct CreateUserResponse {
   #[prost(message, optional, tag = "1")]
   pub user: ::core::option::Option<User>,
 }
-/// Query user
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct QueryUsersRequest {
+pub struct UserQuery {
   /// Query by name
   #[prost(string, tag = "1")]
   pub name: ::prost::alloc::string::String,
 }
-/// Update user request
+/// Query user
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct UpdateUserRequest {
+pub struct QueryUsersRequest {
+  #[prost(message, optional, tag = "1")]
+  pub query: ::core::option::Option<UserQuery>,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct UserUpdate {
   /// Id of the user to be updated
   #[prost(int64, tag = "1")]
   pub id: i64,
@@ -284,6 +301,13 @@ pub struct UpdateUserRequest {
   /// New current playlist id of the user
   #[prost(int64, tag = "3")]
   pub current_playlist_id: i64,
+}
+/// Update user request
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct UpdateUserRequest {
+  #[prost(message, optional, tag = "1")]
+  pub update: ::core::option::Option<UserUpdate>,
 }
 /// Update user response
 #[allow(clippy::derive_partial_eq_without_eq)]
