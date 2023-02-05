@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS playlists (
   id INTEGER PRIMARY KEY,
   owner_id INTEGER NOT NULL,
   name varchar(255) NOT NULL,
-  description text,
+  description text NOT NULL,
   created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY(owner_id) REFERENCES users(id) ON DELETE CASCADE
@@ -16,24 +16,14 @@ CREATE TABLE IF NOT EXISTS playlists (
 CREATE INDEX IF NOT EXISTS playlists_owner_id_idx ON playlists (owner_id);
 CREATE INDEX IF NOT EXISTS playlists_name_id_idx ON playlists (name);
 
-CREATE TABLE IF NOT EXISTS local_srouces (
-  id INTEGER PRIMARY KEY,
-  path text NOT NULL
-);
-
-CREATE TABLE IF NOT EXISTS netease_srouces (
-  id INTEGER PRIMARY KEY
-);
-
 CREATE TABLE IF NOT EXISTS tracks (
   id INTEGER PRIMARY KEY,
   name text NOT NULL,
   artist text NOT NULL,
   album text NOT NULL,
-  local_src_id INTEGER,
-  netease_src_id INTEGER,
-  FOREIGN KEY(local_src_id) REFERENCES local_srouces(id) ON DELETE SET NULL,
-  FOREIGN KEY(netease_src_id) REFERENCES netease_srouces(id) ON DELETE SET NULL
+  duration INTEGER NOT NULL,
+  local_src_path text,
+  netease_src_url text
 );
 CREATE INDEX IF NOT EXISTS tracks_name_idx ON tracks (name);
 CREATE INDEX IF NOT EXISTS tracks_artist_idx ON tracks (artist);

@@ -60,11 +60,14 @@ pub struct Track {
   /// album of the track
   #[prost(string, tag = "4")]
   pub album: ::prost::alloc::string::String,
+  /// duration of the track in milliseconds
+  #[prost(int32, tag = "5")]
+  pub duration: i32,
   /// local source of the track
-  #[prost(message, optional, tag = "5")]
+  #[prost(message, optional, tag = "6")]
   pub local_src: ::core::option::Option<LocalSource>,
   /// netease source of the track
-  #[prost(message, optional, tag = "6")]
+  #[prost(message, optional, tag = "7")]
   pub netease_src: ::core::option::Option<NeteaseSource>,
 }
 /// NeteaseSource, not implemented yet
@@ -89,9 +92,6 @@ pub struct User {
   /// name of the user
   #[prost(string, tag = "2")]
   pub name: ::prost::alloc::string::String,
-  /// id of the current playlist
-  #[prost(string, tag = "3")]
-  pub current_playlist_id: ::prost::alloc::string::String,
 }
 /// Create playlist request
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -122,14 +122,14 @@ pub struct DeletePlaylistsRequest {
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct PlaylistQuery {
   /// which user has the playlist
-  #[prost(int64, tag = "1")]
-  pub user_id: i64,
+  #[prost(int64, optional, tag = "1")]
+  pub user_id: ::core::option::Option<i64>,
   /// Query by contained track id
-  #[prost(int64, tag = "2")]
-  pub track_id: i64,
+  #[prost(int64, optional, tag = "2")]
+  pub track_id: ::core::option::Option<i64>,
   /// Query by name
-  #[prost(string, tag = "3")]
-  pub name: ::prost::alloc::string::String,
+  #[prost(string, optional, tag = "3")]
+  pub name: ::core::option::Option<::prost::alloc::string::String>,
 }
 /// Query playlist request
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -194,17 +194,17 @@ pub struct CreateTrackResponse {
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct TrackQuery {
   /// Query by which playlist contains the track
-  #[prost(int64, tag = "1")]
-  pub playlist_id: i64,
+  #[prost(int64, optional, tag = "1")]
+  pub playlist_id: ::core::option::Option<i64>,
   /// Query by name
-  #[prost(string, tag = "2")]
-  pub name: ::prost::alloc::string::String,
+  #[prost(string, optional, tag = "2")]
+  pub name: ::core::option::Option<::prost::alloc::string::String>,
   /// Query by artist
-  #[prost(string, tag = "3")]
-  pub artist: ::prost::alloc::string::String,
+  #[prost(string, optional, tag = "3")]
+  pub artist: ::core::option::Option<::prost::alloc::string::String>,
   /// Query by album
-  #[prost(string, tag = "4")]
-  pub album: ::prost::alloc::string::String,
+  #[prost(string, optional, tag = "4")]
+  pub album: ::core::option::Option<::prost::alloc::string::String>,
 }
 /// Query track request
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -229,11 +229,13 @@ pub struct TrackUpdate {
   /// New album of the track
   #[prost(string, tag = "4")]
   pub album: ::prost::alloc::string::String,
+  #[prost(int32, tag = "5")]
+  pub duration: i32,
   /// New local source of the track
-  #[prost(message, optional, tag = "5")]
+  #[prost(message, optional, tag = "6")]
   pub local_src: ::core::option::Option<LocalSource>,
   /// New netease source of the track
-  #[prost(message, optional, tag = "6")]
+  #[prost(message, optional, tag = "7")]
   pub netease_src: ::core::option::Option<NeteaseSource>,
 }
 /// Update track request
@@ -279,8 +281,8 @@ pub struct CreateUserResponse {
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct UserQuery {
   /// Query by name
-  #[prost(string, tag = "1")]
-  pub name: ::prost::alloc::string::String,
+  #[prost(string, optional, tag = "1")]
+  pub name: ::core::option::Option<::prost::alloc::string::String>,
 }
 /// Query user
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -298,9 +300,6 @@ pub struct UserUpdate {
   /// New name of the user
   #[prost(string, tag = "2")]
   pub name: ::prost::alloc::string::String,
-  /// New current playlist id of the user
-  #[prost(int64, tag = "3")]
-  pub current_playlist_id: i64,
 }
 /// Update user request
 #[allow(clippy::derive_partial_eq_without_eq)]

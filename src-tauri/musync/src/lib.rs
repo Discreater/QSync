@@ -34,6 +34,7 @@ pub trait Musync {
     &self,
     query: abi::PlaylistQuery,
   ) -> Result<Vec<abi::Playlist>, MusyncError>;
+  async fn playlist(&self, id: PlaylistId) -> Result<abi::Playlist, MusyncError>;
 
   // create a track
   async fn create_track(&self, track: abi::Track) -> Result<abi::Track, MusyncError>;
@@ -44,6 +45,8 @@ pub trait Musync {
   // query tracks
   async fn query_tracks(&self, query: abi::TrackQuery) -> Result<Vec<abi::Track>, MusyncError>;
 
+  async fn track(&self, id: TrackId) -> Result<abi::Track, MusyncError>;
+
   // create a user
   async fn create_user(&self, user: abi::User) -> Result<abi::User, MusyncError>;
   // update a user
@@ -52,4 +55,5 @@ pub trait Musync {
   async fn delete_users(&self, ids: &[UserId]) -> Result<Vec<abi::User>, MusyncError>;
   // query users
   async fn query_users(&self, query: abi::UserQuery) -> Result<Vec<abi::User>, MusyncError>;
+  async fn user(&self, id: UserId) -> Result<abi::User, MusyncError>;
 }

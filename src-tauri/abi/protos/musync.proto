@@ -45,15 +45,16 @@ message Track {
   string artist = 3;
   // album of the track
   string album = 4;
+  // duration of the track in milliseconds
+  int32 duration = 5;
   // local source of the track
-  optional LocalSource local_src = 5;
+  optional LocalSource local_src = 6;
   // netease source of the track
-  optional NeteaseSource netease_src = 6;
+  optional NeteaseSource netease_src = 7;
 }
 
 // NeteaseSource, not implemented yet
-message NeteaseSource {
-}
+message NeteaseSource {}
 
 // LocalSource
 message LocalSource {
@@ -67,8 +68,6 @@ message User {
   int64 id = 1;
   // name of the user
   string name = 2;
-  // id of the current playlist
-  string current_playlist_id = 3;
 }
 
 // Create playlist request
@@ -92,11 +91,11 @@ message DeletePlaylistsRequest {
 // Query playlist by user id and track id
 message PlaylistQuery {
   // which user has the playlist
-  int64 user_id = 1;
+  optional int64 user_id = 1;
   // Query by contained track id
-  int64 track_id = 2;
+  optional int64 track_id = 2;
   // Query by name
-  string name = 3;
+  optional string name = 3;
 }
 
 // Query playlist request
@@ -119,10 +118,7 @@ message PlaylistUpdate {
   optional string description = 5;
 }
 
-message UpdatePlaylistRequest {
-  PlaylistUpdate update = 1;
-}
-
+message UpdatePlaylistRequest { PlaylistUpdate update = 1; }
 
 // Updated playlist will be returned in response
 message UpdatePlaylistResponse {
@@ -145,13 +141,13 @@ message CreateTrackResponse {
 // Query track
 message TrackQuery {
   // Query by which playlist contains the track
-  int64 playlist_id = 1;
+  optional int64 playlist_id = 1;
   // Query by name
-  string name = 2;
+  optional string name = 2;
   // Query by artist
-  string artist = 3;
+  optional string artist = 3;
   // Query by album
-  string album = 4;
+  optional string album = 4;
 }
 
 // Query track request
@@ -169,16 +165,15 @@ message TrackUpdate {
   string artist = 3;
   // New album of the track
   string album = 4;
+  int32 duration = 5;
   // New local source of the track
-  optional LocalSource local_src = 5;
+  optional LocalSource local_src = 6;
   // New netease source of the track
-  optional NeteaseSource netease_src = 6;
+  optional NeteaseSource netease_src = 7;
 }
 
 // Update track request
-message UpdateTrackRequest {
-  TrackUpdate update = 1;
-}
+message UpdateTrackRequest { TrackUpdate update = 1; }
 
 // Update track response
 message UpdateTrackResponse {
@@ -206,27 +201,21 @@ message CreateUserResponse {
 
 message UserQuery {
   // Query by name
-  string name = 1;
+  optional string name = 1;
 }
 
 // Query user
-message QueryUsersRequest {
-  UserQuery query = 1;
-}
+message QueryUsersRequest { UserQuery query = 1; }
 
 message UserUpdate {
   // Id of the user to be updated
   int64 id = 1;
   // New name of the user
   string name = 2;
-  // New current playlist id of the user
-  int64 current_playlist_id = 3;
 }
 
 // Update user request
-message UpdateUserRequest {
-  UserUpdate update = 1;
-}
+message UpdateUserRequest { UserUpdate update = 1; }
 
 // Update user response
 message UpdateUserResponse {
