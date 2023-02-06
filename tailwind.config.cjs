@@ -5,10 +5,16 @@ module.exports = {
     './src/**/*.{vue,js,ts,jsx,tsx}',
   ],
   theme: {
+    screens: {
+      sm: '675px',
+      md: '1010px',
+    },
     extend: {
       colors: {
-        black_bg: '#272727',
-        white_bg: '#f9f9f9',
+        main_w_bg: '#f9f9f9',
+        main_d_bg: '#272727',
+        menu_w_bg: '#f3f3f3',
+        menu_d_bg: '#202020',
       },
     },
   },

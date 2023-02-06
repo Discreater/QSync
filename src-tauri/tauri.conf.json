@@ -66,9 +66,11 @@
       {
         "fullscreen": false,
         "height": 600,
+        "width": 800,
+        "minHeight": 330,
+        "minWidth": 502,
         "resizable": true,
         "title": "QSync",
-        "width": 800,
         "decorations": false
       }
     ]
