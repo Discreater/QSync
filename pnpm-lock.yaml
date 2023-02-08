@@ -22,6 +22,7 @@ specifiers:
   vite-plugin-webfont-dl: ^3.6.0
   vue: ^3.2.45
   vue-i18n: ^9.2.2
+  vue-router: '4'
   vue-tsc: ^1.0.11
 
 dependencies:
@@ -30,6 +31,7 @@ dependencies:
   '@vueuse/core': 9.12.0_vue@3.2.45
   vue: 3.2.45
   vue-i18n: 9.2.2_vue@3.2.45
+  vue-router: 4.1.6_vue@3.2.45
 
 devDependencies:
   '@antfu/eslint-config': 0.34.1_7uibuqfxkfaozanbtbziikiqje
@@ -4043,6 +4045,15 @@ packages:
       '@intlify/vue-devtools': 9.2.2
       '@vue/devtools-api': 6.5.0
       vue: 3.2.45
+
+  /vue-router/4.1.6_vue@3.2.45:
+    resolution: {integrity: sha512-DYWYwsG6xNPmLq/FmZn8Ip+qrhFEzA14EI12MsMgVxvHFDYvlr4NXpVF5hrRH1wVcDP8fGi5F4rxuJSl8/r+EQ==}
+    peerDependencies:
+      vue: ^3.2.0
+    dependencies:
+      '@vue/devtools-api': 6.5.0
+      vue: 3.2.45
+    dev: false
 
   /vue-template-compiler/2.7.14:
     resolution: {integrity: sha512-zyA5Y3ArvVG0NacJDkkzJuPQDF8RFeRlzV2vLeSnhSpieO6LK2OVbdLPi5MPPs09Ii+gMO8nY4S3iKQxBxDmWQ==}
