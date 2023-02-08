@@ -1,19 +1,22 @@
 <script setup lang="ts">
 import { invoke } from '@tauri-apps/api';
-import { onMounted } from 'vue';
+import { onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import TitleBar from './components/TitleBar.vue';
 import Navigator from './components/Navigator.vue';
 import MusicPlayer from './components/MusicPlayer.vue';
 import { toggleDark } from './utils';
+import { defaultTheme } from './utils/theme';
 
 const { locale } = useI18n();
 
+const root = ref<HTMLElement>();
+
 onMounted(async () => {
   const result = await invoke('greet', { name: 'World' });
-
-  // eslint-disable-next-line no-console
-  console.log(result);
+  root.value = document.documentElement;
+  const theme = defaultTheme;
+  root.value.style.setProperty('--main', defaultTheme.main);
 });
 </script>
 
@@ -21,7 +24,7 @@ onMounted(async () => {
   <div class="w-full h-full flex flex-col text-black dark:text-white bg-main_w_bg dark:bg-main_d_bg">
     <TitleBar />
     <div class="grow flex">
-      <Navigator class="hidden sm:block md:block md:w-80" />
+      <Navigator />
       <main class="grow">
         <h1 class="text-center text-3xl font-bold underline">
           Hello World!

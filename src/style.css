@@ -2,11 +2,24 @@
 @tailwind components;
 @tailwind utilities;
 
-html,
-body {
+#app {
   height: 100%;
 }
 
-#app {
-  height: 100%;
+@layer base {
+  html,
+  body {
+    height: 100%;
+  }
+
+  html {
+    font-family:
+      bitter,
+      "noto serif sc",
+      "source han serif sc",
+      "pingfang sc",
+      "hiragino sans gb",
+      "wenquanyi micro hei",
+      sans-serif;
+  }
 }

@@ -6,8 +6,8 @@ module.exports = {
   ],
   theme: {
     screens: {
-      sm: '675px',
-      md: '1010px',
+      sm: '666px',
+      md: '864px',
     },
     extend: {
       colors: {
@@ -15,6 +15,7 @@ module.exports = {
         main_d_bg: '#272727',
         menu_w_bg: '#f3f3f3',
         menu_d_bg: '#202020',
+        main: 'var(--main)',
       },
     },
   },

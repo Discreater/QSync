@@ -1,7 +1,10 @@
 <script setup lang="ts">
-import { Icon } from '@iconify/vue';
 import { appWindow } from '@tauri-apps/api/window';
 import { onBeforeMount, ref } from 'vue';
+
+import IconUnmaximized from '~icons/fluent/square-multiple-16-regular';
+import IconMaximized from '~icons/fluent/maximize-16-regular';
+import IconClose from '~icons/fluent/dismiss-16-regular';
 
 const maximized = ref(false);
 
@@ -32,10 +35,11 @@ function onClose() {
       </svg>
     </div>
     <div id="titlebar-maximize" class="titlebar-button hover:bg-gray-500/10" @click="onToggleMaxmize()">
-      <Icon :icon="maximized ? 'fluent:square-multiple-16-regular' : 'fluent:maximize-16-regular'" />
+      <IconUnmaximized v-if="maximized" />
+      <IconMaximized v-else />
     </div>
     <div id="titlebar-close" class="titlebar-button close hover:text-white hover:bg-[#c42b1c]" @click="onClose()">
-      <Icon icon="fluent:dismiss-16-regular" />
+      <IconClose />
     </div>
   </div>
 </template>

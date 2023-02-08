@@ -1,5 +1,10 @@
 # QSync
 
+## Roadmap
+
+- basic music player
+- vue router
+
 ### MuSync
 
 - Music Player

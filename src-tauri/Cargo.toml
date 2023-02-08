@@ -1,11 +1,11 @@
 [package]
-name = "app"
+name = "qsync"
 version = "0.1.0"
-description = "A Tauri App"
+description = "QSync"
 authors = ["discreater"]
 license = ""
 repository = ""
-default-run = "app"
+default-run = "qsync"
 edition = "2021"
 rust-version = "1.59"
 
