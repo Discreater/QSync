@@ -1,10 +1,18 @@
 <script setup lang="ts">
 import { appWindow } from '@tauri-apps/api/window';
-import { onBeforeMount, ref } from 'vue';
+import { computed, onBeforeMount, ref, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 
 import IconUnmaximized from '~icons/fluent/square-multiple-16-regular';
 import IconMaximized from '~icons/fluent/maximize-16-regular';
 import IconClose from '~icons/fluent/dismiss-16-regular';
+import IconGoBack from '~icons/fluent/arrow-left-24-regular';
+import IconMinimize from '~icons/qsync/minimize';
+
+import QSyncIcon from '~/assets/icon.svg';
+
+const route = useRoute();
+const router = useRouter();
 
 const maximized = ref(false);
 
@@ -23,40 +31,43 @@ async function onToggleMaxmize() {
 function onClose() {
   appWindow.close();
 }
+
+const canGoBack = ref(false);
+watch(() => route.fullPath, () => {
+  canGoBack.value = window.history.length !== 0 && window.history.state.back !== null;
+});
+
+function onGoBack() {
+  if (canGoBack.value)
+    router.back();
+}
 </script>
 
 <template>
-  <div data-tauri-drag-region class="titlebar">
-    <div id="titlebar-minimize" class="titlebar-button hover:bg-gray-500/10" @click="onMinimize()">
-      <!-- <Icon icon="fluent:subtract-16-regular"/> -->
-      <!-- modified fluent:subtract-16-regular -->
-      <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 16 16">
-        <rect width="10" height="0.5" x="3" y="7.5" fill="currentColor" rx=".5" />
-      </svg>
+  <div data-tauri-drag-region class="h-[33px] bg-transparent select-none cursor-default flex justify-start fixed top-0 inset-x-0">
+    <div class="flex justify-center items-center h-9 mt-1 space-x-2">
+      <div :class="`flex justify-center items-center mx-1  w-10 h-9 rounded-md ${canGoBack ? 'hover:bg-gray-500/20' : 'opacity-25'}`" @click="onGoBack()">
+        <IconGoBack />
+      </div>
+      <img data-tauri-drag-region :src="QSyncIcon" class="w-6" alt="QSync logo">
+      <span data-tauri-drag-region>QSync</span>
     </div>
-    <div id="titlebar-maximize" class="titlebar-button hover:bg-gray-500/10" @click="onToggleMaxmize()">
-      <IconUnmaximized v-if="maximized" />
-      <IconMaximized v-else />
-    </div>
-    <div id="titlebar-close" class="titlebar-button close hover:text-white hover:bg-[#c42b1c]" @click="onClose()">
-      <IconClose />
+    <div class="flex ml-auto">
+      <div id="titlebar-minimize" class="titlebar-button hover:bg-gray-500/10" @click="onMinimize()">
+        <IconMinimize />
+      </div>
+      <div id="titlebar-maximize" class="titlebar-button hover:bg-gray-500/10" @click="onToggleMaxmize()">
+        <IconUnmaximized v-if="maximized" />
+        <IconMaximized v-else />
+      </div>
+      <div id="titlebar-close" class="titlebar-button close hover:text-white hover:bg-[#c42b1c]" @click="onClose()">
+        <IconClose />
+      </div>
     </div>
   </div>
 </template>
 
 <style scoped>
-.titlebar {
-  height: 33px;
-  background: transparent;
-  user-select: none;
-  display: flex;
-  justify-content: flex-end;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-}
-
 .titlebar-button {
   display: inline-flex;
   justify-content: center;

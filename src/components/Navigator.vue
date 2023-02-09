@@ -49,20 +49,20 @@ function onItemClick(item: Item) {
 const handlerTop = computed(() => {
   let idx = menu.top.findIndex(item => item.key === route.name);
   if (idx !== -1)
-    return `${(idx * 10 + 9) / 4}rem`;
+    return `${(idx * 11 + 11) / 4}rem`;
 
   idx = menu.bottom.findIndex(item => item.key === route.name);
   if (idx !== -1)
-    return `calc(100% - ${((menu.bottom.length - idx) * 10) / 4}rem)`;
+    return `calc(100% - ${((menu.bottom.length - idx) * 11) / 4}rem)`;
 
   return 0;
 });
 </script>
 
 <template>
-  <div class="select-none relative hidden sm:flex md:flex flex-col justify-between sm:w-12 md:w-80 px-1 pt-9 bg-menu_w_bg dark:bg-menu_d_bg">
+  <div class="select-none relative hidden sm:flex md:flex flex-col justify-between sm:w-12 md:w-80 px-1 pt-11 bg-menu_w_bg dark:bg-menu_d_bg">
     <div
-      class="transition-position duration-400 absolute w-[3px] h-4 my-2.5 rounded-md bg-main" :style="{
+      class="transition-position duration-400 absolute w-[3px] h-5 my-2.5 rounded-md bg-main" :style="{
         top: handlerTop,
       }"
     />
