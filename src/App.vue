@@ -19,11 +19,11 @@ onMounted(async () => {
   <div class="w-full h-full flex flex-col text-black dark:text-white bg-main_w_bg dark:bg-main_d_bg">
     <TitleBar />
     <div class="grow flex">
-      <Navigator />
+      <Navigator class="shrink-0" />
       <main class="grow pt-9">
         <RouterView />
       </main>
     </div>
-    <MusicPlayer />
+    <MusicPlayer class="shrink-0" />
   </div>
 </template>

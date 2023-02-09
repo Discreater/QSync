@@ -17,6 +17,9 @@ module.exports = {
         menu_d_bg: '#202020',
         main: 'var(--main)',
       },
+      transitionProperty: {
+        position: 'top, bottom',
+      },
     },
   },
   plugins: [],

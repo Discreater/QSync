@@ -65,8 +65,8 @@
     "windows": [
       {
         "fullscreen": false,
-        "height": 600,
-        "width": 800,
+        "height": 864,
+        "width": 1152,
         "minHeight": 330,
         "minWidth": 502,
         "resizable": true,

@@ -5,6 +5,8 @@ import messages from '@intlify/unplugin-vue-i18n/messages';
 import { createRouter, createWebHistory } from 'vue-router';
 import App from './App.vue';
 import Home from './pages/Home.vue';
+import MusicLib from './pages/MusicLib.vue';
+import Settings from './pages/Settings.vue';
 
 const i18n = createI18n({
   legacy: false,
@@ -16,6 +18,12 @@ const i18n = createI18n({
 const routes = [
   {
     path: '/', component: Home, name: 'home',
+  },
+  {
+    path: '/music-lib', component: MusicLib, name: 'music-lib',
+  },
+  {
+    path: '/settings', component: Settings, name: 'settings',
   },
 ];
 
