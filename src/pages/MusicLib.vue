@@ -1,12 +1,18 @@
+<script setup lang="ts">
+import Basic from '~/layouts/Basic.vue';
+</script>
+
 <template>
-  <div>
-    Music lib
-    <p>
-      The Caterpillar and Alice looked at each other for some time in silence: at
-      last the Caterpillar took the hookah out of its mouth, and addressed her in a
-      languid, sleepy voice.
-    </p>
-  </div>
+  <Basic>
+    <div>
+      Music lib
+      <p>
+        The Caterpillar and Alice looked at each other for some time in silence: at
+        last the Caterpillar took the hookah out of its mouth, and addressed her in a
+        languid, sleepy voice.
+      </p>
+    </div>
+  </Basic>
 </template>
 
 <style scoped>

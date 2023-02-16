@@ -29,7 +29,7 @@ export default defineConfig({
       },
     }),
     webfontDownload([
-      'https://fonts.googleapis.com/css2?family=Bitter&family=Noto+Serif+SC&display=swap',
+      'https://fonts.googleapis.com/css2?family=Bitter&family=Noto+Sans+SC:wght@300&display=swap',
     ]),
   ],
 });
