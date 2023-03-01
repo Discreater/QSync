@@ -2,7 +2,6 @@
 import type { Component } from 'vue';
 import { ref } from 'vue';
 import { useToggle } from '@vueuse/core';
-import Button from './Button.vue';
 import IconDown from '~icons/fluent/chevron-down-24-regular?width=1em';
 import IconUp from '~icons/fluent/chevron-up-24-regular?width=1em';
 

@@ -2,8 +2,16 @@ menu:
   settings: 设置
   home: 主页
   music-lib: 音乐库
+  account: 账号
 settings:
   library: 库
   music-lib-position: 音乐库位置
   add-folder: 添加文件夹
   lib-no-folder: 此库中不包含任何文件夹
+account:
+  add: 添加账号
+  user: 用户
+  pwd: 密码
+  server: 服务器
+confirm: 确认
+cancel: 取消

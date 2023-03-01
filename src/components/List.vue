@@ -1,9 +1,10 @@
 <script setup lang="ts">
-
 </script>
 
 <template>
-  <div class="">
-    <slot name="empty" />
-  </div>
+  <ul class="">
+    <slot name="item">
+      <slot name="empty" />
+    </slot>
+  </ul>
 </template>

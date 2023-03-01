@@ -1,0 +1,337 @@
+function isTv() {
+  // This is going to be really difficult to get right
+  const userAgent = navigator.userAgent.toLowerCase();
+
+  // The OculusBrowsers userAgent also has the samsungbrowser defined but is not a tv.
+  if (userAgent.includes('oculusbrowser'))
+    return false;
+
+  if (userAgent.includes('tv'))
+    return true;
+
+  if (userAgent.includes('samsungbrowser'))
+    return true;
+
+  if (userAgent.includes('viera'))
+    return true;
+
+  return isWeb0s();
+}
+
+function isWeb0s() {
+  const userAgent = navigator.userAgent.toLowerCase();
+
+  return userAgent.includes('netcast')
+      || userAgent.includes('web0s');
+}
+
+function isMobile(userAgent: string) {
+  const terms = [
+    'mobi',
+    'ipad',
+    'iphone',
+    'ipod',
+    'silk',
+    'gt-p1000',
+    'nexus 7',
+    'kindle fire',
+    'opera mini',
+  ];
+
+  const lower = userAgent.toLowerCase();
+
+  for (let i = 0, length = terms.length; i < length; i++) {
+    if (lower.includes(terms[i]))
+      return true;
+  }
+
+  return false;
+}
+
+function hasKeyboard(browser: Browser) {
+  if (browser.touch)
+    return true;
+
+  if (browser.xboxOne)
+    return true;
+
+  if (browser.ps4)
+    return true;
+
+  if (browser.edgeUwp) {
+    // This is OK for now, but this won't always be true
+    // Should we use this?
+    // https://gist.github.com/wagonli/40d8a31bd0d6f0dd7a5d
+    return true;
+  }
+
+  return !!browser.tv;
+}
+
+function iOSversion() {
+  // MacIntel: Apple iPad Pro 11 iOS 13.1
+  if (/iP(hone|od|ad)|MacIntel/.test(navigator.platform)) {
+    const tests = [
+      // Original test for getting full iOS version number in iOS 2.0+
+      /OS (\d+)_(\d+)_?(\d+)?/,
+      // Test for iPads running iOS 13+ that can only get the major OS version
+      /Version\/(\d+)/,
+    ];
+    for (const test of tests) {
+      const matches = (navigator.appVersion).match(test);
+      if (matches) {
+        return [
+          parseInt(matches[1], 10),
+          parseInt(matches[2] || '0', 10),
+          parseInt(matches[3] || '0', 10),
+        ];
+      }
+    }
+  }
+  return [];
+}
+
+function web0sVersion(browser: Browser) {
+  // Detect webOS version by web engine version
+
+  if (browser.chrome) {
+    const userAgent = navigator.userAgent.toLowerCase();
+
+    if (userAgent.includes('netcast')) {
+      // The built-in browser (NetCast) may have a version that doesn't correspond to the actual web engine
+      // Since there is no reliable way to detect webOS version, we return an undefined version
+
+      console.warn('Unable to detect webOS version - NetCast');
+
+      return undefined;
+    }
+
+    if (browser.versionMajor) {
+      // The next is only valid for the app
+
+      if (browser.versionMajor >= 79) {
+        return 6;
+      }
+      else if (browser.versionMajor >= 68) {
+        return 5;
+      }
+      else if (browser.versionMajor >= 53) {
+        return 4;
+      }
+      else if (browser.versionMajor >= 38) {
+        return 3;
+      }
+      else if (browser.versionMajor >= 34) {
+      // webOS 2 browser
+        return 2;
+      }
+      else if (browser.versionMajor >= 26) {
+      // webOS 1 browser
+        return 1;
+      }
+    }
+  }
+  else if (browser.versionMajor) {
+    if (browser.versionMajor >= 538) {
+    // webOS 2 app
+      return 2;
+    }
+    else if (browser.versionMajor >= 537) {
+    // webOS 1 app
+      return 1;
+    }
+  }
+
+  console.error('Unable to detect webOS version');
+
+  return undefined;
+}
+
+let _supportsCssAnimation: boolean;
+let _supportsCssAnimationWithPrefix: boolean;
+function supportsCssAnimation(allowPrefix: boolean) {
+  // TODO: Assess if this is still needed, as all of our targets should natively support CSS animations.
+  if (allowPrefix) {
+    if (_supportsCssAnimationWithPrefix === true || _supportsCssAnimationWithPrefix === false)
+      return _supportsCssAnimationWithPrefix;
+  }
+  else {
+    if (_supportsCssAnimation === true || _supportsCssAnimation === false)
+      return _supportsCssAnimation;
+  }
+
+  let animation = false;
+  const domPrefixes = ['Webkit', 'O', 'Moz'];
+  const elm = document.createElement('div');
+
+  if (elm.style.animationName !== undefined)
+    animation = true;
+
+  if (animation === false && allowPrefix) {
+    for (let i = 0; i < domPrefixes.length; i++) {
+      if (elm.style[`${domPrefixes[i]}AnimationName` as any] !== undefined) {
+        animation = true;
+        break;
+      }
+    }
+  }
+
+  if (allowPrefix) {
+    _supportsCssAnimationWithPrefix = animation;
+    return _supportsCssAnimationWithPrefix;
+  }
+  else {
+    _supportsCssAnimation = animation;
+    return _supportsCssAnimation;
+  }
+}
+
+const uaMatch = function (ua: string) {
+  ua = ua.toLowerCase();
+
+  const match = /(edg)[ /]([\w.]+)/.exec(ua)
+      || /(edga)[ /]([\w.]+)/.exec(ua)
+      || /(edgios)[ /]([\w.]+)/.exec(ua)
+      || /(edge)[ /]([\w.]+)/.exec(ua)
+      || /(opera)[ /]([\w.]+)/.exec(ua)
+      || /(opr)[ /]([\w.]+)/.exec(ua)
+      || /(chrome)[ /]([\w.]+)/.exec(ua)
+      || /(safari)[ /]([\w.]+)/.exec(ua)
+      || /(firefox)[ /]([\w.]+)/.exec(ua)
+      || (!ua.includes('compatible') && /(mozilla)(?:.*? rv:([\w.]+)|)/.exec(ua))
+      || [];
+
+  const versionMatch = /(version)[ /]([\w.]+)/.exec(ua);
+
+  let platform_match: RegExpExecArray | string[] = /(ipad)/.exec(ua)
+      || /(iphone)/.exec(ua)
+      || /(windows)/.exec(ua)
+      || /(android)/.exec(ua)
+      || [];
+
+  let browser = match[1] || '';
+
+  if (browser === 'edge')
+    platform_match = [''];
+
+  if (browser === 'opr')
+    browser = 'opera';
+
+  let version;
+  if (versionMatch && versionMatch.length > 2)
+    version = versionMatch[2];
+
+  version = version || match[2] || '0';
+
+  let versionMajor = parseInt(version.split('.')[0]);
+
+  if (isNaN(versionMajor))
+    versionMajor = 0;
+
+  return {
+    browser,
+    version,
+    platform: platform_match[0] || '',
+    versionMajor,
+  };
+};
+
+const userAgent = navigator.userAgent;
+
+const matched = uaMatch(userAgent);
+interface BrowserVersion {
+  version?: string
+  versionMajor?: number
+  web0sVersion?: number
+  tizenVersion?: number
+  supportsCssAnimation?: (allowPrefix: boolean) => boolean
+  iOSVersion?: number[] | number
+}
+interface BrowserType {
+  [key: string]: boolean
+}
+type Browser = BrowserType & BrowserVersion;
+const browser: Browser = {};
+
+if (matched.browser) {
+  browser[matched.browser] = true;
+  browser.version = matched.version;
+  browser.versionMajor = matched.versionMajor;
+}
+
+if (matched.platform)
+  browser[matched.platform] = true;
+
+browser.edgeChromium = browser.edg || browser.edga || browser.edgios;
+
+if (!browser.chrome && !browser.edgeChromium && !browser.edge && !browser.opera && userAgent.toLowerCase().includes('webkit'))
+  browser.safari = true;
+
+browser.osx = userAgent.toLowerCase().includes('mac os x');
+
+// This is a workaround to detect iPads on iOS 13+ that report as desktop Safari
+// This may break in the future if Apple releases a touchscreen Mac
+// https://forums.developer.apple.com/thread/119186
+if (browser.osx && !browser.iphone && !browser.ipod && !browser.ipad && navigator.maxTouchPoints > 1)
+  browser.ipad = true;
+
+if (userAgent.toLowerCase().includes('playstation 4')) {
+  browser.ps4 = true;
+  browser.tv = true;
+}
+
+if (isMobile(userAgent))
+  browser.mobile = true;
+
+if (userAgent.toLowerCase().includes('xbox')) {
+  browser.xboxOne = true;
+  browser.tv = true;
+}
+browser.animate = typeof document !== 'undefined' && document.documentElement.animate != null;
+browser.hisense = userAgent.toLowerCase().includes('hisense');
+// @ts-expect-error window.tizen may exists
+browser.tizen = userAgent.toLowerCase().includes('tizen') || window.tizen != null;
+browser.vidaa = userAgent.toLowerCase().includes('vidaa');
+browser.web0s = isWeb0s();
+browser.edgeUwp = browser.edge && (userAgent.toLowerCase().includes('msapphost') || userAgent.toLowerCase().includes('webview'));
+
+if (browser.web0s) {
+  browser.web0sVersion = web0sVersion(browser);
+}
+else if (browser.tizen) {
+  // UserAgent string contains 'Safari' and 'safari' is set by matched browser, but we only want 'tizen' to be true
+  delete browser.safari;
+
+  const v = (navigator.appVersion).match(/Tizen (\d+).(\d+)/);
+  if (v)
+    browser.tizenVersion = parseInt(v[1]);
+}
+else {
+  browser.orsay = userAgent.toLowerCase().includes('smarthub');
+}
+
+if (browser.edgeUwp)
+  browser.edge = true;
+
+browser.tv = isTv();
+browser.operaTv = browser.tv && userAgent.toLowerCase().includes('opr/');
+
+if (browser.mobile || browser.tv)
+  browser.slow = true;
+
+if ((typeof document !== 'undefined' && ('ontouchstart' in window)) || (navigator.maxTouchPoints > 0))
+  browser.touch = true;
+
+browser.keyboard = hasKeyboard(browser);
+browser.supportsCssAnimation = supportsCssAnimation;
+
+browser.iOS = browser.ipad || browser.iphone || browser.ipod;
+
+if (browser.iOS) {
+  browser.iOSVersion = iOSversion();
+
+  if (browser.iOSVersion && browser.iOSVersion.length >= 2)
+    browser.iOSVersion = browser.iOSVersion[0] + (browser.iOSVersion[1] / 10);
+}
+
+export default browser;

@@ -34,9 +34,6 @@ async function handleAddMusicFolder() {
       </template>
       <template #drop>
         <List :items="store.musicFolders">
-          <template #item="{ item }">
-            {{ item }}
-          </template>
           <template #empty>
             {{ t('settings.lib-no-folder') }}
           </template>

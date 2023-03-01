@@ -8,6 +8,7 @@ import MenuItem from './MenuItem.vue';
 import IconHome from '~icons/fluent/home-24-regular';
 import IconMusicNote from '~icons/fluent/music-note-2-24-regular';
 import IconSettings from '~icons/fluent/settings-24-regular';
+import IconAccount from '~icons/fluent/person-circle-24-regular';
 
 const { t } = useI18n();
 
@@ -31,6 +32,11 @@ const menu = {
     },
   ],
   bottom: [
+    {
+      key: 'account',
+      icon: IconAccount,
+      name: 'menu.account',
+    },
     {
       key: 'settings',
       icon: IconSettings,

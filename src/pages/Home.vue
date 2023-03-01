@@ -3,8 +3,10 @@ import { useI18n } from 'vue-i18n';
 import Basic from '~/layouts/Basic.vue';
 import { toggleDark } from '~/utils';
 import H1 from '~/components/typo/H1.vue';
+import { useQSyncStore } from '~/store';
 
-const { t, locale } = useI18n();
+const { t } = useI18n();
+const store = useQSyncStore();
 </script>
 
 <template>
@@ -22,7 +24,7 @@ const { t, locale } = useI18n();
     <p class="hidden sm:hidden md:block">
       large
     </p>
-    <select v-model="locale">
+    <select v-model="store.locale">
       <option value="en">
         English
       </option>

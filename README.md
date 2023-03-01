@@ -13,7 +13,6 @@
    - Netease
    - QQ Music
 - Lyric
-   - [Lyricify-App](https://github.com/WXRIW/Lyricify-App)
 
 ## Tech Stack
 

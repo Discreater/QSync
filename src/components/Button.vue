@@ -13,8 +13,8 @@ const { text, icon, disabled } = withDefaults(defineProps<{ text?: string; icon?
           cursor-default flex items-center justify-between
           rounded-md px-2 h-8"
   >
-    <Component :is="icon" v-if="icon" />
-    <span class="ml-2">
+    <Component :is="icon" v-if="icon" class="mr-2" />
+    <span>
       {{ text }}
     </span>
   </button>

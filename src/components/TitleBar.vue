@@ -10,14 +10,17 @@ import IconGoBack from '~icons/fluent/arrow-left-24-regular';
 import IconMinimize from '~icons/qsync/minimize';
 
 import QSyncIcon from '~/assets/icon.svg';
+import { getPlatform, inTauri } from '~/platforms';
 
 const route = useRoute();
 const router = useRouter();
 
 const maximized = ref(false);
 
-onBeforeMount(async () => {
-  maximized.value = await appWindow.isMaximized();
+inTauri(() => {
+  onBeforeMount(async () => {
+    maximized.value = await appWindow.isMaximized();
+  });
 });
 
 function onMinimize() {
@@ -52,7 +55,7 @@ function onGoBack() {
       <img data-tauri-drag-region :src="QSyncIcon" class="w-6" alt="QSync logo">
       <span data-tauri-drag-region>QSync</span>
     </div>
-    <div class="flex ml-auto">
+    <div v-if="getPlatform() === 'tauri'" class="flex ml-auto">
       <div id="titlebar-minimize" class="titlebar-button hover:bg-gray-500/10" @click="onMinimize()">
         <IconMinimize />
       </div>
