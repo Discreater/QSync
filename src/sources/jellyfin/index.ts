@@ -1,4 +1,4 @@
-import type { Api } from '@jellyfin/sdk';
+import type { Api, RecommendedServerInfo } from '@jellyfin/sdk';
 import { Jellyfin } from '@jellyfin/sdk';
 import { getSystemApi } from '@jellyfin/sdk/lib/utils/api/system-api';
 import { getUserApi } from '@jellyfin/sdk/lib/utils/api/user-api';
@@ -14,6 +14,7 @@ export interface JellyfinClientOptions {
 export class JellyfinClient {
   jellyfin: Jellyfin;
   api?: Api;
+  bestServer?: RecommendedServerInfo;
   constructor(private opt: JellyfinClientOptions, deviceName: string, deviceId: string) {
     this.jellyfin = new Jellyfin({
       clientInfo: {
@@ -27,17 +28,28 @@ export class JellyfinClient {
     });
   }
 
-  async connect() {
-    if (this.api)
-      return;
+  async testConnect() {
     const server = await this.jellyfin.discovery.getRecommendedServerCandidates(this.opt.server);
     const best = this.jellyfin.discovery.findBestServer(server);
     if (!best) {
       logger.error('Cannot connect to server');
-      throw new Error('Cannot connect to server');
+      return undefined;
+    }
+    return best;
+  }
+
+  async connect() {
+    if (this.api)
+      return;
+    if (!this.bestServer) {
+      const best = await this.testConnect();
+      if (!best)
+        throw new Error('Cannot connect to server');
+
+      this.bestServer = best;
     }
 
-    const api = this.jellyfin.createApi(best.address);
+    const api = this.jellyfin.createApi(this.bestServer.address);
 
     // Fetch the public system info
     const info = await getSystemApi(api).getPublicSystemInfo();

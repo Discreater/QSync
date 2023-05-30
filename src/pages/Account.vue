@@ -23,11 +23,12 @@ const showAddModel = ref(false);
 function addAccount() {
   if (sourceType.value === 'jellyfin') {
     if (server.value !== undefined && username.value !== undefined && password.value !== undefined) {
-      const opt = new JellyfinClient({
+      const opt = {
         server: server.value,
         user: username.value,
         pwd: password.value,
-      }, store.deviceName, store.deviceId);
+      };
+      const client = new JellyfinClient(opt, store.deviceName, store.deviceId);
     }
   }
 
