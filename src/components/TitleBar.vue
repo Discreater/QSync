@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { appWindow } from '@tauri-apps/api/window';
-import { computed, onBeforeMount, ref, watch } from 'vue';
+import { onBeforeMount, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
 import IconUnmaximized from '~icons/fluent/square-multiple-16-regular';

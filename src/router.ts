@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import Account from './pages/Account.vue';
+import Source from './pages/Source.vue';
 import Home from './pages/Home.vue';
 import MusicLib from './pages/MusicLib.vue';
 import Settings from './pages/Settings.vue';
@@ -15,7 +15,7 @@ const routes = [
     path: '/settings', component: Settings, name: 'settings',
   },
   {
-    path: '/account', component: Account, name: 'account',
+    path: '/source', component: Source, name: 'source',
   },
 ];
 

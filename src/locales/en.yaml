@@ -2,3 +2,12 @@ menu:
   home: Home
   settings: Settings
   music-lib: Music Library
+  source: Source
+confirm: confirm
+source:
+  type:
+    jellyfin: Jellyfin
+  server: Server
+  user: User
+  pwd: Password
+  add: Add Source

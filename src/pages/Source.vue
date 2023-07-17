@@ -4,20 +4,28 @@ import { ref } from 'vue';
 import Basic from '~/layouts/Basic.vue';
 import H1 from '~/components/typo/H1.vue';
 import H2 from '~/components/typo/H2.vue';
-import Button from '~/components/Button.vue';
+import QButton from '~/components/QButton.vue';
 
 import IconAdd from '~icons/fluent/add-circle-24-regular';
 import { useQSyncStore } from '~/store';
 import QInput from '~/components/QInput.vue';
 import { JellyfinClient } from '~/sources/jellyfin';
+import QSelect from '~/components/QSelect.vue';
 
 const { t } = useI18n();
 const store = useQSyncStore();
 
-const sourceType = ref<'jellyfin'>('jellyfin');
+type SourceType = 'jellyfin' | 'local';
+
+const sourceType = ref<SourceType>('local');
+const sourceTypeOptions: { label: string; value: SourceType }[] = [
+  { label: t('source.type.jellyfin'), value: 'jellyfin' },
+  { label: t('source.type.local'), value: 'local' },
+];
 const server = ref<string | undefined>();
 const username = ref<string | undefined>();
 const password = ref<string | undefined>();
+const directory = ref<string | undefined>();
 
 const showAddModel = ref(false);
 function addAccount() {
@@ -46,26 +54,25 @@ function addAccount() {
 <template>
   <Basic>
     <div class="flex justify-between">
-      <H1>{{ t("menu.account") }}</H1>
-      <Button :icon="IconAdd" :text="t('account.add')" @click="showAddModel = true" />
+      <H1>{{ t("menu.source") }}</H1>
+      <QButton :icon="IconAdd" :text="t('source.add')" @click="showAddModel = true" />
     </div>
     <div>
       accounts
     </div>
     <div v-show="showAddModel" class="absolute inset-0 bg-[#4b4b4b80] flex justify-center items-center">
       <div class="flex flex-col bg-[#1c1c1c] px-4 pb-4 pt-2 rounded-md gap-2">
-        <H2>{{ t('account.add') }}</H2>
+        <H2>{{ t('source.add') }}</H2>
+        <QSelect v-model:value="sourceType" :options="sourceTypeOptions" />
         <div class="grid grid-cols-[1fr_3fr] gap-2">
-          <label for="server">{{ t('account.server') }}: </label>
-          <QInput id="server" v-model="server" type="url" placeholder="localhost:8096" />
-          <label for="username">{{ t('account.user') }}: </label>
-          <QInput id="username" v-model="username" type="text" />
-          <label for="password">{{ t('account.pwd') }}: </label>
-          <QInput id="password" v-model="password" type="password" />
+          <QInput v-if="sourceType === 'local'" id="directory" v-model="directory" :label="t('source.directory')" type="directory" />
+          <QInput v-if="sourceType === 'jellyfin'" id="server" v-model="server" :label="t('source.server')" type="url" placeholder="localhost:8096" />
+          <QInput v-if="sourceType === 'jellyfin'" id="username" v-model="username" :label="t('source.user')" type="text" />
+          <QInput v-if="sourceType === 'jellyfin'" id="password" v-model="password" :label="t('source.pwd')" type="password" />
         </div>
         <div class="flex justify-end gap-2">
-          <Button :text="t('confirm')" @click="addAccount()" />
-          <Button :text="t('cancel')" @click="showAddModel = false" />
+          <QButton :text="t('confirm')" @click="addAccount()" />
+          <QButton :text="t('cancel')" @click="showAddModel = false" />
         </div>
       </div>
     </div>

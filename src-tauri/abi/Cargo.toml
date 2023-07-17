@@ -8,7 +8,7 @@ edition = "2021"
 [dependencies]
 prost = "0.11.6"
 prost-types = "0.11.6"
-sqlx = { version = "0.6.2", features = ["chrono", "sqlite", "macros", "migrate", "uuid", "runtime-tokio-rustls"] }
+sqlx = { version = "0.7", features = ["chrono", "sqlite", "macros", "migrate", "uuid", "runtime-tokio-rustls"] }
 thiserror = "1.0.38"
 tonic = "0.8.3"
 

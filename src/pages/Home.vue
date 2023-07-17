@@ -4,9 +4,15 @@ import Basic from '~/layouts/Basic.vue';
 import { toggleDark } from '~/utils';
 import H1 from '~/components/typo/H1.vue';
 import { useQSyncStore } from '~/store';
+import QSelect from '~/components/QSelect.vue';
 
 const { t } = useI18n();
 const store = useQSyncStore();
+
+const langOptions = [
+  { label: 'English', value: 'en' },
+  { label: '简体中文', value: 'zh-CN' },
+];
 </script>
 
 <template>
@@ -24,13 +30,6 @@ const store = useQSyncStore();
     <p class="hidden sm:hidden md:block">
       large
     </p>
-    <select v-model="store.locale">
-      <option value="en">
-        English
-      </option>
-      <option value="zh-CN">
-        简体中文
-      </option>
-    </select>
+    <QSelect v-model:value="store.locale" :options="langOptions" />
   </Basic>
 </template>

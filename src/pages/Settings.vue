@@ -4,7 +4,7 @@ import Basic from '~/layouts/Basic.vue';
 import H1 from '~/components/typo/H1.vue';
 import H2 from '~/components/typo/H2.vue';
 import LongButton from '~/components/LongButton.vue';
-import Button from '~/components/Button.vue';
+import QButton from '~/components/QButton.vue';
 
 import IconFolder from '~icons/fluent/folder-24-regular';
 import IconFolderAdd from '~icons/fluent/folder-add-24-regular';
@@ -30,7 +30,7 @@ async function handleAddMusicFolder() {
     <H2>{{ t("settings.library") }}</H2>
     <LongButton :icon="IconFolder" :droppable="true" :text="t('settings.music-lib-position')">
       <template #extra>
-        <Button :icon="IconFolderAdd" :text="t('settings.add-folder')" @click.stop="handleAddMusicFolder()" />
+        <QButton :icon="IconFolderAdd" :text="t('settings.add-folder')" @click.stop="handleAddMusicFolder()" />
       </template>
       <template #drop>
         <List :items="store.musicFolders">

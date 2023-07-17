@@ -1,16 +1,48 @@
 <script setup lang="ts">
-const { id, type, placeholder, value } = defineProps<{ id: string; type: 'url' | 'text' | 'password'; placeholder?: string; value?: string }>();
+import { ref } from 'vue';
+import QButton from './QButton.vue';
+import { logger } from '~/utils/logger';
+import { open } from '~/platforms/dialog';
+
+const { id, type, placeholder, value } = defineProps<{ id: string; type: 'url' | 'directory' | 'text' | 'password'; placeholder?: string; value?: string; label?: string }>();
 const emit = defineEmits<{
   (e: 'update:value', value: string): void
 }>();
+
+const inputType = type === 'directory' ? 'file' : type;
 function onValueChange(e: Event) {
   emit('update:value', (e.target as HTMLInputElement).value);
+}
+const showDir = ref<string | undefined>(undefined);
+async function onClcickSelect() {
+  const dirs = await open({
+    title: 'Select directory',
+    directory: true,
+    recursive: true,
+  });
+  logger.trace(dirs);
+  let dir;
+  if (Array.isArray(dirs))
+    dir = dirs[0];
+  else if (dirs === null)
+    dir = '';
+  else
+    dir = dirs;
+  showDir.value = dir;
+
+  emit('update:value', dir);
 }
 </script>
 
 <template>
+  <label v-if="label" :for="id">{{ label }}</label>
+  <div v-if="type === 'directory'">
+    <p>{{ showDir }}</p>
+    <QButton text="Select" @click="onClcickSelect()" />
+  </div>
   <input
-    :id="id" :type="type" :placeholder="placeholder" :value="value"
+    v-else
+    :id="id" :type="inputType" :placeholder="placeholder" :value="value"
     class="bg-[#323232] focus:bg-[#1f1f1f] focus:border-main focus:outline-none focus:ring-1 focus:ring-gray-500/30 rounded border-b-2"
     @input="onValueChange($event)"
   >

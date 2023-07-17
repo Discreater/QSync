@@ -33,9 +33,9 @@ const menu = {
   ],
   bottom: [
     {
-      key: 'account',
+      key: 'source',
       icon: IconAccount,
-      name: 'menu.account',
+      name: 'menu.source',
     },
     {
       key: 'settings',

@@ -2,7 +2,7 @@ use std::vec;
 
 use async_trait::async_trait;
 use sqlx::{QueryBuilder, Sqlite, SqlitePool};
-use tracing::{log::warn, trace};
+use tracing::{warn, trace};
 
 use crate::{Musync, MusyncError, Musyncer, PlaylistId, TrackId, UserId};
 const BIND_LIMIT: usize = 256;
@@ -434,7 +434,7 @@ mod tests {
   async fn init_manager() -> Musyncer {
     let tdb = TestSqlite::new(Path::new("../migrations")).await;
     let pool = tdb.get_pool();
-    Musyncer::new(pool.clone())
+    Musyncer::new(pool)
   }
 
   async fn create_test_user(manager: &Musyncer) -> abi::User {
