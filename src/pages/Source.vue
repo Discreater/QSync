@@ -13,6 +13,7 @@ import { JellyfinClient } from '~/sources/jellyfin';
 import QSelect from '~/components/QSelect.vue';
 import LongButton from '~/components/LongButton.vue';
 import type { Item } from '~/components/types';
+import { logger } from '~/utils/logger';
 
 const { t } = useI18n();
 const store = useQSyncStore();
@@ -39,17 +40,23 @@ function addAccount() {
         pwd: password.value,
       };
       const client = new JellyfinClient(opt, store.deviceName, store.deviceId);
+      logger.warn('jellyfin not support yet');
+    }
+    // const client = new JellyfinClient({
+    // }, store.deviceName, store.deviceId);
+    // client.connect().then(() => {
+    //   logger.info('jellyfin test success');
+    // }).catch((reason) => {
+    //   logger.error('jellyfin test error');
+    //   logger.error(reason);
+    // });
+  }
+  else if (sourceType.value === 'local') {
+    if (directory.value !== undefined) {
+      store.addMusicFolder(directory.value);
+      showAddModel.value = false;
     }
   }
-
-  // const client = new JellyfinClient({
-  // }, store.deviceName, store.deviceId);
-  // client.connect().then(() => {
-  //   logger.info('jellyfin test success');
-  // }).catch((reason) => {
-  //   logger.error('jellyfin test error');
-  //   logger.error(reason);
-  // });
 }
 </script>
 
@@ -70,11 +77,17 @@ function addAccount() {
             <QSelect v-model:value="sourceType" :options="sourceTypeOptions" />
           </template>
         </LongButton>
-        <div class="grid grid-cols-[1fr_3fr] gap-2">
-          <QInput v-if="sourceType === 'local'" id="directory" v-model="directory" :label="t('source.directory')" type="directory" />
-          <QInput v-if="sourceType === 'jellyfin'" id="server" v-model="server" :label="t('source.server')" type="url" placeholder="localhost:8096" />
-          <QInput v-if="sourceType === 'jellyfin'" id="username" v-model="username" :label="t('source.user')" type="text" />
-          <QInput v-if="sourceType === 'jellyfin'" id="password" v-model="password" :label="t('source.pwd')" type="password" />
+        <div class="w-full border-white/20 border-b" />
+        <div class="flex flex-col gap-2">
+          <QInput
+            v-if="sourceType === 'local'" id="directory" v-model:value="directory" :label="t('source.directory')"
+            type="directory"
+          />
+          <template v-if="sourceType === 'jellyfin'">
+            <QInput id="server" v-model="server" :label="t('source.server')" type="url" placeholder="localhost:8096" />
+            <QInput id="username" v-model="username" :label="t('source.user')" type="text" />
+            <QInput id="password" v-model="password" :label="t('source.pwd')" type="password" />
+          </template>
         </div>
         <div class="flex justify-end gap-2">
           <QButton :text="t('confirm')" @click="addAccount()" />

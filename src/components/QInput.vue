@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import QButton from './QButton.vue';
+import LongButton from './LongButton.vue';
 import { logger } from '~/utils/logger';
 import { open } from '~/platforms/dialog';
 
@@ -20,6 +21,8 @@ async function onClcickSelect() {
     directory: true,
     recursive: true,
   });
+  if (dirs === undefined)
+    return;
   logger.trace(dirs);
   let dir;
   if (Array.isArray(dirs))
@@ -35,15 +38,17 @@ async function onClcickSelect() {
 </script>
 
 <template>
-  <label v-if="label" :for="id">{{ label }}</label>
-  <div v-if="type === 'directory'">
-    <p>{{ showDir }}</p>
-    <QButton text="Select" @click="onClcickSelect()" />
-  </div>
-  <input
-    v-else
-    :id="id" :type="inputType" :placeholder="placeholder" :value="value"
-    class="bg-[#323232] focus:bg-[#1f1f1f] focus:border-main focus:outline-none focus:ring-1 focus:ring-gray-500/30 rounded border-b-2"
-    @input="onValueChange($event)"
-  >
+  <LongButton :text="label">
+    <template #extra>
+      <div v-if="type === 'directory'" class="flex items-center gap-3">
+        <p>{{ showDir }}</p>
+        <QButton text="..." @click="onClcickSelect()" />
+      </div>
+      <input
+        v-else :id="id" :type="inputType" :placeholder="placeholder" :value="value"
+        class="bg-[#323232] focus:bg-[#1f1f1f] focus:border-main focus:outline-none ring-1 ring-gray-500/30 rounded border-b h-8 px-2"
+        @input="onValueChange($event)"
+      >
+    </template>
+  </LongButton>
 </template>

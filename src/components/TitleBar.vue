@@ -49,7 +49,7 @@ function onGoBack() {
 <template>
   <div data-tauri-drag-region class="h-[33px] bg-transparent select-none cursor-default flex justify-start fixed top-0 inset-x-0">
     <div class="flex justify-center items-center h-14 space-x-2">
-      <div :class="`flex justify-center items-center mx-1  w-12 h-10 rounded-sm ${canGoBack ? 'hover:bg-gray-500/20' : 'opacity-25'}`" @click="onGoBack()">
+      <div :class="`flex justify-center items-center mx-1 w-10 h-10 rounded-sm ${canGoBack ? 'hover:bg-gray-500/20' : 'opacity-25'}`" @click="onGoBack()">
         <IconGoBack />
       </div>
       <img data-tauri-drag-region :src="QSyncIcon" class="w-6" alt="QSync logo">

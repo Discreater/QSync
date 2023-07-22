@@ -4,11 +4,12 @@ import { computed, ref } from 'vue';
 import MenuItem from './MenuItem.vue';
 import type { Item, ItemKey } from './types';
 
-const { top, bottom, defaultActivated, activated: _activated } = defineProps<{
+const { top, bottom, defaultActivated, activated: _activated, responsible } = defineProps<{
   top: Item[]
   bottom?: Item[]
   defaultActivated?: ItemKey | null
   activated?: ItemKey | null
+  responsible?: boolean
 }>();
 
 const emit = defineEmits<{
@@ -42,7 +43,7 @@ function handleItemClick(item: Item) {
 </script>
 
 <template>
-  <div class="h-full relative select-none hidden sm:flex md:flex flex-col justify-between">
+  <div :class="`h-full relative select-none ${responsible ? 'hidden sm:flex md:flex' : ''} flex-col justify-between`">
     <div
       class="transition-position duration-400 absolute w-[3px] h-5 my-2.5 rounded-md bg-main" :style="{
         top: handlerTop,
@@ -50,14 +51,15 @@ function handleItemClick(item: Item) {
     />
     <div>
       <MenuItem
-        v-for="item in top" :key="item.key" :selected="item.key === activated" :name="t(item.name)"
+        v-for="item in top" :key="item.key" :selected="item.key === activated" :name="t(item.name)" :responsible="responsible"
         @click="handleItemClick(item)"
       >
         <Component :is="item.icon" class="text-xl" />
       </MenuItem>
-    </div><div>
+    </div>
+    <div>
       <MenuItem
-        v-for="item in bottom" :key="item.key" :selected="item.key === activated" :name="t(item.name)"
+        v-for="item in bottom" :key="item.key" :selected="item.key === activated" :name="t(item.name)" :responsible="responsible"
         @click="handleItemClick(item)"
       >
         <Component :is="item.icon" class="text-xl" />

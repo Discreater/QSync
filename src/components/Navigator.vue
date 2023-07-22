@@ -56,7 +56,7 @@ function onItemClick(item: Item) {
 </script>
 
 <template>
-  <div class="bg-menu_w_bg dark:bg-menu_d_bg  sm:w-12 md:w-[23rem] px-1 pt-14">
-    <QMenu :activated="activated" :top="menu.top" :bottom="menu.bottom" @item-click="onItemClick" />
+  <div class="bg-menu_w_bg dark:bg-menu_d_bg  sm:w-12 md:w-[23rem] px-0 sm:px-1 pt-14">
+    <QMenu :activated="activated" :top="menu.top" :bottom="menu.bottom" :responsible="true" @item-click="onItemClick" />
   </div>
 </template>

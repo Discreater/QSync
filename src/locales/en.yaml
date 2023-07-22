@@ -5,7 +5,7 @@ menu:
   source: Source
 confirm: confirm
 source:
-  type:
+  types:
     jellyfin: Jellyfin
   server: Server
   user: User

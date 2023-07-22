@@ -12,7 +12,7 @@ const emit = defineEmits<{
   'update:value': [value: ItemKey]
 }>();
 const open = ref(false);
-const selected = ref<Item>(options[0]);
+const selected = ref<Item | undefined>(options.find(v => v.key === value));
 
 function onValueChange(opt: Item) {
   selected.value = opt;
@@ -21,7 +21,7 @@ function onValueChange(opt: Item) {
 }
 
 const menuOffset = computed(() => {
-  const idx = options.findIndex(opt => opt.key === selected.value.key);
+  const idx = options.findIndex(opt => opt.key === selected.value?.key);
   return `-${(idx * 11) / 4 + 0.5}rem`;
 });
 </script>
@@ -34,7 +34,7 @@ const menuOffset = computed(() => {
         top: menuOffset,
       }"
     >
-      <QMenu :top="options" :activated="selected.key" @item-click="onValueChange" />
+      <QMenu :top="options" :activated="selected?.key" @item-click="onValueChange" />
     </div>
   </div>
 </template>
