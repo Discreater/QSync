@@ -13,7 +13,8 @@ source:
   user: 用户
   pwd: 密码
   server: 服务器
-  type:
+  type: 源类型
+  types:
     jellyfin: Jellyfin
     local: 目录
   directory: 选择目录

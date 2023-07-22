@@ -10,8 +10,8 @@ const { t } = useI18n();
 const store = useQSyncStore();
 
 const langOptions = [
-  { label: 'English', value: 'en' },
-  { label: '简体中文', value: 'zh-CN' },
+  { name: 'English', key: 'en' },
+  { name: '简体中文', key: 'zh-CN' },
 ];
 </script>
 

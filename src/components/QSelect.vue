@@ -1,37 +1,40 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-
-interface Option {
-  label: string
-  value: string
-}
+import { computed, ref } from 'vue';
+import QButton from './QButton.vue';
+import type { Item, ItemKey } from './types';
+import QMenu from './QMenu.vue';
 
 const { value, options } = defineProps<{
   value?: string
-  options: Option[]
+  options: Item[]
 }>();
 const emit = defineEmits<{
-  (e: 'update:value', value: string): void
+  'update:value': [value: ItemKey]
 }>();
 const open = ref(false);
-const selected = ref<Option | undefined>(options[0]);
+const selected = ref<Item>(options[0]);
 
-function onValueChange(opt: Option) {
+function onValueChange(opt: Item) {
   selected.value = opt;
   open.value = false;
-  emit('update:value', opt.value);
+  emit('update:value', opt.key);
 }
+
+const menuOffset = computed(() => {
+  const idx = options.findIndex(opt => opt.key === selected.value.key);
+  return `-${(idx * 11) / 4 + 0.5}rem`;
+});
 </script>
 
 <template>
-  <div>
-    <div class="bg-transparent px-2.5 py-2.5 border-b-2 border-gray-200 dark:border-gray-700" @click="open = !open">
-      {{ selected?.label }}
-    </div>
-    <div v-if="open">
-      <div v-for="opt in options" :key="opt.value" :value="opt.value" @click="onValueChange(opt)">
-        {{ opt.label }}
-      </div>
+  <div class="relative w-36 h-10">
+    <QButton v-if="!open" :text="selected?.name" class="w-full" :dropdown="true" @click="open = !open" />
+    <div
+      v-else class="absolute p-2 w-full rounded-sm dark:bg-main_d_bg ring-2 ring-black/10" :style="{
+        top: menuOffset,
+      }"
+    >
+      <QMenu :top="options" :activated="selected.key" @item-click="onValueChange" />
     </div>
   </div>
 </template>

@@ -8,6 +8,7 @@ import TitleBar from '~/components/TitleBar.vue';
 import Navigator from '~/components/Navigator.vue';
 import MusicPlayer from '~/components/MusicPlayer.vue';
 import { defaultTheme } from '~/utils/theme';
+
 const root = ref<HTMLElement>();
 
 onMounted(async () => {
@@ -27,7 +28,7 @@ store.$subscribe((_mutation, state) => {
 </script>
 
 <template>
-  <div class="w-full h-full flex flex-col text-black dark:text-white bg-main_w_bg dark:bg-main_d_bg">
+  <div class="w-full h-full flex flex-col text-black dark:text-white bg-main_w_bg dark:bg-main_d_bg border-white/10 border">
     <div class="grow flex">
       <Navigator class="shrink-0" />
       <RouterView />
