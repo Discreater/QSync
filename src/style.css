@@ -27,4 +27,12 @@
       "wenquanyi micro hei",
       sans-serif;
   }
+
+  .container .scrollbar-track {
+    background: transparent;
+  }
+  .container .scrollbar-track .scrollbar-thumb {
+    width: 2px;
+    background: rgb(158, 160, 163);
+  }
 }

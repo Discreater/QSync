@@ -7,6 +7,9 @@ import H2 from '~/components/typo/H2.vue';
 import QButton from '~/components/QButton.vue';
 
 import IconAdd from '~icons/fluent/add-circle-24-regular';
+import IconLoading from '~icons/fluent/arrow-clockwise-dashes-24-filled';
+import IconFolder from '~icons/fluent/folder-24-regular';
+import IconDelete from '~icons/fluent/delete-24-regular';
 import { useQSyncStore } from '~/store';
 import QInput from '~/components/QInput.vue';
 import { JellyfinClient } from '~/sources/jellyfin';
@@ -39,7 +42,7 @@ function addAccount() {
         user: username.value,
         pwd: password.value,
       };
-      const client = new JellyfinClient(opt, store.deviceName, store.deviceId);
+      const _client = new JellyfinClient(opt, store.deviceName, store.deviceId);
       logger.warn('jellyfin not support yet');
     }
     // const client = new JellyfinClient({
@@ -52,7 +55,7 @@ function addAccount() {
     // });
   }
   else if (sourceType.value === 'local') {
-    if (directory.value !== undefined) {
+    if (directory.value) {
       store.addMusicFolder(directory.value);
       showAddModel.value = false;
     }
@@ -66,8 +69,14 @@ function addAccount() {
       <H1>{{ t("menu.source") }}</H1>
       <QButton :icon="IconAdd" :text="t('source.add')" @click="showAddModel = true" />
     </div>
+    <H2>{{ t('source.types.local') }}</H2>
     <div>
-      accounts
+      <LongButton v-for="dir in store.musicFolders" :key="dir.path" :text="dir.path" :icon="IconFolder" @click="store.updateFolder(dir.path)">
+        <template #extra>
+          <IconLoading :class="dir.updating ? 'animate-spin' : ''" />
+          <QButton :icon="IconDelete" @click="store.removeFolder(dir.path)" />
+        </template>
+      </LongButton>
     </div>
     <div v-show="showAddModel" class="absolute inset-0 bg-[#4b4b4b80] flex justify-center items-center">
       <div class="flex flex-col bg-[#1c1c1c] px-4 pb-4 pt-2 rounded-md gap-2">
@@ -97,3 +106,14 @@ function addAccount() {
     </div>
   </Basic>
 </template>
+
+<style>
+  @keyframes rotating {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+</style>

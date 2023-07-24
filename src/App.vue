@@ -28,8 +28,8 @@ store.$subscribe((_mutation, state) => {
 </script>
 
 <template>
-  <div class="w-full h-full flex flex-col text-black dark:text-white bg-main_w_bg dark:bg-main_d_bg border-white/10 border">
-    <div class="grow flex">
+  <div class="w-full h-full max-h-screen flex flex-col text-black dark:text-white bg-main_w_bg dark:bg-main_d_bg border-white/10 border">
+    <div class="flex-1 flex overflow-hidden">
       <Navigator class="shrink-0" />
       <RouterView />
     </div>
