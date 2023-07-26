@@ -7,7 +7,7 @@ import H2 from '~/components/typo/H2.vue';
 import QButton from '~/components/QButton.vue';
 
 import IconAdd from '~icons/fluent/add-circle-24-regular';
-import IconLoading from '~icons/fluent/arrow-clockwise-dashes-24-filled';
+import IconSpinner from '~icons/fluent/spinner-ios-20-regular';
 import IconFolder from '~icons/fluent/folder-24-regular';
 import IconDelete from '~icons/fluent/delete-24-regular';
 import { useQSyncStore } from '~/store';
@@ -42,7 +42,7 @@ function addAccount() {
         user: username.value,
         pwd: password.value,
       };
-      const _client = new JellyfinClient(opt, store.deviceName, store.deviceId);
+      const _client = new JellyfinClient(opt, store.jellyfinSource.deviceName, store.jellyfinSource.deviceId);
       logger.warn('jellyfin not support yet');
     }
     // const client = new JellyfinClient({
@@ -53,8 +53,7 @@ function addAccount() {
     //   logger.error('jellyfin test error');
     //   logger.error(reason);
     // });
-  }
-  else if (sourceType.value === 'local') {
+  } else if (sourceType.value === 'local') {
     if (directory.value) {
       store.addMusicFolder(directory.value);
       showAddModel.value = false;
@@ -73,7 +72,7 @@ function addAccount() {
     <div>
       <LongButton v-for="dir in store.musicFolders" :key="dir.path" :text="dir.path" :icon="IconFolder" @click="store.updateFolder(dir.path)">
         <template #extra>
-          <IconLoading :class="dir.updating ? 'animate-spin' : ''" />
+          <IconSpinner :class="dir.updating ? 'animate-spin' : ''" />
           <QButton :icon="IconDelete" @click="store.removeFolder(dir.path)" />
         </template>
       </LongButton>

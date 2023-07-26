@@ -4,9 +4,9 @@ import { onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { inTauri } from './platforms';
 import { useQSyncStore } from './store';
+import QPlayer from './components/QPlayer.vue';
 import TitleBar from '~/components/TitleBar.vue';
 import Navigator from '~/components/Navigator.vue';
-import MusicPlayer from '~/components/MusicPlayer.vue';
 import { defaultTheme } from '~/utils/theme';
 
 const root = ref<HTMLElement>();
@@ -28,12 +28,15 @@ store.$subscribe((_mutation, state) => {
 </script>
 
 <template>
-  <div class="w-full h-full max-h-screen flex flex-col text-black dark:text-white bg-main_w_bg dark:bg-main_d_bg border-white/10 border">
+  <div
+    class="w-full h-full max-h-screen flex flex-col
+     text-black dark:text-white bg-main_w_bg dark:bg-main_d_bg border-white/10 border rounded-lg"
+  >
     <div class="flex-1 flex overflow-hidden">
       <Navigator class="shrink-0" />
       <RouterView />
     </div>
     <TitleBar />
-    <MusicPlayer class="shrink-0" />
+    <QPlayer class="shrink-0" />
   </div>
 </template>

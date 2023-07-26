@@ -11,7 +11,7 @@ import IconFolderAdd from '~icons/fluent/folder-add-24-regular';
 
 import { open } from '~/platforms/dialog';
 import { useQSyncStore } from '~/store';
-import List from '~/components/List.vue';
+import QList from '~/components/QList.vue';
 
 const { t } = useI18n();
 const store = useQSyncStore();
@@ -33,14 +33,14 @@ async function handleAddMusicFolder() {
         <QButton :icon="IconFolderAdd" :text="t('settings.add-folder')" @click.stop="handleAddMusicFolder()" />
       </template>
       <template #drop>
-        <List :items="store.musicFolders" :key-map="(t) => t.path">
+        <QList :items="store.musicFolders" :key-map="(t) => t.path">
           <template #item="{ item }">
             <div>{{ item.path }}</div>
           </template>
           <template #empty>
             {{ t('settings.lib-no-folder') }}
           </template>
-        </List>
+        </QList>
       </template>
     </LongButton>
   </Basic>

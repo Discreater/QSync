@@ -7,6 +7,8 @@ use std::fs;
 
 use serde::Serialize;
 
+mod player;
+
 #[tauri::command]
 fn greet(name: &str) -> String {
   format!("Hello, {name}!")
@@ -14,7 +16,7 @@ fn greet(name: &str) -> String {
 
 fn main() {
   tauri::Builder::default()
-    .invoke_handler(tauri::generate_handler![update_folder, greet])
+    .invoke_handler(tauri::generate_handler![update_folder, greet, player::read_track])
     .run(tauri::generate_context!())
     .expect("error while running tauri application");
 }
@@ -46,3 +48,4 @@ fn update_folder(dir: String) -> Result<Vec<Track>, String> {
   add_track(dir, &mut tracks);
   Ok(tracks)
 }
+

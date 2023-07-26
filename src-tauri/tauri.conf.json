@@ -92,7 +92,8 @@
         "minWidth": 502,
         "resizable": true,
         "title": "QSync",
-        "decorations": false
+        "decorations": false,
+        "transparent": true
       }
     ]
   }

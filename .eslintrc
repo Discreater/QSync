@@ -1,7 +1,15 @@
 {
-    "extends": "@antfu",
-    "rules": {
-        "semi": ["error", "always"],
-        "@typescript-eslint/semi": ["error", "always"]
-      }
+  "extends": "@antfu",
+  "rules": {
+    "semi": [
+      "error",
+      "always"
+    ],
+    "@typescript-eslint/semi": [
+      "error",
+      "always"
+    ],
+    "brace-style": "off",
+    "@typescript-eslint/brace-style": ["error", "1tbs"]
+  }
 }

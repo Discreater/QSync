@@ -22,3 +22,5 @@ confirm: 确认
 cancel: 取消
 music-lib:
   music: 音乐
+btn:
+  shuffle: 随机播放
