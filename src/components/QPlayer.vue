@@ -3,6 +3,7 @@ import { computed, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import QHoverButton from './QHoverButton.vue';
 import QSlider from './QSlider.vue';
+import QPopover from './QPopover.vue';
 import { ViewTrack, readTrack } from '~/sources/folder';
 import type { Track } from '~/store';
 import { sameTrack, useQSyncStore } from '~/store';
@@ -13,6 +14,8 @@ import IconNext from '~icons/fluent/next-24-filled';
 import IconPlay from '~icons/fluent/play-24-filled';
 import IconPause from '~icons/fluent/pause-20-filled';
 import IconRepeat from '~icons/fluent/arrow-repeat-all-24-regular';
+import IconVolume from '~icons/fluent/speaker-2-24-regular';
+import IconMore from '~icons/fluent/more-horizontal-24-regular';
 
 const { t } = useI18n();
 
@@ -65,7 +68,7 @@ watch((store.playbackQueue), async (playback) => {
 audio.onended = () => {
   store.nextTrack();
 };
-audio.ontimeupdate = (e) => {
+audio.ontimeupdate = () => {
   localProgress.value = audio.currentTime;
   store.$patch((state) => {
     state.playbackQueue.progress = audio.currentTime;
@@ -103,20 +106,35 @@ function onSliderUpdate(v: number) {
     state.playbackQueue.progress = v;
   });
 }
-const progressbar = computed(() => localProgress.value / duration.value);
+const volume = ref(audio.volume);
+function onVolumeUpdate(v: number) {
+  v = Math.max(0, v);
+  v = Math.min(100, v);
+  volume.value = v / 100;
+  audio.volume = volume.value;
+}
 </script>
 
 <template>
-  <div class="h-[118px] flex flex-col border-solid border-t border-black/30 px-3 gap-1">
+  <div class="h-[118px] flex flex-col border-solid border-t border-black/30 gap-1">
     <QSlider
+      class="px-3"
+      :left="{
+        type: 'value',
+        formatter: formatTime,
+      }"
+      :right="{
+        type: 'value',
+        formatter: (v) => duration ? `${formatTime(duration - v)}` : '',
+      }"
       :value="store.playbackQueue.progress" :min="0" :max="duration" :formatter="formatTime" @update:value="onSliderUpdate"
     />
-    <div class="flex justify-between items-center">
+    <div class="flex justify-between items-center px-2">
       <div class="flex-1">
         {{ viewTrack?.name() }}
       </div>
       <div class="flex-1 flex justify-center items-center gap-3">
-        <QHoverButton :icon="IconArrowShuffle" />
+        <QHoverButton :icon="IconArrowShuffle" :disabled="true" />
         <QHoverButton :icon="IconPrevious" @click="handlePrevious" />
         <button class="rounded-full w-14 h-14 text-2xl flex justify-center items-center bg-gradient-to-br from-orange-500 to-purple-500" @click="togglePlay">
           <IconPause v-if="store.playbackQueue.playing" />
@@ -125,8 +143,22 @@ const progressbar = computed(() => localProgress.value / duration.value);
         <QHoverButton :icon="IconNext" @click="handleNext" />
         <QHoverButton :icon="IconRepeat" :disabled="true" />
       </div>
-      <div class="flex-1">
-        {{ progressbar }}
+      <div class="flex-1 flex justify-end items-center gap-2">
+        <QPopover>
+          <QHoverButton :icon="IconVolume" />
+          <template #popover>
+            <QSlider
+              :left="{
+                type: 'icon',
+                icon: IconVolume,
+              }" :right="{
+                type: 'value',
+                formatter: (v) => `${v.toFixed(0)}`,
+              }" :min="0" :max="100" :value="volume * 100" @input="onVolumeUpdate"
+            />
+          </template>
+        </QPopover>
+        <QHoverButton :icon="IconMore" :disabled="true" />
         <!-- todo controller -->
       </div>
     </div>

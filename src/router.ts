@@ -3,6 +3,7 @@ import Source from './pages/Source.vue';
 import Home from './pages/Home.vue';
 import MusicLib from './pages/MusicLib.vue';
 import Settings from './pages/Settings.vue';
+import Playback from './pages/Playback.vue';
 
 const routes = [
   {
@@ -16,6 +17,9 @@ const routes = [
   },
   {
     path: '/source', component: Source, name: 'source',
+  },
+  {
+    path: '/playback', component: Playback, name: 'playback',
   },
 ];
 

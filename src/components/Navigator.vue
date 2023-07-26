@@ -10,6 +10,7 @@ import IconHome from '~icons/fluent/home-24-regular';
 import IconMusicNote from '~icons/fluent/music-note-2-24-regular';
 import IconSettings from '~icons/fluent/settings-24-regular';
 import IconAccount from '~icons/fluent/person-circle-24-regular';
+import IconPLayback from '~icons/fluent/navigation-play-20-regular';
 
 const { t } = useI18n();
 
@@ -24,6 +25,11 @@ const menu = {
       key: 'music-lib',
       icon: IconMusicNote,
       name: 'menu.music-lib',
+    },
+    {
+      key: 'playback',
+      icon: IconPLayback,
+      name: 'menu.playback',
     },
   ],
   bottom: [
