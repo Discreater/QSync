@@ -1,37 +1,38 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n';
-import { computed, ref } from 'vue';
+import { computed, ref, toRefs } from 'vue';
 import MenuItem from './MenuItem.vue';
 import type { Item, ItemKey } from './types';
 
-const { top, bottom, defaultActivated, activated: _activated, responsible } = defineProps<{
+const props = defineProps<{
   top: Item[]
   bottom?: Item[]
   defaultActivated?: ItemKey | null
   activated?: ItemKey | null
   responsible?: boolean
 }>();
-
 const emit = defineEmits<{
   'itemClick': [item: Item]
 }>();
 
+const { top, bottom, activated: _activated, responsible } = toRefs(props);
+
 const { t } = useI18n();
 
-const localActivated = ref(defaultActivated);
-const activated = computed(() => _activated ?? localActivated.value);
+const localActivated = ref(props.defaultActivated);
+const activated = computed(() => _activated?.value ?? localActivated.value);
 
 const handlerTop = computed(() => {
   if (!activated.value)
     return 0;
-  let idx = top.findIndex(item => item.key === activated.value);
+  let idx = top.value.findIndex(item => item.key === activated.value);
   if (idx !== -1)
     return `${(idx * 11) / 4}rem`;
 
-  if (bottom) {
-    idx = bottom.findIndex(item => item.key === activated.value);
+  if (bottom?.value) {
+    idx = bottom.value.findIndex(item => item.key === activated.value);
     if (idx !== -1)
-      return `calc(100% - ${((bottom.length - idx) * 11) / 4}rem)`;
+      return `calc(100% - ${((bottom.value.length - idx) * 11) / 4}rem)`;
   }
   return 0;
 });

@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
-import { useI18n } from 'vue-i18n';
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
+import { convertFileSrc } from '@tauri-apps/api/tauri';
 import QHoverButton from './QHoverButton.vue';
 import QSlider from './QSlider.vue';
 import QPopover from './QPopover.vue';
-import { ViewTrack, readTrack } from '~/sources/folder';
-import type { Track } from '~/store';
+import { ViewTrack } from '~/sources/folder';
+import type { PlaybackQueue, Track } from '~/store';
 import { sameTrack, useQSyncStore } from '~/store';
 import { logger } from '~/utils/logger';
 import IconArrowShuffle from '~icons/fluent/arrow-shuffle-24-regular';
@@ -16,44 +16,27 @@ import IconPause from '~icons/fluent/pause-20-filled';
 import IconRepeat from '~icons/fluent/arrow-repeat-all-24-regular';
 import IconVolume from '~icons/fluent/speaker-2-24-regular';
 import IconMore from '~icons/fluent/more-horizontal-24-regular';
-
-const { t } = useI18n();
+import { pad } from '~/utils';
 
 const audio = new Audio();
 const store = useQSyncStore();
 
 const currentTrack = ref<Track>();
-const preloadedTrack = ref<{ track: Track; blob: Blob }>();
 
 const localProgress = ref(0);
 const duration = ref(0);
 
-async function loadTrack(track: Track, preload: Track | undefined) {
+function loadTrack(track: Track) {
+  logger.trace(`load new track: ${track.path}`);
   currentTrack.value = track;
-  let blob;
-  logger.debug(`next track: ${track.path}`);
-  logger.debug(`preloaded track: ${preloadedTrack.value?.track.path}`);
-  if (preloadedTrack.value && sameTrack(track, preloadedTrack.value.track)) {
-    logger.trace('same track');
-    blob = preloadedTrack.value.blob;
-  } else {
-    blob = await readTrack(track.path);
-  }
-  const url = URL.createObjectURL(blob);
-  audio.src = url;
-  if (preload) {
-    logger.trace(`preloading next track ${preload.path}`);
-    readTrack(preload.path).then((blob) => {
-      preloadedTrack.value = { track: preload, blob };
-    });
-  }
+  audio.src = convertFileSrc(track.path);
 }
 
-watch((store.playbackQueue), async (playback) => {
+function updatePlayer(playback: PlaybackQueue) {
   // ignore the same track
   if (!currentTrack.value || !sameTrack(playback.queue[playback.current], currentTrack.value)) {
-    logger.debug('play new track');
-    loadTrack(playback.queue[playback.current], playback.queue[playback.current + 1]);
+    const track = playback.queue[playback.current];
+    loadTrack(track);
   }
 
   if (Math.abs(playback.progress - audio.currentTime) > 1)
@@ -63,7 +46,18 @@ watch((store.playbackQueue), async (playback) => {
     audio.play();
   else if (!playback.playing && !audio.paused)
     audio.pause();
+}
+
+watch((store.playbackQueue), (playback) => {
+  updatePlayer(playback);
 }, { deep: true });
+
+onMounted(() => {
+  updatePlayer(store.playbackQueue);
+});
+onUnmounted(() => {
+  audio.pause();
+});
 
 audio.onended = () => {
   store.nextTrack();
@@ -91,10 +85,6 @@ function togglePlay() {
 }
 
 function formatTime(time: number) {
-  function pad(num: number, length: number): string {
-    const str = `${num}`;
-    return str.padStart(length, '0');
-  }
   const hour = Math.floor(time / 3600);
   const min = pad(Math.floor(time / 60), 2);
   const sec = pad(Math.floor(time % 60), 2);
@@ -106,12 +96,16 @@ function onSliderUpdate(v: number) {
     state.playbackQueue.progress = v;
   });
 }
-const volume = ref(audio.volume);
+watch(store.config, (config) => {
+  audio.volume = config.volume / 100;
+});
+audio.volume = store.config.volume / 100;
 function onVolumeUpdate(v: number) {
   v = Math.max(0, v);
   v = Math.min(100, v);
-  volume.value = v / 100;
-  audio.volume = volume.value;
+  store.$patch((state) => {
+    state.config.volume = v;
+  });
 }
 </script>
 
@@ -134,7 +128,7 @@ function onVolumeUpdate(v: number) {
         {{ viewTrack?.name() }}
       </div>
       <div class="flex-1 flex justify-center items-center gap-3">
-        <QHoverButton :icon="IconArrowShuffle" :disabled="true" />
+        <QHoverButton :icon="IconArrowShuffle" @click="store.shufflePLayback()" />
         <QHoverButton :icon="IconPrevious" @click="handlePrevious" />
         <button class="rounded-full w-14 h-14 text-2xl flex justify-center items-center bg-gradient-to-br from-orange-500 to-purple-500" @click="togglePlay">
           <IconPause v-if="store.playbackQueue.playing" />
@@ -154,7 +148,7 @@ function onVolumeUpdate(v: number) {
               }" :right="{
                 type: 'value',
                 formatter: (v) => `${v.toFixed(0)}`,
-              }" :min="0" :max="100" :value="volume * 100" @input="onVolumeUpdate"
+              }" :min="0" :max="100" :value="store.config.volume" @input="onVolumeUpdate"
             />
           </template>
         </QPopover>

@@ -25,3 +25,4 @@ music-lib:
   music: 音乐
 btn:
   shuffle: 随机播放
+  location: 正在播放

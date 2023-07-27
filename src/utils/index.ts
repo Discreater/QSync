@@ -18,3 +18,8 @@ export function shuffle<T>(array: T[]): T[] {
 
   return array;
 }
+
+export function pad(num: number, length: number): string {
+  const str = `${num}`;
+  return str.padStart(length, '0');
+}

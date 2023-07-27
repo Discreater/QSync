@@ -31,8 +31,20 @@
 
   .container .scrollbar-track {
     background: transparent;
+    transition: all 0.2s ease;
+  }
+  .container .scrollbar-track:hover {
+    background: #ffffff20;
+    border-radius: 4px;
+  }
+  .container .scrollbar-track:hover .scrollbar-thumb {
+    width: 8px;
   }
   .container .scrollbar-track .scrollbar-thumb {
+    transition: all 0.2s ease;
+    left: 0;
+    right: 0;
+    margin: auto;
     width: 2px;
     background: rgb(158, 160, 163);
   }

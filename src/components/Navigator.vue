@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 
 import { ref, watch } from 'vue';
@@ -11,8 +10,6 @@ import IconMusicNote from '~icons/fluent/music-note-2-24-regular';
 import IconSettings from '~icons/fluent/settings-24-regular';
 import IconAccount from '~icons/fluent/person-circle-24-regular';
 import IconPLayback from '~icons/fluent/navigation-play-20-regular';
-
-const { t } = useI18n();
 
 const menu = {
   top: [

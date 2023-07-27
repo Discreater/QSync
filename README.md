@@ -22,3 +22,7 @@
    - Vue
    - Typescript
    - TailwindCSS
+
+## Roadmap
+
+- [ ] Only record track start time. Not the current progress.

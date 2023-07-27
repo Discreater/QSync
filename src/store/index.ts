@@ -4,6 +4,7 @@ import { updateFolder } from '~/sources/folder';
 import type { LocalFolder, RawTrack } from '~/sources/folder';
 
 import type { JellyfinClientOptions } from '~/sources/jellyfin';
+import { shuffle } from '~/utils';
 
 import { generateDeviceId, getDeviceName } from '~/utils/apphost';
 import { logger } from '~/utils/logger';
@@ -16,7 +17,7 @@ export function sameTrack(a: Track | undefined, b: Track | undefined): boolean {
   return a.path === b.path;
 }
 
-interface PlaybackQueue {
+export interface PlaybackQueue {
   queue: Track[]
   playing: boolean
   current: number
@@ -47,6 +48,9 @@ export const useQSyncStore = defineStore('qsync', {
       deviceId: generateDeviceId(),
       deviceName: getDeviceName(),
     } as JellyfinSource,
+    config: {
+      volume: 100,
+    },
   }),
   actions: {
     addMusicFolder(folder: string) {
@@ -121,6 +125,11 @@ export const useQSyncStore = defineStore('qsync', {
           playing: true,
         },
       });
+    },
+    shufflePLayback() {
+      this.playbackQueue.queue = shuffle([...this.playbackQueue.queue]);
+      this.playbackQueue.current = 0;
+      this.playbackQueue.progress = 0;
     },
   },
   persist: true,

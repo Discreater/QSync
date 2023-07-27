@@ -81,9 +81,9 @@ function iOSversion() {
       const matches = (navigator.appVersion).match(test);
       if (matches) {
         return [
-          parseInt(matches[1], 10),
-          parseInt(matches[2] || '0', 10),
-          parseInt(matches[3] || '0', 10),
+          Number.parseInt(matches[1], 10),
+          Number.parseInt(matches[2] || '0', 10),
+          Number.parseInt(matches[3] || '0', 10),
         ];
       }
     }
@@ -111,32 +111,25 @@ function web0sVersion(browser: Browser) {
 
       if (browser.versionMajor >= 79) {
         return 6;
-      }
-      else if (browser.versionMajor >= 68) {
+      } else if (browser.versionMajor >= 68) {
         return 5;
-      }
-      else if (browser.versionMajor >= 53) {
+      } else if (browser.versionMajor >= 53) {
         return 4;
-      }
-      else if (browser.versionMajor >= 38) {
+      } else if (browser.versionMajor >= 38) {
         return 3;
-      }
-      else if (browser.versionMajor >= 34) {
+      } else if (browser.versionMajor >= 34) {
       // webOS 2 browser
         return 2;
-      }
-      else if (browser.versionMajor >= 26) {
+      } else if (browser.versionMajor >= 26) {
       // webOS 1 browser
         return 1;
       }
     }
-  }
-  else if (browser.versionMajor) {
+  } else if (browser.versionMajor) {
     if (browser.versionMajor >= 538) {
     // webOS 2 app
       return 2;
-    }
-    else if (browser.versionMajor >= 537) {
+    } else if (browser.versionMajor >= 537) {
     // webOS 1 app
       return 1;
     }
@@ -154,8 +147,7 @@ function supportsCssAnimation(allowPrefix: boolean) {
   if (allowPrefix) {
     if (_supportsCssAnimationWithPrefix === true || _supportsCssAnimationWithPrefix === false)
       return _supportsCssAnimationWithPrefix;
-  }
-  else {
+  } else {
     if (_supportsCssAnimation === true || _supportsCssAnimation === false)
       return _supportsCssAnimation;
   }
@@ -179,8 +171,7 @@ function supportsCssAnimation(allowPrefix: boolean) {
   if (allowPrefix) {
     _supportsCssAnimationWithPrefix = animation;
     return _supportsCssAnimationWithPrefix;
-  }
-  else {
+  } else {
     _supportsCssAnimation = animation;
     return _supportsCssAnimation;
   }
@@ -223,9 +214,9 @@ const uaMatch = function (ua: string) {
 
   version = version || match[2] || '0';
 
-  let versionMajor = parseInt(version.split('.')[0]);
+  let versionMajor = Number.parseInt(version.split('.')[0]);
 
-  if (isNaN(versionMajor))
+  if (Number.isNaN(versionMajor))
     versionMajor = 0;
 
   return {
@@ -297,16 +288,14 @@ browser.edgeUwp = browser.edge && (userAgent.toLowerCase().includes('msapphost')
 
 if (browser.web0s) {
   browser.web0sVersion = web0sVersion(browser);
-}
-else if (browser.tizen) {
+} else if (browser.tizen) {
   // UserAgent string contains 'Safari' and 'safari' is set by matched browser, but we only want 'tizen' to be true
   delete browser.safari;
 
   const v = (navigator.appVersion).match(/Tizen (\d+).(\d+)/);
   if (v)
-    browser.tizenVersion = parseInt(v[1]);
-}
-else {
+    browser.tizenVersion = Number.parseInt(v[1]);
+} else {
   browser.orsay = userAgent.toLowerCase().includes('smarthub');
 }
 

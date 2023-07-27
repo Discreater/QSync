@@ -18,7 +18,7 @@ const views = store.playbackQueue.queue.map(track => new ViewTrack(track));
       {{ t('menu.playback') }}
     </H1>
     <QScrollbar class="flex-1 grow relative px-16">
-      <QList :items="views" :key-map="(track) => track.path">
+      <QList :items="views" :key-map="(track) => track.key()">
         <template #item="{ item, idx }">
           <div :class="`h-12 mb-2 rounded-md ring-1 ring-black/10 ${idx === store.playbackQueue.current ? 'text-orange-500' : ''}  ${idx % 2 === 0 ? 'bg-[#4b4b4b60]' : 'hover:bg-[#4b4b4b60]'}`">
             {{ item.name() }}

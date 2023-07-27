@@ -2,13 +2,35 @@ import { invoke } from '@tauri-apps/api';
 import { logger } from '~/utils/logger';
 
 export class ViewTrack {
-  path: string;
-  constructor(raw: RawTrack) {
-    this.path = raw.path;
+  constructor(public raw: RawTrack) {
+  }
+
+  key(): string {
+    return this.raw.path;
   }
 
   name(): string {
-    return this.path.split('\\').pop()!;
+    return this.raw.title ?? this.raw.path.split(/[\\/]/).pop() ?? this.raw.path;
+  }
+
+  artist(): string {
+    return this.raw.artist ?? '';
+  }
+
+  album(): string {
+    return this.raw.album ?? '';
+  }
+
+  genre(): string {
+    return this.raw.genre ?? '';
+  }
+
+  duration(): number {
+    return this.raw.duration;
+  }
+
+  year(): number | undefined {
+    return this.raw.year;
   }
 }
 
@@ -20,6 +42,12 @@ export interface LocalFolder {
 
 export interface RawTrack {
   path: string
+  duration: number
+  artist?: string
+  album?: string
+  title?: string
+  genre?: string
+  year?: number
 }
 
 export async function updateFolder(path: string): Promise<RawTrack[]> {
