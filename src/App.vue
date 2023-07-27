@@ -2,12 +2,25 @@
 import { invoke } from '@tauri-apps/api';
 import { onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
+import SmoothScrollbar from 'smooth-scrollbar';
 import { inTauri } from './platforms';
 import { useQSyncStore } from './store';
 import QPlayer from './components/QPlayer.vue';
 import TitleBar from '~/components/TitleBar.vue';
 import Navigator from '~/components/Navigator.vue';
 import { defaultTheme } from '~/utils/theme';
+
+// originally created by @DjSt3rios
+// see: https://github.com/idiotWu/smooth-scrollbar/discussions/367
+class ShiftScrollPlugin extends SmoothScrollbar.ScrollbarPlugin {
+  static pluginName = 'ShiftScroll';
+
+  transformDelta(delta: any, fromEvent: any) {
+    return /wheel/.test(fromEvent.type) && fromEvent.shiftKey ? { x: delta.y, y: delta.x } : delta;
+  }
+}
+
+SmoothScrollbar.use(ShiftScrollPlugin);
 
 const root = ref<HTMLElement>();
 

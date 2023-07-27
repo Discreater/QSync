@@ -17,6 +17,7 @@ module.exports = {
         menu_d_bg: '#202020',
         main: 'var(--main)',
         passion: '#f97316',
+        highlight: '#4b4b4b60',
       },
       transitionProperty: {
         position: 'top, bottom',
