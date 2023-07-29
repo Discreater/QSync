@@ -1,41 +1,22 @@
 <script setup lang="ts">
-import type { Component } from 'vue';
 import { computed, ref, toRefs } from 'vue';
-import QHoverButton from './QHoverButton.vue';
-
-interface LeftValue {
-  type: 'value'
-  formatter?: (v: number) => string
-}
-
-interface LeftIcon {
-  type: 'icon'
-  icon: Component
-}
-
-interface RightValue {
-  type: 'value'
-  formatter?: (v: number) => string
-}
 
 interface Props {
   min?: number
   max?: number
   value?: number
-  left?: LeftValue | LeftIcon
-  right?: RightValue
 }
 const props = defineProps<Props>();
 const emit = defineEmits<{
   'update:value': [value: number]
   'input': [value: number]
 }>();
-const { min, max, value } = toRefs(props);
+const { min, max } = toRefs(props);
 
 const sliderValue = ref(0);
 const dragging = ref(false);
 
-const showValue = computed(() => dragging.value ? sliderValue.value : value?.value);
+const showValue = computed(() => props.value === undefined ? sliderValue.value : (dragging.value ? sliderValue.value : props.value));
 const showValuePercent = computed(() => (max?.value && showValue?.value) ? (showValue.value / max.value) : 0);
 
 function onMouseDown() {
@@ -56,8 +37,7 @@ function onInput(e: InputEvent) {
 
 <template>
   <div class="flex items-center h-9 justify-between gap-4 min-w-[20rem]">
-    <span v-if="left?.type === 'value'" class="text-xs w-14 pl-1"> {{ left.formatter ? left.formatter(showValue ?? 0) : showValue }} </span>
-    <QHoverButton v-else-if="left?.type === 'icon'" :icon="left.icon" :disabled="true" />
+    <slot name="left" :value="showValue" />
     <input
       class="grow"
       type="range" :min="min" :max="max ?? 100" :value="showValue" :style="{
@@ -65,7 +45,7 @@ function onInput(e: InputEvent) {
       }" :title="showValue?.toString()"
       @mousedown="onMouseDown" @input="onInput($event as InputEvent)" @mouseup="onMouseUp"
     >
-    <span v-if="right" class="text-xs text-right w-14 pr-1">{{ showValue ? (right.formatter ? right.formatter(showValue) : showValue) : '' }}</span>
+    <slot name="right" :value="showValue" />
   </div>
 </template>
 

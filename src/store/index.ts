@@ -1,7 +1,7 @@
 import { createPinia, defineStore } from 'pinia';
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate';
-import { updateFolder } from '~/sources/folder';
 import type { LocalFolder, RawTrack } from '~/sources/folder';
+import { ViewTrack, getTrackInfo, updateFolder } from '~/sources/folder';
 
 import type { JellyfinClientOptions } from '~/sources/jellyfin';
 import { shuffle } from '~/utils';
@@ -51,6 +51,7 @@ export const useQSyncStore = defineStore('qsync', {
     config: {
       volume: 100,
     },
+    viewTracks: new Map<string, ViewTrack>(),
   }),
   actions: {
     addMusicFolder(folder: string) {
@@ -71,6 +72,25 @@ export const useQSyncStore = defineStore('qsync', {
       const tracks = await updateFolder(folder);
       f.tracks = tracks;
       f.updating = false;
+    },
+    async getShowTrack(path: string): Promise<ViewTrack> {
+      const viewed = this.viewTracks.get(path);
+      if (viewed)
+        return viewed;
+
+      const stored = this.musicFolders.flatMap(v => v.tracks).find(v => v.path === path);
+      if (!stored) {
+        logger.error('can\'t find track', path);
+        return ViewTrack.empty;
+      } else {
+        if (!stored.fullLoaded) {
+          const full = await getTrackInfo(path, true);
+          Object.assign(stored, full);
+        }
+        const view = new ViewTrack(stored);
+        this.viewTracks.set(path, view);
+        return view;
+      }
     },
     removeFolder(folder: string) {
       const f = this.musicFolders.findIndex(v => v.path === folder);
@@ -132,7 +152,9 @@ export const useQSyncStore = defineStore('qsync', {
       this.playbackQueue.progress = 0;
     },
   },
-  persist: true,
+  persist: {
+    paths: ['musicFolders', 'locale', 'playbackQueue', 'jellyfinSource', 'config'],
+  },
 });
 
 export const pinia = createPinia();

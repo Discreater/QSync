@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-white/10">
+  <div class="hover:bg-white/10 rounded-md p-1">
     <slot />
   </div>
 </template>

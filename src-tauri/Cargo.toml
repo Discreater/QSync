@@ -25,6 +25,7 @@ musync = { version = "0.1.0", path = "musync" }
 lofty = "0.15.0"
 id3 = "1.7.0"
 thiserror = "1.0.44"
+tauri-plugin-window-state = { git = "https://github.com/tauri-apps/plugins-workspace", branch = "v1" }
 
 [features]
 # by default Tauri runs in production mode

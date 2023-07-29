@@ -46,7 +46,7 @@ function handleItemClick(item: Item) {
 <template>
   <div :class="`h-full relative select-none ${responsible ? 'hidden sm:flex md:flex' : ''} flex-col justify-between`">
     <div
-      class="transition-position duration-400 absolute w-[3px] h-5 my-2.5 rounded-md bg-main" :style="{
+      class="transition-position duration-400 absolute w-[3px] h-5 my-2.5 rounded-md bg-passion" :style="{
         top: handlerTop,
       }"
     />

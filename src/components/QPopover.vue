@@ -9,6 +9,8 @@ const show = ref(false);
     <div @click="show = !show">
       <slot />
     </div>
+    <!-- mask -->
+    <div v-if="show" class="fixed inset-0 bg-transparent w-screen h-screen" @click="show = false" />
     <div v-show="show" class="absolute bottom-10 right-0 ring ring-black/10 bg-main_d_bg shadow-lg p-4 rounded-lg transition-all">
       <slot name="popover" />
     </div>

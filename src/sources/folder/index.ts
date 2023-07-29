@@ -1,7 +1,12 @@
 import { invoke } from '@tauri-apps/api';
-import { logger } from '~/utils/logger';
 
 export class ViewTrack {
+  static empty = new ViewTrack({
+    path: '@undefined@',
+    duration: 0,
+  });
+
+  url: string | undefined;
   constructor(public raw: RawTrack) {
   }
 
@@ -32,6 +37,17 @@ export class ViewTrack {
   year(): number | undefined {
     return this.raw.year;
   }
+
+  picture_url(): string | undefined {
+    if (this.url === undefined) {
+      if (!this.raw.pictures || this.raw.pictures?.length === 0)
+        return undefined;
+      const p1 = this.raw.pictures[0];
+      this.url = URL.createObjectURL(p1.data);
+      return this.url;
+    }
+    return this.url;
+  }
 }
 
 export interface LocalFolder {
@@ -48,14 +64,26 @@ export interface RawTrack {
   title?: string
   genre?: string
   year?: number
+  pictures?: Picture[]
+  fullLoaded?: boolean
+}
+
+export interface Picture {
+  mime_type: string
+  picture_type: number
+  description: string
+  data: Blob
 }
 
 export async function updateFolder(path: string): Promise<RawTrack[]> {
   return (await invoke('update_folder', { dir: path }) as RawTrack[]);
 }
 
-export async function readTrack(path: string): Promise<Blob> {
-  logger.trace('read track from', path);
-  const data = Uint8Array.from(await invoke('read_track', { path }));
-  return new Blob([data.buffer], { type: 'audio/mpeg' });
+export async function getTrackInfo(path: string, full: boolean): Promise<RawTrack> {
+  const raw = (await invoke('get_track_info', { path, full }) as RawTrack);
+  raw.pictures?.forEach((p) => {
+    p.data = new Blob([Uint8Array.from(p.data as unknown as number[]).buffer], { type: p.mime_type });
+  });
+  raw.fullLoaded = true;
+  return raw;
 }
