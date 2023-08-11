@@ -6,11 +6,11 @@ use serde::{ser::Serializer, Serialize};
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
   #[error(transparent)]
-  IoError(#[from] std::io::Error),
+  Io(#[from] std::io::Error),
   #[error(transparent)]
-  LoftyError(#[from] lofty::LoftyError),
+  Lofty(#[from] lofty::LoftyError),
   #[error(transparent)]
-  ParseError(#[from] ParseIntError)
+  Parse(#[from] ParseIntError),
 }
 
 // we must manually implement serde::Serialize

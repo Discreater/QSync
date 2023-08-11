@@ -8,9 +8,8 @@ import QPopover from './QPopover.vue';
 import HoverLayer from './HoverLayer.vue';
 import H2 from './typo/H2.vue';
 import type { ViewTrack } from '~/sources/folder';
-import { getTrackInfo } from '~/sources/folder';
-import type { PlaybackQueue, Track } from '~/store';
-import { sameTrack, useQSyncStore } from '~/store';
+import type { Track } from '~/store';
+import { getShowTrack, sameTrack, useConfigStore, usePlayerStore, useQSyncStore } from '~/store';
 import { logger } from '~/utils/logger';
 import IconArrowShuffle from '~icons/fluent/arrow-shuffle-24-regular';
 import IconPrevious from '~icons/fluent/previous-24-filled';
@@ -26,10 +25,13 @@ const router = useRouter();
 const route = useRoute();
 
 const audio = new Audio();
-const store = useQSyncStore();
+const qsyncStore = useQSyncStore();
+const playerStore = usePlayerStore();
+const configStore = useConfigStore();
 
 const currentTrack = ref<Track>();
 
+// in seconds (float point)
 const localProgress = ref(0);
 const duration = ref(0);
 
@@ -37,9 +39,6 @@ function loadTrack(track: Track) {
   logger.trace(`load new track: ${track.path}`);
   currentTrack.value = track;
   audio.src = convertFileSrc(track.path);
-  getTrackInfo(track.path, true).then((info) => {
-    track.pictures = info.pictures;
-  });
   if (route.name === 'lyric') {
     router.replace({
       name: 'lyric',
@@ -50,26 +49,33 @@ function loadTrack(track: Track) {
   }
 }
 
-async function updatePlayer(playback: PlaybackQueue) {
+async function updatePlayer(pState: typeof playerStore) {
+  const playback = qsyncStore.playbackQueue;
+  if (playback.length === 0)
+    return;
+
   // ignore the same track
-  if (!currentTrack.value || !sameTrack(playback.queue[playback.current], currentTrack.value))
-    loadTrack(playback.queue[playback.current]);
+  if (!currentTrack.value || !sameTrack(playback[pState.current], currentTrack.value))
+    loadTrack(playback[pState.current]);
 
-  if (Math.abs(playback.progress - audio.currentTime) > 1)
-    audio.currentTime = playback.progress;
+  if (Math.abs(pState.progress - audio.currentTime * 1000) > 1000) {
+    logger.debug('update time');
+    localProgress.value = pState.progress / 1000;
+    audio.currentTime = localProgress.value;
+  }
 
-  if (playback.playing && audio.paused)
+  if (pState.playing && audio.paused)
     await audio.play();
-  else if (!playback.playing && !audio.paused)
+  else if (!pState.playing && !audio.paused)
     audio.pause();
 }
 
-watch((store.playbackQueue), async (playback) => {
-  await updatePlayer(playback);
+watch(playerStore, async (pState) => {
+  await updatePlayer(pState);
 }, { deep: true });
 
 onMounted(async () => {
-  await updatePlayer(store.playbackQueue);
+  await updatePlayer(playerStore);
 });
 onUnmounted(() => {
   audio.pause();
@@ -77,14 +83,13 @@ onUnmounted(() => {
 
 audio.onended = () => {
   audio.pause();
-  store.nextTrack();
+  qsyncStore.nextTrack();
 };
+localProgress.value = playerStore.progress;
 audio.ontimeupdate = () => {
   localProgress.value = audio.currentTime;
-  store.$patch((state) => {
-    state.playbackQueue.progress = audio.currentTime;
-  });
 };
+
 audio.onloadedmetadata = () => {
   duration.value = audio.duration;
 };
@@ -92,20 +97,20 @@ audio.onloadedmetadata = () => {
 const viewTrack = ref<ViewTrack>();
 watch(currentTrack, (track) => {
   if (track) {
-    store.getShowTrack(track.path).then((t) => {
+    getShowTrack(track.path).then((t) => {
       viewTrack.value = t;
     });
   }
 });
 
 function handlePrevious() {
-  store.previousTrack();
+  qsyncStore.previousTrack();
 }
 function handleNext() {
-  store.nextTrack();
+  qsyncStore.nextTrack();
 }
 function togglePlay() {
-  store.togglePlay();
+  playerStore.togglePlay();
 }
 
 function formatTime(time: number) {
@@ -116,19 +121,18 @@ function formatTime(time: number) {
 }
 
 function onSliderUpdate(v: number) {
-  store.$patch((state) => {
-    state.playbackQueue.progress = v;
-  });
+  localProgress.value = v;
+  playerStore.updateProgress(v * 1000);
 }
-watch(store.config, (config) => {
+watch(configStore, (config) => {
   audio.volume = config.volume / 100;
 });
-audio.volume = store.config.volume / 100;
+audio.volume = configStore.volume / 100;
 function onVolumeUpdate(v: number) {
   v = Math.max(0, v);
   v = Math.min(100, v);
-  store.$patch((state) => {
-    state.config.volume = v;
+  configStore.$patch({
+    volume: v,
   });
 }
 function onInfoCardClick() {
@@ -146,37 +150,40 @@ const showCardImg = computed(() => route.name !== 'lyric');
 
 <template>
   <div class="h-[118px] flex flex-col border-solid border-t border-black/30 gap-1 p-1">
-    <QSlider class="px-3" :value="store.playbackQueue.progress" :min="0" :max="duration" @update:value="onSliderUpdate">
+    <QSlider class="px-3" :value="localProgress" :min="0" :max="duration" @update:value="onSliderUpdate">
       <template #left="{ value }">
         <span class="text-xs w-14"> {{ formatTime(value) }} </span>
       </template>
       <template #right="{ value }">
-        <span class="text-xs text-right w-14">{{ duration && value ? `${formatTime(duration - value)}` : '' }}</span>
+        <span class="text-xs text-right w-14">{{ duration && value != null ? `${formatTime(duration - value)}` : ''
+        }}</span>
       </template>
     </QSlider>
     <div class="grow flex justify-between items-center p-1">
-      <HoverLayer class="flex-1 h-full flex gap-5 select-none cursor-default min-w-0" @click="onInfoCardClick()">
-        <img
-          v-if="showCardImg" :src="viewTrack?.picture_url()"
-          :class="`object-scale-down w-20 border-white/10 border ${viewTrack?.picture_url() ? '' : 'invisible'}`"
-        >
-        <div class="flex flex-col min-w-0">
-          <H2 class="truncate" :title="viewTrack?.name">
-            {{ viewTrack?.name() }}
-          </H2>
-          <p class="truncate" :title="viewTrack?.artist()">
-            {{ viewTrack?.artist() }}
-          </p>
-        </div>
-      </HoverLayer>
+      <div class="flex-1 h-full flex">
+        <HoverLayer class="flex select-none cursor-default min-w-0" @click="onInfoCardClick()">
+          <img
+            v-if="showCardImg" :src="viewTrack?.picture_url()"
+            :class="`object-scale-down w-20 border-white/10 border ${viewTrack?.picture_url() ? '' : 'invisible'}`"
+          >
+          <div :class="`flex flex-col min-w-0 transition-all duration-300 ${showCardImg ? 'ml-5' : 'ml-2 mr-3'}`">
+            <H2 class="truncate" :title="viewTrack?.name()">
+              {{ viewTrack?.name() }}
+            </H2>
+            <p class="truncate" :title="viewTrack?.artist()">
+              {{ viewTrack?.artist() }}
+            </p>
+          </div>
+        </HoverLayer>
+      </div>
       <div class="flex-1 flex justify-center items-center gap-3">
-        <QHoverButton :icon="IconArrowShuffle" @click="store.shufflePLayback()" />
+        <QHoverButton :icon="IconArrowShuffle" @click="qsyncStore.shufflePLayback()" />
         <QHoverButton :icon="IconPrevious" @click="handlePrevious" />
         <button
           class="rounded-full w-14 h-14 text-2xl flex justify-center items-center bg-gradient-to-br from-orange-500 to-purple-500"
           @click="togglePlay"
         >
-          <IconPause v-if="store.playbackQueue.playing" />
+          <IconPause v-if="playerStore.playing" />
           <IconPlay v-else />
         </button>
         <QHoverButton :icon="IconNext" @click="handleNext" />
@@ -186,7 +193,7 @@ const showCardImg = computed(() => route.name !== 'lyric');
         <QPopover>
           <QHoverButton :icon="IconVolume" />
           <template #popover>
-            <QSlider :min="0" :max="100" :value="store.config.volume" @input="onVolumeUpdate">
+            <QSlider :min="0" :max="100" :value="configStore.volume" @input="onVolumeUpdate">
               <template #left>
                 <QHoverButton :icon="IconVolume" :disabled="true" />
               </template>
@@ -197,7 +204,6 @@ const showCardImg = computed(() => route.name !== 'lyric');
           </template>
         </QPopover>
         <QHoverButton :icon="IconMore" :disabled="true" />
-        <!-- todo controller -->
       </div>
     </div>
   </div>

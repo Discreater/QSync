@@ -43,7 +43,8 @@ export class ViewTrack {
       if (!this.raw.pictures || this.raw.pictures?.length === 0)
         return undefined;
       const p1 = this.raw.pictures[0];
-      this.url = URL.createObjectURL(p1.data);
+      const blob = new Blob([Uint8Array.from(p1.data as unknown as number[]).buffer], { type: p1.mime_type });
+      this.url = URL.createObjectURL(blob);
       return this.url;
     }
     return this.url;
@@ -72,7 +73,7 @@ export interface Picture {
   mime_type: string
   picture_type: number
   description: string
-  data: Blob
+  data: number[]
 }
 
 export async function updateFolder(path: string): Promise<RawTrack[]> {
@@ -81,9 +82,6 @@ export async function updateFolder(path: string): Promise<RawTrack[]> {
 
 export async function getTrackInfo(path: string, full: boolean): Promise<RawTrack> {
   const raw = (await invoke('get_track_info', { path, full }) as RawTrack);
-  raw.pictures?.forEach((p) => {
-    p.data = new Blob([Uint8Array.from(p.data as unknown as number[]).buffer], { type: p.mime_type });
-  });
   raw.fullLoaded = true;
   return raw;
 }

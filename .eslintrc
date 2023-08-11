@@ -10,6 +10,17 @@
       "always"
     ],
     "brace-style": "off",
-    "@typescript-eslint/brace-style": ["error", "1tbs"]
+    "@typescript-eslint/brace-style": [
+      "error",
+      "1tbs"
+    ],
+    "quotes": "off",
+    "@typescript-eslint/quotes": [
+      "error",
+      "single",
+      {
+        "avoidEscape": true
+      }
+    ]
   }
 }

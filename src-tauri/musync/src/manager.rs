@@ -2,7 +2,7 @@ use std::vec;
 
 use async_trait::async_trait;
 use sqlx::{QueryBuilder, Sqlite, SqlitePool};
-use tracing::{warn, trace};
+use tracing::{trace, warn};
 
 use crate::{Musync, MusyncError, Musyncer, PlaylistId, TrackId, UserId};
 const BIND_LIMIT: usize = 256;

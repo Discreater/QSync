@@ -6,7 +6,7 @@ import { onMounted, onUnmounted, ref } from 'vue';
 import IconArrowShuffle from '~icons/fluent/arrow-shuffle-24-regular';
 import H1 from '~/components/typo/H1.vue';
 import Basic from '~/layouts/Basic.vue';
-import { useQSyncStore } from '~/store';
+import { usePlayerStore, useQSyncStore } from '~/store';
 import { ViewTrack } from '~/sources/folder';
 import QButton from '~/components/QButton.vue';
 import { pad, shuffle } from '~/utils';
@@ -19,6 +19,7 @@ import type { Column } from '~/components/QTable.vue';
 
 const { t } = useI18n();
 const store = useQSyncStore();
+const playerStore = usePlayerStore();
 const container = ref<HTMLDivElement | null>(null);
 const scrollbar = ref<Scrollbar | null>(null);
 
@@ -43,12 +44,7 @@ function shufflePlay() {
 }
 
 function playByIdx(idx: number) {
-  store.$patch((state) => {
-    state.playbackQueue.current = idx;
-    state.playbackQueue.queue = views.value.map(v => v.raw);
-    state.playbackQueue.playing = true;
-    state.playbackQueue.progress = 0;
-  });
+  store.play(views.value.map(v => v.raw), idx);
 }
 
 function locateToPlaying() {
@@ -71,7 +67,7 @@ function locateToTop() {
 }
 
 function rowClassName(row: ViewTrack) {
-  if (store.playbackQueue.queue[store.playbackQueue.current]?.path === row.raw.path)
+  if (store.playbackQueue[playerStore.current]?.path === row.raw.path)
     return 'playing';
   return '';
 }

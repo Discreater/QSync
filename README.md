@@ -25,4 +25,4 @@
 
 ## Roadmap
 
-- [ ] Only record track start time. Not the current progress.
+- [x] Only record track start time. Not the current progress.

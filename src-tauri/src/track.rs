@@ -1,10 +1,10 @@
 use crate::error::Result;
-use lofty::{Accessor, AudioFile, ItemKey, TaggedFileExt, Picture};
+use lofty::{Accessor, AudioFile, ItemKey, Picture, TaggedFileExt};
 use serde::{
   ser::{SerializeSeq, SerializeStruct},
   Serialize,
 };
-use std::{borrow::Cow, path::PathBuf};
+use std::borrow::Cow;
 
 #[derive(Serialize, Default)]
 pub struct Track {

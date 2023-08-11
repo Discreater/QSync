@@ -19,6 +19,11 @@ export function shuffle<T>(array: T[]): T[] {
   return array;
 }
 
+/** Make sure return positive */
+export function mod(n: number, m: number) {
+  return ((n % m) + m) % m;
+}
+
 export function pad(num: number | string, length: number): string {
   const str = typeof num === 'number' ? `${num}` : num;
   return str.padStart(length, '0');
