@@ -18,6 +18,7 @@ fn greet(name: &str) -> String {
 
 fn main() {
   tauri::Builder::default()
+    .manage(AppState::default())
     .plugin(tauri_plugin_window_state::Builder::default().build())
     .invoke_handler(tauri::generate_handler![
       update_folder,
@@ -25,8 +26,20 @@ fn main() {
       player::read_track,
       track::get_track_info,
     ])
+    .setup(|app| {
+      let _data_dir = app
+        .path_resolver()
+        .app_data_dir()
+        .expect("failed to resolve app data dir");
+      todo!()
+    })
     .run(tauri::generate_context!())
     .expect("error while running tauri application");
+}
+
+#[derive(Default)]
+pub struct AppState {
+  pub playback: Vec<Track>,
 }
 
 fn add_track(dir: String, tracks: &mut Vec<Track>) -> Result<()> {

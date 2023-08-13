@@ -19,7 +19,7 @@ import IconPause from '~icons/fluent/pause-20-filled';
 import IconRepeat from '~icons/fluent/arrow-repeat-all-24-regular';
 import IconVolume from '~icons/fluent/speaker-2-24-regular';
 import IconMore from '~icons/fluent/more-horizontal-24-regular';
-import { pad } from '~/utils';
+import { formatTime } from '~/utils';
 
 const router = useRouter();
 const route = useRoute();
@@ -113,13 +113,6 @@ function togglePlay() {
   playerStore.togglePlay();
 }
 
-function formatTime(time: number) {
-  const hour = Math.floor(time / 3600);
-  const min = pad(Math.floor(time / 60), 2);
-  const sec = pad(Math.floor(time % 60), 2);
-  return `${hour}:${min}:${sec}`;
-}
-
 function onSliderUpdate(v: number) {
   localProgress.value = v;
   playerStore.updateProgress(v * 1000);
@@ -146,16 +139,21 @@ function onInfoCardClick() {
   }
 }
 const showCardImg = computed(() => route.name !== 'lyric');
+
+function artistAlbum(view: ViewTrack | undefined) {
+  if (view)
+    return `${view.artist()} • ${view.album()}`;
+}
 </script>
 
 <template>
   <div class="h-[118px] flex flex-col border-solid border-t border-black/30 gap-1 p-1">
     <QSlider class="px-3" :value="localProgress" :min="0" :max="duration" @update:value="onSliderUpdate">
       <template #left="{ value }">
-        <span class="text-xs w-14"> {{ formatTime(value) }} </span>
+        <span class="text-xs w-14"> {{ formatTime(value, 'hh:mm:ss') }} </span>
       </template>
       <template #right="{ value }">
-        <span class="text-xs text-right w-14">{{ duration && value != null ? `${formatTime(duration - value)}` : ''
+        <span class="text-xs text-right w-14">{{ duration && value != null ? `${formatTime(duration - value, 'hh:mm:ss')}` : ''
         }}</span>
       </template>
     </QSlider>
@@ -170,8 +168,8 @@ const showCardImg = computed(() => route.name !== 'lyric');
             <H2 class="truncate" :title="viewTrack?.name()">
               {{ viewTrack?.name() }}
             </H2>
-            <p class="truncate" :title="viewTrack?.artist()">
-              {{ viewTrack?.artist() }}
+            <p class="truncate font-thin" :title="artistAlbum(viewTrack)">
+              {{ artistAlbum(viewTrack) }}
             </p>
           </div>
         </HoverLayer>

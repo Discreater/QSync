@@ -30,8 +30,13 @@ export class ViewTrack {
     return this.raw.genre ?? '';
   }
 
+  /** @returns in millisecond */
   duration(): number {
     return this.raw.duration;
+  }
+
+  durationInSec(): number {
+    return Math.floor(this.duration() / 1000);
   }
 
   year(): number | undefined {

@@ -9,6 +9,7 @@ import { usePlayerStore, useQSyncStore } from '~/store';
 import QTable from '~/components/QTable.vue';
 import QHoverButton from '~/components/QHoverButton.vue';
 import IconPlay from '~icons/fluent/play-24-regular';
+import { formatTime } from '~/utils';
 
 const { t } = useI18n();
 const store = useQSyncStore();
@@ -77,7 +78,7 @@ const columns: Column[] = [
             {{ row.genre() }}
           </template>
           <template v-else-if="column.key === 'duration'">
-            {{ row.duration() }}
+            {{ formatTime(row.durationInSec()) }}
           </template>
         </template>
       </QTable>

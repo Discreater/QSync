@@ -4,12 +4,12 @@ export interface Column {
   title?: string
 };
 
-const { columns, data } = defineProps<{ columns: Column[]; data: Row[]; rowClassName?: (row: Row) => string }>();
+const { columns, data, showHead } = defineProps<{ columns: Column[]; data: Row[]; showHead?: boolean; rowClassName?: (row: Row) => string }>();
 </script>
 
 <template>
   <table class="text-sm border-separate border-spacing-y-2">
-    <thead>
+    <thead v-if="showHead">
       <tr>
         <th v-for="col in columns" :key="col.key">
           <slot name="headerCell" :column="col">

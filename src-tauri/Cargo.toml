@@ -10,7 +10,7 @@ edition = "2021"
 rust-version = "1.59"
 
 [workspace]
-members = ["abi", "musync"]
+members = [".", "abi", "musync", "migration", "entity"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -26,6 +26,7 @@ lofty = "0.15.0"
 id3 = "1.7.0"
 thiserror = "1.0.44"
 tauri-plugin-window-state = { git = "https://github.com/tauri-apps/plugins-workspace", branch = "v1" }
+abi = { version = "0.1.0", path = "abi" }
 
 [features]
 # by default Tauri runs in production mode

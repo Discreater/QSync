@@ -7,14 +7,17 @@ edition = "2021"
 
 [dependencies]
 abi = { version = "0.1.0", path = "../abi" }
-anyhow = "1.0.68"
-async-trait = "0.1.64"
-sqlx = { version = "0.7", features = ["runtime-tokio-rustls", "sqlite", "macros", "migrate", "chrono", "uuid"] }
-thiserror = "1.0.38"
+anyhow = "1"
+async-trait = "0.1.73"
+thiserror = "1"
 tracing = "0.1.37"
+sea-orm = { version = "0.12", features = [ "sqlx-sqlite", "runtime-tokio-rustls", "macros", "with-json" ] }
+migration = { path = "../migration" }
+entity = { path = "../entity" }
+chrono = "0.4.26"
 
 [dev-dependencies]
 tokio = { version = "1.25.0", features = ["full"] }
 # sqlx-db-tester = { path = "../../../sqlx-db-tester"}
-sqlx-db-tester = { git = "https://github.com/Discreater/sqlx-db-tester", branch = "sqlite"}
+# sqlx-db-tester = { git = "https://github.com/Discreater/sqlx-db-tester", branch = "sqlite"}
 tracing-subscriber = "0.3.16"

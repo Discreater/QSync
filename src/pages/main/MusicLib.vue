@@ -9,7 +9,7 @@ import Basic from '~/layouts/Basic.vue';
 import { usePlayerStore, useQSyncStore } from '~/store';
 import { ViewTrack } from '~/sources/folder';
 import QButton from '~/components/QButton.vue';
-import { pad, shuffle } from '~/utils';
+import { formatTime, shuffle } from '~/utils';
 import QHoverButton from '~/components/QHoverButton.vue';
 import IconPlay from '~icons/fluent/play-24-regular';
 import IconLocation from '~icons/fluent/my-location-24-regular';
@@ -101,13 +101,6 @@ const columns: Column[] = [
     title: 'Duration',
   },
 ];
-
-function formatTime(time: number) {
-  time = Math.floor(time / 1000);
-  const minutes = pad(Math.floor(time / 60), 2);
-  const seconds = pad(time % 60, 2);
-  return `${minutes}:${seconds}`;
-}
 </script>
 
 <template>
@@ -148,7 +141,7 @@ function formatTime(time: number) {
             {{ row.genre() }}
           </template>
           <template v-else-if="column.key === 'duration'">
-            {{ formatTime(row.duration()) }}
+            {{ formatTime(row.durationInSec()) }}
           </template>
         </template>
       </QTable>

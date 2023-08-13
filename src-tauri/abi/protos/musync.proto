@@ -6,11 +6,11 @@ import "google/protobuf/timestamp.proto";
 // Playlist
 message Playlist {
   // unique id for the playlist
-  int64 id = 1;
+  int32 id = 1;
   // id of the owner of the playlist
-  int64 owner_id = 2;
+  int32 owner_id = 2;
   // ids of tracks in the playlist
-  repeated int64 track_ids = 3;
+  repeated int32 track_ids = 3;
   // name of the playlist
   string name = 4;
   // description of the playlist
@@ -22,35 +22,47 @@ message Playlist {
 }
 
 // CurrentPlaylist controller
-message CurrentPlaylist {
+message Playback {
   // unique id for the current playlist
-  int64 id = 1;
+  int32 id = 1;
   // id of the playlist
-  int64 playlist_id = 2;
-  // id of the current playing track
-  int64 current_track_id = 3;
+  int32 playlist_id = 2;
+  // index of the current playing track in the playlist
+  uint32 position = 3;
   // is the playlist playing
   bool playing = 4;
-  // time when the current track started playing
+  // time when the current track started playing.
+  // When not playing, it represents the progress directly.
+  // In milliseconds
   google.protobuf.Timestamp started_at = 5;
+  uint32 paused_at = 6;
 }
 
 // Track
 message Track {
   // unique id for the track
-  int64 id = 1;
-  // name of the track
-  string name = 2;
+  int32 id = 1;
+  // title of the track
+  string title = 2;
   // artist of the track
-  string artist = 3;
+  optional string artist = 3;
   // album of the track
-  string album = 4;
+  optional string album = 4;
   // duration of the track in milliseconds
-  int32 duration = 5;
+  optional uint32 duration = 5;
+  // genre of the track
+  optional string genre = 6;
+  // year of the track
+  optional uint32 year = 7;
+  // time when the track is created
+  google.protobuf.Timestamp created_at = 8;
+  // time of the last update
+  google.protobuf.Timestamp updated_at = 9;
   // local source of the track
-  optional LocalSource local_src = 6;
+  optional LocalSource local_src = 10;
   // netease source of the track
-  optional NeteaseSource netease_src = 7;
+  optional NeteaseSource netease_src = 11;
+
 }
 
 // NeteaseSource, not implemented yet
@@ -65,9 +77,13 @@ message LocalSource {
 // User
 message User {
   // unique id for the user
-  int64 id = 1;
+  int32 id = 1;
   // name of the user
   string name = 2;
+  // time when the user is created
+  google.protobuf.Timestamp created_at = 3;
+  // time of the last update
+  google.protobuf.Timestamp updated_at = 4;
 }
 
 // Create playlist request
@@ -85,15 +101,15 @@ message CreatePlaylistResponse {
 // Delete playlist request
 message DeletePlaylistsRequest {
   // Ids of playlists to be deleted
-  repeated int64 ids = 1;
+  repeated int32 ids = 1;
 }
 
 // Query playlist by user id and track id
 message PlaylistQuery {
   // which user has the playlist
-  optional int64 user_id = 1;
+  optional int32 user_id = 1;
   // Query by contained track id
-  optional int64 track_id = 2;
+  optional int32 track_id = 2;
   // Query by name
   optional string name = 3;
 }
@@ -107,11 +123,11 @@ message QueryPlaylistsRequest {
 // Update playlist: add/remove tracks, update name and description
 message PlaylistUpdate {
   // Id of the playlist to be updated
-  int64 id = 1;
+  int32 id = 1;
   // Ids of tracks to be added
-  repeated int64 added_track_ids = 2;
+  repeated int32 added_track_ids = 2;
   // Ids of tracks to be removed
-  repeated int64 removed_track_ids = 3;
+  repeated int32 removed_track_ids = 3;
   // New name of the playlist
   optional string name = 4;
   // New description of the playlist
@@ -141,13 +157,17 @@ message CreateTrackResponse {
 // Query track
 message TrackQuery {
   // Query by which playlist contains the track
-  optional int64 playlist_id = 1;
-  // Query by name
-  optional string name = 2;
+  optional int32 playlist_id = 1;
+  // Query by title
+  optional string title = 2;
   // Query by artist
   optional string artist = 3;
   // Query by album
   optional string album = 4;
+  // Query by genre
+  optional string genre = 5;
+  // Query by year
+  optional uint32 year = 6;
 }
 
 // Query track request
@@ -158,18 +178,22 @@ message QueryTracksRequest {
 
 message TrackUpdate {
   // Id of the track to be updated
-  int64 id = 1;
-  // New name of the track
-  string name = 2;
+  int32 id = 1;
+  // New title of the track
+  optional string title = 2;
   // New artist of the track
-  string artist = 3;
+  optional string artist = 3;
   // New album of the track
-  string album = 4;
-  int32 duration = 5;
+  optional string album = 4;
+  optional uint32 duration = 5;
+  // New genre of the track
+  optional string genre = 6;
+  // New year of the track
+  optional uint32 year = 7;
   // New local source of the track
-  optional LocalSource local_src = 6;
+  optional LocalSource local_src = 8;
   // New netease source of the track
-  optional NeteaseSource netease_src = 7;
+  optional NeteaseSource netease_src = 9;
 }
 
 // Update track request
@@ -184,7 +208,7 @@ message UpdateTrackResponse {
 // Delete tracks request
 message DeleteTracksRequest {
   // Ids of tracks to be deleted
-  repeated int64 track_ids = 1;
+  repeated int32 track_ids = 1;
 }
 
 // Create user request
@@ -209,7 +233,7 @@ message QueryUsersRequest { UserQuery query = 1; }
 
 message UserUpdate {
   // Id of the user to be updated
-  int64 id = 1;
+  int32 id = 1;
   // New name of the user
   string name = 2;
 }
@@ -226,7 +250,7 @@ message UpdateUserResponse {
 // Delete users request
 message DeleteUsersRequest {
   // Ids of users to be deleted
-  repeated int64 ids = 1;
+  repeated int32 ids = 1;
 }
 
 // Musync service

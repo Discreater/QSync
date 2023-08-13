@@ -1,18 +1,18 @@
 # QSync
 
-## Roadmap
-
-- basic music player
-- vue router
-
 ### MuSync
-
-- Music Player
-- Local Music Library
-- Remote Music Library
+![playing](docs/img/playing.png)
+- [x] Music Player
+- [x] Local Music Library
+- [] Unified Track ID
+- [] Remote Music Library
    - Netease
    - QQ Music
-- Lyric
+   - Bilibili
+   - Migu
+   - Youtube
+- [] Lyric
+- [] Download metadata
 
 ## Tech Stack
 
@@ -22,7 +22,3 @@
    - Vue
    - Typescript
    - TailwindCSS
-
-## Roadmap
-
-- [x] Only record track start time. Not the current progress.

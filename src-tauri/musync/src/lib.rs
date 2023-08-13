@@ -1,17 +1,17 @@
-mod error;
+pub mod error;
 mod manager;
 
 use async_trait::async_trait;
 pub use error::MusyncError;
-use sqlx::SqlitePool;
+use sea_orm::DatabaseConnection;
 
-pub type PlaylistId = i64;
-pub type TrackId = i64;
-pub type UserId = i64;
+pub type PlaylistId = i32;
+pub type TrackId = i32;
+pub type UserId = i32;
 
 #[derive(Debug)]
 pub struct Musyncer {
-  pool: SqlitePool,
+  db: DatabaseConnection,
 }
 
 #[async_trait]
@@ -28,7 +28,7 @@ pub trait Musync {
     playlist: abi::PlaylistUpdate,
   ) -> Result<abi::Playlist, MusyncError>;
   // delete playlists
-  async fn delete_playlists(&self, ids: &[PlaylistId]) -> Result<Vec<abi::Playlist>, MusyncError>;
+  async fn delete_playlists(&self, ids: &[PlaylistId]) -> Result<u64, MusyncError>;
   // query playlists
   async fn query_playlists(
     &self,
@@ -41,7 +41,7 @@ pub trait Musync {
   // update a track
   async fn update_track(&self, track: abi::TrackUpdate) -> Result<abi::Track, MusyncError>;
   // delete tracks
-  async fn delete_tracks(&self, ids: &[TrackId]) -> Result<Vec<abi::Track>, MusyncError>;
+  async fn delete_tracks(&self, ids: &[TrackId]) -> Result<u64, MusyncError>;
   // query tracks
   async fn query_tracks(&self, query: abi::TrackQuery) -> Result<Vec<abi::Track>, MusyncError>;
 
@@ -52,7 +52,7 @@ pub trait Musync {
   // update a user
   async fn update_user(&self, user: abi::UserUpdate) -> Result<abi::User, MusyncError>;
   // delete users
-  async fn delete_users(&self, ids: &[UserId]) -> Result<Vec<abi::User>, MusyncError>;
+  async fn delete_users(&self, ids: &[UserId]) -> Result<u64, MusyncError>;
   // query users
   async fn query_users(&self, query: abi::UserQuery) -> Result<Vec<abi::User>, MusyncError>;
   async fn user(&self, id: UserId) -> Result<abi::User, MusyncError>;

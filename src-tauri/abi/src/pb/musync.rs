@@ -3,14 +3,14 @@
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Playlist {
   /// unique id for the playlist
-  #[prost(int64, tag = "1")]
-  pub id: i64,
+  #[prost(int32, tag = "1")]
+  pub id: i32,
   /// id of the owner of the playlist
-  #[prost(int64, tag = "2")]
-  pub owner_id: i64,
+  #[prost(int32, tag = "2")]
+  pub owner_id: i32,
   /// ids of tracks in the playlist
-  #[prost(int64, repeated, tag = "3")]
-  pub track_ids: ::prost::alloc::vec::Vec<i64>,
+  #[prost(int32, repeated, tag = "3")]
+  pub track_ids: ::prost::alloc::vec::Vec<i32>,
   /// name of the playlist
   #[prost(string, tag = "4")]
   pub name: ::prost::alloc::string::String,
@@ -27,47 +27,63 @@ pub struct Playlist {
 /// CurrentPlaylist controller
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct CurrentPlaylist {
+pub struct Playback {
   /// unique id for the current playlist
-  #[prost(int64, tag = "1")]
-  pub id: i64,
+  #[prost(int32, tag = "1")]
+  pub id: i32,
   /// id of the playlist
-  #[prost(int64, tag = "2")]
-  pub playlist_id: i64,
-  /// id of the current playing track
-  #[prost(int64, tag = "3")]
-  pub current_track_id: i64,
+  #[prost(int32, tag = "2")]
+  pub playlist_id: i32,
+  /// index of the current playing track in the playlist
+  #[prost(uint32, tag = "3")]
+  pub position: u32,
   /// is the playlist playing
   #[prost(bool, tag = "4")]
   pub playing: bool,
-  /// time when the current track started playing
+  /// time when the current track started playing.
+  /// When not playing, it represents the progress directly.
+  /// In milliseconds
   #[prost(message, optional, tag = "5")]
   pub started_at: ::core::option::Option<::prost_types::Timestamp>,
+  #[prost(uint32, tag = "6")]
+  pub paused_at: u32,
 }
 /// Track
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Track {
   /// unique id for the track
-  #[prost(int64, tag = "1")]
-  pub id: i64,
-  /// name of the track
+  #[prost(int32, tag = "1")]
+  pub id: i32,
+  /// title of the track
   #[prost(string, tag = "2")]
-  pub name: ::prost::alloc::string::String,
+  pub title: ::prost::alloc::string::String,
   /// artist of the track
-  #[prost(string, tag = "3")]
-  pub artist: ::prost::alloc::string::String,
+  #[prost(string, optional, tag = "3")]
+  pub artist: ::core::option::Option<::prost::alloc::string::String>,
   /// album of the track
-  #[prost(string, tag = "4")]
-  pub album: ::prost::alloc::string::String,
+  #[prost(string, optional, tag = "4")]
+  pub album: ::core::option::Option<::prost::alloc::string::String>,
   /// duration of the track in milliseconds
-  #[prost(int32, tag = "5")]
-  pub duration: i32,
+  #[prost(uint32, optional, tag = "5")]
+  pub duration: ::core::option::Option<u32>,
+  /// genre of the track
+  #[prost(string, optional, tag = "6")]
+  pub genre: ::core::option::Option<::prost::alloc::string::String>,
+  /// year of the track
+  #[prost(uint32, optional, tag = "7")]
+  pub year: ::core::option::Option<u32>,
+  /// time when the track is created
+  #[prost(message, optional, tag = "8")]
+  pub created_at: ::core::option::Option<::prost_types::Timestamp>,
+  /// time of the last update
+  #[prost(message, optional, tag = "9")]
+  pub updated_at: ::core::option::Option<::prost_types::Timestamp>,
   /// local source of the track
-  #[prost(message, optional, tag = "6")]
+  #[prost(message, optional, tag = "10")]
   pub local_src: ::core::option::Option<LocalSource>,
   /// netease source of the track
-  #[prost(message, optional, tag = "7")]
+  #[prost(message, optional, tag = "11")]
   pub netease_src: ::core::option::Option<NeteaseSource>,
 }
 /// NeteaseSource, not implemented yet
@@ -87,11 +103,17 @@ pub struct LocalSource {
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct User {
   /// unique id for the user
-  #[prost(int64, tag = "1")]
-  pub id: i64,
+  #[prost(int32, tag = "1")]
+  pub id: i32,
   /// name of the user
   #[prost(string, tag = "2")]
   pub name: ::prost::alloc::string::String,
+  /// time when the user is created
+  #[prost(message, optional, tag = "3")]
+  pub created_at: ::core::option::Option<::prost_types::Timestamp>,
+  /// time of the last update
+  #[prost(message, optional, tag = "4")]
+  pub updated_at: ::core::option::Option<::prost_types::Timestamp>,
 }
 /// Create playlist request
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -114,19 +136,19 @@ pub struct CreatePlaylistResponse {
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct DeletePlaylistsRequest {
   /// Ids of playlists to be deleted
-  #[prost(int64, repeated, tag = "1")]
-  pub ids: ::prost::alloc::vec::Vec<i64>,
+  #[prost(int32, repeated, tag = "1")]
+  pub ids: ::prost::alloc::vec::Vec<i32>,
 }
 /// Query playlist by user id and track id
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct PlaylistQuery {
   /// which user has the playlist
-  #[prost(int64, optional, tag = "1")]
-  pub user_id: ::core::option::Option<i64>,
+  #[prost(int32, optional, tag = "1")]
+  pub user_id: ::core::option::Option<i32>,
   /// Query by contained track id
-  #[prost(int64, optional, tag = "2")]
-  pub track_id: ::core::option::Option<i64>,
+  #[prost(int32, optional, tag = "2")]
+  pub track_id: ::core::option::Option<i32>,
   /// Query by name
   #[prost(string, optional, tag = "3")]
   pub name: ::core::option::Option<::prost::alloc::string::String>,
@@ -144,14 +166,14 @@ pub struct QueryPlaylistsRequest {
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct PlaylistUpdate {
   /// Id of the playlist to be updated
-  #[prost(int64, tag = "1")]
-  pub id: i64,
+  #[prost(int32, tag = "1")]
+  pub id: i32,
   /// Ids of tracks to be added
-  #[prost(int64, repeated, tag = "2")]
-  pub added_track_ids: ::prost::alloc::vec::Vec<i64>,
+  #[prost(int32, repeated, tag = "2")]
+  pub added_track_ids: ::prost::alloc::vec::Vec<i32>,
   /// Ids of tracks to be removed
-  #[prost(int64, repeated, tag = "3")]
-  pub removed_track_ids: ::prost::alloc::vec::Vec<i64>,
+  #[prost(int32, repeated, tag = "3")]
+  pub removed_track_ids: ::prost::alloc::vec::Vec<i32>,
   /// New name of the playlist
   #[prost(string, optional, tag = "4")]
   pub name: ::core::option::Option<::prost::alloc::string::String>,
@@ -194,17 +216,23 @@ pub struct CreateTrackResponse {
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct TrackQuery {
   /// Query by which playlist contains the track
-  #[prost(int64, optional, tag = "1")]
-  pub playlist_id: ::core::option::Option<i64>,
-  /// Query by name
+  #[prost(int32, optional, tag = "1")]
+  pub playlist_id: ::core::option::Option<i32>,
+  /// Query by title
   #[prost(string, optional, tag = "2")]
-  pub name: ::core::option::Option<::prost::alloc::string::String>,
+  pub title: ::core::option::Option<::prost::alloc::string::String>,
   /// Query by artist
   #[prost(string, optional, tag = "3")]
   pub artist: ::core::option::Option<::prost::alloc::string::String>,
   /// Query by album
   #[prost(string, optional, tag = "4")]
   pub album: ::core::option::Option<::prost::alloc::string::String>,
+  /// Query by genre
+  #[prost(string, optional, tag = "5")]
+  pub genre: ::core::option::Option<::prost::alloc::string::String>,
+  /// Query by year
+  #[prost(uint32, optional, tag = "6")]
+  pub year: ::core::option::Option<u32>,
 }
 /// Query track request
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -218,24 +246,30 @@ pub struct QueryTracksRequest {
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct TrackUpdate {
   /// Id of the track to be updated
-  #[prost(int64, tag = "1")]
-  pub id: i64,
-  /// New name of the track
-  #[prost(string, tag = "2")]
-  pub name: ::prost::alloc::string::String,
+  #[prost(int32, tag = "1")]
+  pub id: i32,
+  /// New title of the track
+  #[prost(string, optional, tag = "2")]
+  pub title: ::core::option::Option<::prost::alloc::string::String>,
   /// New artist of the track
-  #[prost(string, tag = "3")]
-  pub artist: ::prost::alloc::string::String,
+  #[prost(string, optional, tag = "3")]
+  pub artist: ::core::option::Option<::prost::alloc::string::String>,
   /// New album of the track
-  #[prost(string, tag = "4")]
-  pub album: ::prost::alloc::string::String,
-  #[prost(int32, tag = "5")]
-  pub duration: i32,
+  #[prost(string, optional, tag = "4")]
+  pub album: ::core::option::Option<::prost::alloc::string::String>,
+  #[prost(uint32, optional, tag = "5")]
+  pub duration: ::core::option::Option<u32>,
+  /// New genre of the track
+  #[prost(string, optional, tag = "6")]
+  pub genre: ::core::option::Option<::prost::alloc::string::String>,
+  /// New year of the track
+  #[prost(uint32, optional, tag = "7")]
+  pub year: ::core::option::Option<u32>,
   /// New local source of the track
-  #[prost(message, optional, tag = "6")]
+  #[prost(message, optional, tag = "8")]
   pub local_src: ::core::option::Option<LocalSource>,
   /// New netease source of the track
-  #[prost(message, optional, tag = "7")]
+  #[prost(message, optional, tag = "9")]
   pub netease_src: ::core::option::Option<NeteaseSource>,
 }
 /// Update track request
@@ -258,8 +292,8 @@ pub struct UpdateTrackResponse {
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct DeleteTracksRequest {
   /// Ids of tracks to be deleted
-  #[prost(int64, repeated, tag = "1")]
-  pub track_ids: ::prost::alloc::vec::Vec<i64>,
+  #[prost(int32, repeated, tag = "1")]
+  pub track_ids: ::prost::alloc::vec::Vec<i32>,
 }
 /// Create user request
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -295,8 +329,8 @@ pub struct QueryUsersRequest {
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct UserUpdate {
   /// Id of the user to be updated
-  #[prost(int64, tag = "1")]
-  pub id: i64,
+  #[prost(int32, tag = "1")]
+  pub id: i32,
   /// New name of the user
   #[prost(string, tag = "2")]
   pub name: ::prost::alloc::string::String,
@@ -321,8 +355,8 @@ pub struct UpdateUserResponse {
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct DeleteUsersRequest {
   /// Ids of users to be deleted
-  #[prost(int64, repeated, tag = "1")]
-  pub ids: ::prost::alloc::vec::Vec<i64>,
+  #[prost(int32, repeated, tag = "1")]
+  pub ids: ::prost::alloc::vec::Vec<i32>,
 }
 /// Generated client implementations.
 pub mod musync_service_client {
@@ -338,7 +372,7 @@ pub mod musync_service_client {
     /// Attempt to create a new client by connecting to a given endpoint.
     pub async fn connect<D>(dst: D) -> Result<Self, tonic::transport::Error>
     where
-      D: std::convert::TryInto<tonic::transport::Endpoint>,
+      D: TryInto<tonic::transport::Endpoint>,
       D::Error: Into<StdError>,
     {
       let conn = tonic::transport::Endpoint::new(dst)?.connect().await?;
@@ -393,10 +427,26 @@ pub mod musync_service_client {
       self.inner = self.inner.accept_compressed(encoding);
       self
     }
+    /// Limits the maximum size of a decoded message.
+    ///
+    /// Default: `4MB`
+    #[must_use]
+    pub fn max_decoding_message_size(mut self, limit: usize) -> Self {
+      self.inner = self.inner.max_decoding_message_size(limit);
+      self
+    }
+    /// Limits the maximum size of an encoded message.
+    ///
+    /// Default: `usize::MAX`
+    #[must_use]
+    pub fn max_encoding_message_size(mut self, limit: usize) -> Self {
+      self.inner = self.inner.max_encoding_message_size(limit);
+      self
+    }
     pub async fn create_playlist(
       &mut self,
       request: impl tonic::IntoRequest<super::CreatePlaylistRequest>,
-    ) -> Result<tonic::Response<super::CreatePlaylistResponse>, tonic::Status> {
+    ) -> std::result::Result<tonic::Response<super::CreatePlaylistResponse>, tonic::Status> {
       self.inner.ready().await.map_err(|e| {
         tonic::Status::new(
           tonic::Code::Unknown,
@@ -405,12 +455,17 @@ pub mod musync_service_client {
       })?;
       let codec = tonic::codec::ProstCodec::default();
       let path = http::uri::PathAndQuery::from_static("/musync.MusyncService/createPlaylist");
-      self.inner.unary(request.into_request(), path, codec).await
+      let mut req = request.into_request();
+      req
+        .extensions_mut()
+        .insert(GrpcMethod::new("musync.MusyncService", "createPlaylist"));
+      self.inner.unary(req, path, codec).await
     }
     pub async fn query_playlists(
       &mut self,
       request: impl tonic::IntoRequest<super::QueryPlaylistsRequest>,
-    ) -> Result<tonic::Response<tonic::codec::Streaming<super::Playlist>>, tonic::Status> {
+    ) -> std::result::Result<tonic::Response<tonic::codec::Streaming<super::Playlist>>, tonic::Status>
+    {
       self.inner.ready().await.map_err(|e| {
         tonic::Status::new(
           tonic::Code::Unknown,
@@ -419,15 +474,16 @@ pub mod musync_service_client {
       })?;
       let codec = tonic::codec::ProstCodec::default();
       let path = http::uri::PathAndQuery::from_static("/musync.MusyncService/queryPlaylists");
-      self
-        .inner
-        .server_streaming(request.into_request(), path, codec)
-        .await
+      let mut req = request.into_request();
+      req
+        .extensions_mut()
+        .insert(GrpcMethod::new("musync.MusyncService", "queryPlaylists"));
+      self.inner.server_streaming(req, path, codec).await
     }
     pub async fn update_playlist(
       &mut self,
       request: impl tonic::IntoRequest<super::UpdatePlaylistRequest>,
-    ) -> Result<tonic::Response<super::UpdatePlaylistResponse>, tonic::Status> {
+    ) -> std::result::Result<tonic::Response<super::UpdatePlaylistResponse>, tonic::Status> {
       self.inner.ready().await.map_err(|e| {
         tonic::Status::new(
           tonic::Code::Unknown,
@@ -436,12 +492,17 @@ pub mod musync_service_client {
       })?;
       let codec = tonic::codec::ProstCodec::default();
       let path = http::uri::PathAndQuery::from_static("/musync.MusyncService/updatePlaylist");
-      self.inner.unary(request.into_request(), path, codec).await
+      let mut req = request.into_request();
+      req
+        .extensions_mut()
+        .insert(GrpcMethod::new("musync.MusyncService", "updatePlaylist"));
+      self.inner.unary(req, path, codec).await
     }
     pub async fn delete_playlists(
       &mut self,
       request: impl tonic::IntoRequest<super::DeletePlaylistsRequest>,
-    ) -> Result<tonic::Response<tonic::codec::Streaming<super::Playlist>>, tonic::Status> {
+    ) -> std::result::Result<tonic::Response<tonic::codec::Streaming<super::Playlist>>, tonic::Status>
+    {
       self.inner.ready().await.map_err(|e| {
         tonic::Status::new(
           tonic::Code::Unknown,
@@ -450,15 +511,16 @@ pub mod musync_service_client {
       })?;
       let codec = tonic::codec::ProstCodec::default();
       let path = http::uri::PathAndQuery::from_static("/musync.MusyncService/deletePlaylists");
-      self
-        .inner
-        .server_streaming(request.into_request(), path, codec)
-        .await
+      let mut req = request.into_request();
+      req
+        .extensions_mut()
+        .insert(GrpcMethod::new("musync.MusyncService", "deletePlaylists"));
+      self.inner.server_streaming(req, path, codec).await
     }
     pub async fn create_track(
       &mut self,
       request: impl tonic::IntoRequest<super::CreateTrackRequest>,
-    ) -> Result<tonic::Response<super::CreateTrackResponse>, tonic::Status> {
+    ) -> std::result::Result<tonic::Response<super::CreateTrackResponse>, tonic::Status> {
       self.inner.ready().await.map_err(|e| {
         tonic::Status::new(
           tonic::Code::Unknown,
@@ -467,12 +529,17 @@ pub mod musync_service_client {
       })?;
       let codec = tonic::codec::ProstCodec::default();
       let path = http::uri::PathAndQuery::from_static("/musync.MusyncService/createTrack");
-      self.inner.unary(request.into_request(), path, codec).await
+      let mut req = request.into_request();
+      req
+        .extensions_mut()
+        .insert(GrpcMethod::new("musync.MusyncService", "createTrack"));
+      self.inner.unary(req, path, codec).await
     }
     pub async fn query_tracks(
       &mut self,
       request: impl tonic::IntoRequest<super::QueryTracksRequest>,
-    ) -> Result<tonic::Response<tonic::codec::Streaming<super::Track>>, tonic::Status> {
+    ) -> std::result::Result<tonic::Response<tonic::codec::Streaming<super::Track>>, tonic::Status>
+    {
       self.inner.ready().await.map_err(|e| {
         tonic::Status::new(
           tonic::Code::Unknown,
@@ -481,15 +548,16 @@ pub mod musync_service_client {
       })?;
       let codec = tonic::codec::ProstCodec::default();
       let path = http::uri::PathAndQuery::from_static("/musync.MusyncService/queryTracks");
-      self
-        .inner
-        .server_streaming(request.into_request(), path, codec)
-        .await
+      let mut req = request.into_request();
+      req
+        .extensions_mut()
+        .insert(GrpcMethod::new("musync.MusyncService", "queryTracks"));
+      self.inner.server_streaming(req, path, codec).await
     }
     pub async fn update_track(
       &mut self,
       request: impl tonic::IntoRequest<super::UpdateTrackRequest>,
-    ) -> Result<tonic::Response<super::UpdateTrackResponse>, tonic::Status> {
+    ) -> std::result::Result<tonic::Response<super::UpdateTrackResponse>, tonic::Status> {
       self.inner.ready().await.map_err(|e| {
         tonic::Status::new(
           tonic::Code::Unknown,
@@ -498,12 +566,17 @@ pub mod musync_service_client {
       })?;
       let codec = tonic::codec::ProstCodec::default();
       let path = http::uri::PathAndQuery::from_static("/musync.MusyncService/updateTrack");
-      self.inner.unary(request.into_request(), path, codec).await
+      let mut req = request.into_request();
+      req
+        .extensions_mut()
+        .insert(GrpcMethod::new("musync.MusyncService", "updateTrack"));
+      self.inner.unary(req, path, codec).await
     }
     pub async fn delete_tracks(
       &mut self,
       request: impl tonic::IntoRequest<super::DeleteTracksRequest>,
-    ) -> Result<tonic::Response<tonic::codec::Streaming<super::Track>>, tonic::Status> {
+    ) -> std::result::Result<tonic::Response<tonic::codec::Streaming<super::Track>>, tonic::Status>
+    {
       self.inner.ready().await.map_err(|e| {
         tonic::Status::new(
           tonic::Code::Unknown,
@@ -512,15 +585,16 @@ pub mod musync_service_client {
       })?;
       let codec = tonic::codec::ProstCodec::default();
       let path = http::uri::PathAndQuery::from_static("/musync.MusyncService/deleteTracks");
-      self
-        .inner
-        .server_streaming(request.into_request(), path, codec)
-        .await
+      let mut req = request.into_request();
+      req
+        .extensions_mut()
+        .insert(GrpcMethod::new("musync.MusyncService", "deleteTracks"));
+      self.inner.server_streaming(req, path, codec).await
     }
     pub async fn create_user(
       &mut self,
       request: impl tonic::IntoRequest<super::CreateUserRequest>,
-    ) -> Result<tonic::Response<super::CreateUserResponse>, tonic::Status> {
+    ) -> std::result::Result<tonic::Response<super::CreateUserResponse>, tonic::Status> {
       self.inner.ready().await.map_err(|e| {
         tonic::Status::new(
           tonic::Code::Unknown,
@@ -529,12 +603,17 @@ pub mod musync_service_client {
       })?;
       let codec = tonic::codec::ProstCodec::default();
       let path = http::uri::PathAndQuery::from_static("/musync.MusyncService/createUser");
-      self.inner.unary(request.into_request(), path, codec).await
+      let mut req = request.into_request();
+      req
+        .extensions_mut()
+        .insert(GrpcMethod::new("musync.MusyncService", "createUser"));
+      self.inner.unary(req, path, codec).await
     }
     pub async fn query_users(
       &mut self,
       request: impl tonic::IntoRequest<super::QueryUsersRequest>,
-    ) -> Result<tonic::Response<tonic::codec::Streaming<super::User>>, tonic::Status> {
+    ) -> std::result::Result<tonic::Response<tonic::codec::Streaming<super::User>>, tonic::Status>
+    {
       self.inner.ready().await.map_err(|e| {
         tonic::Status::new(
           tonic::Code::Unknown,
@@ -543,15 +622,16 @@ pub mod musync_service_client {
       })?;
       let codec = tonic::codec::ProstCodec::default();
       let path = http::uri::PathAndQuery::from_static("/musync.MusyncService/queryUsers");
-      self
-        .inner
-        .server_streaming(request.into_request(), path, codec)
-        .await
+      let mut req = request.into_request();
+      req
+        .extensions_mut()
+        .insert(GrpcMethod::new("musync.MusyncService", "queryUsers"));
+      self.inner.server_streaming(req, path, codec).await
     }
     pub async fn update_user(
       &mut self,
       request: impl tonic::IntoRequest<super::UpdateUserRequest>,
-    ) -> Result<tonic::Response<super::UpdateUserResponse>, tonic::Status> {
+    ) -> std::result::Result<tonic::Response<super::UpdateUserResponse>, tonic::Status> {
       self.inner.ready().await.map_err(|e| {
         tonic::Status::new(
           tonic::Code::Unknown,
@@ -560,12 +640,17 @@ pub mod musync_service_client {
       })?;
       let codec = tonic::codec::ProstCodec::default();
       let path = http::uri::PathAndQuery::from_static("/musync.MusyncService/updateUser");
-      self.inner.unary(request.into_request(), path, codec).await
+      let mut req = request.into_request();
+      req
+        .extensions_mut()
+        .insert(GrpcMethod::new("musync.MusyncService", "updateUser"));
+      self.inner.unary(req, path, codec).await
     }
     pub async fn delete_users(
       &mut self,
       request: impl tonic::IntoRequest<super::DeleteUsersRequest>,
-    ) -> Result<tonic::Response<tonic::codec::Streaming<super::User>>, tonic::Status> {
+    ) -> std::result::Result<tonic::Response<tonic::codec::Streaming<super::User>>, tonic::Status>
+    {
       self.inner.ready().await.map_err(|e| {
         tonic::Status::new(
           tonic::Code::Unknown,
@@ -574,10 +659,11 @@ pub mod musync_service_client {
       })?;
       let codec = tonic::codec::ProstCodec::default();
       let path = http::uri::PathAndQuery::from_static("/musync.MusyncService/deleteUsers");
-      self
-        .inner
-        .server_streaming(request.into_request(), path, codec)
-        .await
+      let mut req = request.into_request();
+      req
+        .extensions_mut()
+        .insert(GrpcMethod::new("musync.MusyncService", "deleteUsers"));
+      self.inner.server_streaming(req, path, codec).await
     }
   }
 }
@@ -591,75 +677,75 @@ pub mod musync_service_server {
     async fn create_playlist(
       &self,
       request: tonic::Request<super::CreatePlaylistRequest>,
-    ) -> Result<tonic::Response<super::CreatePlaylistResponse>, tonic::Status>;
+    ) -> std::result::Result<tonic::Response<super::CreatePlaylistResponse>, tonic::Status>;
     /// Server streaming response type for the queryPlaylists method.
-    type queryPlaylistsStream: futures_core::Stream<Item = Result<super::Playlist, tonic::Status>>
+    type queryPlaylistsStream: futures_core::Stream<Item = std::result::Result<super::Playlist, tonic::Status>>
       + Send
       + 'static;
     async fn query_playlists(
       &self,
       request: tonic::Request<super::QueryPlaylistsRequest>,
-    ) -> Result<tonic::Response<Self::queryPlaylistsStream>, tonic::Status>;
+    ) -> std::result::Result<tonic::Response<Self::queryPlaylistsStream>, tonic::Status>;
     async fn update_playlist(
       &self,
       request: tonic::Request<super::UpdatePlaylistRequest>,
-    ) -> Result<tonic::Response<super::UpdatePlaylistResponse>, tonic::Status>;
+    ) -> std::result::Result<tonic::Response<super::UpdatePlaylistResponse>, tonic::Status>;
     /// Server streaming response type for the deletePlaylists method.
-    type deletePlaylistsStream: futures_core::Stream<Item = Result<super::Playlist, tonic::Status>>
+    type deletePlaylistsStream: futures_core::Stream<Item = std::result::Result<super::Playlist, tonic::Status>>
       + Send
       + 'static;
     async fn delete_playlists(
       &self,
       request: tonic::Request<super::DeletePlaylistsRequest>,
-    ) -> Result<tonic::Response<Self::deletePlaylistsStream>, tonic::Status>;
+    ) -> std::result::Result<tonic::Response<Self::deletePlaylistsStream>, tonic::Status>;
     async fn create_track(
       &self,
       request: tonic::Request<super::CreateTrackRequest>,
-    ) -> Result<tonic::Response<super::CreateTrackResponse>, tonic::Status>;
+    ) -> std::result::Result<tonic::Response<super::CreateTrackResponse>, tonic::Status>;
     /// Server streaming response type for the queryTracks method.
-    type queryTracksStream: futures_core::Stream<Item = Result<super::Track, tonic::Status>>
+    type queryTracksStream: futures_core::Stream<Item = std::result::Result<super::Track, tonic::Status>>
       + Send
       + 'static;
     async fn query_tracks(
       &self,
       request: tonic::Request<super::QueryTracksRequest>,
-    ) -> Result<tonic::Response<Self::queryTracksStream>, tonic::Status>;
+    ) -> std::result::Result<tonic::Response<Self::queryTracksStream>, tonic::Status>;
     async fn update_track(
       &self,
       request: tonic::Request<super::UpdateTrackRequest>,
-    ) -> Result<tonic::Response<super::UpdateTrackResponse>, tonic::Status>;
+    ) -> std::result::Result<tonic::Response<super::UpdateTrackResponse>, tonic::Status>;
     /// Server streaming response type for the deleteTracks method.
-    type deleteTracksStream: futures_core::Stream<Item = Result<super::Track, tonic::Status>>
+    type deleteTracksStream: futures_core::Stream<Item = std::result::Result<super::Track, tonic::Status>>
       + Send
       + 'static;
     async fn delete_tracks(
       &self,
       request: tonic::Request<super::DeleteTracksRequest>,
-    ) -> Result<tonic::Response<Self::deleteTracksStream>, tonic::Status>;
+    ) -> std::result::Result<tonic::Response<Self::deleteTracksStream>, tonic::Status>;
     async fn create_user(
       &self,
       request: tonic::Request<super::CreateUserRequest>,
-    ) -> Result<tonic::Response<super::CreateUserResponse>, tonic::Status>;
+    ) -> std::result::Result<tonic::Response<super::CreateUserResponse>, tonic::Status>;
     /// Server streaming response type for the queryUsers method.
-    type queryUsersStream: futures_core::Stream<Item = Result<super::User, tonic::Status>>
+    type queryUsersStream: futures_core::Stream<Item = std::result::Result<super::User, tonic::Status>>
       + Send
       + 'static;
     async fn query_users(
       &self,
       request: tonic::Request<super::QueryUsersRequest>,
-    ) -> Result<tonic::Response<Self::queryUsersStream>, tonic::Status>;
+    ) -> std::result::Result<tonic::Response<Self::queryUsersStream>, tonic::Status>;
     async fn update_user(
       &self,
       request: tonic::Request<super::UpdateUserRequest>,
-    ) -> Result<tonic::Response<super::UpdateUserResponse>, tonic::Status>;
+    ) -> std::result::Result<tonic::Response<super::UpdateUserResponse>, tonic::Status>;
     /// Server streaming response type for the deleteUsers method.
-    type deleteUsersStream: futures_core::Stream<Item = Result<super::User, tonic::Status>>
+    type deleteUsersStream: futures_core::Stream<Item = std::result::Result<super::User, tonic::Status>>
       + Send
       + 'static;
     async fn delete_users(
       &self,
       request: tonic::Request<super::DeleteUsersRequest>,
-    ) -> Result<tonic::Response<Self::deleteUsersStream>, tonic::Status>;
+    ) -> std::result::Result<tonic::Response<Self::deleteUsersStream>, tonic::Status>;
   }
   /// Musync service
   #[derive(Debug)]
@@ -667,6 +753,8 @@ pub mod musync_service_server {
     inner: _Inner<T>,
     accept_compression_encodings: EnabledCompressionEncodings,
     send_compression_encodings: EnabledCompressionEncodings,
+    max_decoding_message_size: Option<usize>,
+    max_encoding_message_size: Option<usize>,
   }
   struct _Inner<T>(Arc<T>);
   impl<T: MusyncService> MusyncServiceServer<T> {
@@ -679,6 +767,8 @@ pub mod musync_service_server {
         inner,
         accept_compression_encodings: Default::default(),
         send_compression_encodings: Default::default(),
+        max_decoding_message_size: None,
+        max_encoding_message_size: None,
       }
     }
     pub fn with_interceptor<F>(inner: T, interceptor: F) -> InterceptedService<Self, F>
@@ -699,6 +789,22 @@ pub mod musync_service_server {
       self.send_compression_encodings.enable(encoding);
       self
     }
+    /// Limits the maximum size of a decoded message.
+    ///
+    /// Default: `4MB`
+    #[must_use]
+    pub fn max_decoding_message_size(mut self, limit: usize) -> Self {
+      self.max_decoding_message_size = Some(limit);
+      self
+    }
+    /// Limits the maximum size of an encoded message.
+    ///
+    /// Default: `usize::MAX`
+    #[must_use]
+    pub fn max_encoding_message_size(mut self, limit: usize) -> Self {
+      self.max_encoding_message_size = Some(limit);
+      self
+    }
   }
   impl<T, B> tonic::codegen::Service<http::Request<B>> for MusyncServiceServer<T>
   where
@@ -709,7 +815,7 @@ pub mod musync_service_server {
     type Response = http::Response<tonic::body::BoxBody>;
     type Error = std::convert::Infallible;
     type Future = BoxFuture<Self::Response, Self::Error>;
-    fn poll_ready(&mut self, _cx: &mut Context<'_>) -> Poll<Result<(), Self::Error>> {
+    fn poll_ready(&mut self, _cx: &mut Context<'_>) -> Poll<std::result::Result<(), Self::Error>> {
       Poll::Ready(Ok(()))
     }
     fn call(&mut self, req: http::Request<B>) -> Self::Future {
@@ -727,20 +833,23 @@ pub mod musync_service_server {
               &mut self,
               request: tonic::Request<super::CreatePlaylistRequest>,
             ) -> Self::Future {
-              let inner = self.0.clone();
+              let inner = Arc::clone(&self.0);
               let fut = async move { (*inner).create_playlist(request).await };
               Box::pin(fut)
             }
           }
           let accept_compression_encodings = self.accept_compression_encodings;
           let send_compression_encodings = self.send_compression_encodings;
+          let max_decoding_message_size = self.max_decoding_message_size;
+          let max_encoding_message_size = self.max_encoding_message_size;
           let inner = self.inner.clone();
           let fut = async move {
             let inner = inner.0;
             let method = createPlaylistSvc(inner);
             let codec = tonic::codec::ProstCodec::default();
             let mut grpc = tonic::server::Grpc::new(codec)
-              .apply_compression_config(accept_compression_encodings, send_compression_encodings);
+              .apply_compression_config(accept_compression_encodings, send_compression_encodings)
+              .apply_max_message_size_config(max_decoding_message_size, max_encoding_message_size);
             let res = grpc.unary(method, req).await;
             Ok(res)
           };
@@ -759,20 +868,23 @@ pub mod musync_service_server {
               &mut self,
               request: tonic::Request<super::QueryPlaylistsRequest>,
             ) -> Self::Future {
-              let inner = self.0.clone();
+              let inner = Arc::clone(&self.0);
               let fut = async move { (*inner).query_playlists(request).await };
               Box::pin(fut)
             }
           }
           let accept_compression_encodings = self.accept_compression_encodings;
           let send_compression_encodings = self.send_compression_encodings;
+          let max_decoding_message_size = self.max_decoding_message_size;
+          let max_encoding_message_size = self.max_encoding_message_size;
           let inner = self.inner.clone();
           let fut = async move {
             let inner = inner.0;
             let method = queryPlaylistsSvc(inner);
             let codec = tonic::codec::ProstCodec::default();
             let mut grpc = tonic::server::Grpc::new(codec)
-              .apply_compression_config(accept_compression_encodings, send_compression_encodings);
+              .apply_compression_config(accept_compression_encodings, send_compression_encodings)
+              .apply_max_message_size_config(max_decoding_message_size, max_encoding_message_size);
             let res = grpc.server_streaming(method, req).await;
             Ok(res)
           };
@@ -790,20 +902,23 @@ pub mod musync_service_server {
               &mut self,
               request: tonic::Request<super::UpdatePlaylistRequest>,
             ) -> Self::Future {
-              let inner = self.0.clone();
+              let inner = Arc::clone(&self.0);
               let fut = async move { (*inner).update_playlist(request).await };
               Box::pin(fut)
             }
           }
           let accept_compression_encodings = self.accept_compression_encodings;
           let send_compression_encodings = self.send_compression_encodings;
+          let max_decoding_message_size = self.max_decoding_message_size;
+          let max_encoding_message_size = self.max_encoding_message_size;
           let inner = self.inner.clone();
           let fut = async move {
             let inner = inner.0;
             let method = updatePlaylistSvc(inner);
             let codec = tonic::codec::ProstCodec::default();
             let mut grpc = tonic::server::Grpc::new(codec)
-              .apply_compression_config(accept_compression_encodings, send_compression_encodings);
+              .apply_compression_config(accept_compression_encodings, send_compression_encodings)
+              .apply_max_message_size_config(max_decoding_message_size, max_encoding_message_size);
             let res = grpc.unary(method, req).await;
             Ok(res)
           };
@@ -823,20 +938,23 @@ pub mod musync_service_server {
               &mut self,
               request: tonic::Request<super::DeletePlaylistsRequest>,
             ) -> Self::Future {
-              let inner = self.0.clone();
+              let inner = Arc::clone(&self.0);
               let fut = async move { (*inner).delete_playlists(request).await };
               Box::pin(fut)
             }
           }
           let accept_compression_encodings = self.accept_compression_encodings;
           let send_compression_encodings = self.send_compression_encodings;
+          let max_decoding_message_size = self.max_decoding_message_size;
+          let max_encoding_message_size = self.max_encoding_message_size;
           let inner = self.inner.clone();
           let fut = async move {
             let inner = inner.0;
             let method = deletePlaylistsSvc(inner);
             let codec = tonic::codec::ProstCodec::default();
             let mut grpc = tonic::server::Grpc::new(codec)
-              .apply_compression_config(accept_compression_encodings, send_compression_encodings);
+              .apply_compression_config(accept_compression_encodings, send_compression_encodings)
+              .apply_max_message_size_config(max_decoding_message_size, max_encoding_message_size);
             let res = grpc.server_streaming(method, req).await;
             Ok(res)
           };
@@ -851,20 +969,23 @@ pub mod musync_service_server {
             type Response = super::CreateTrackResponse;
             type Future = BoxFuture<tonic::Response<Self::Response>, tonic::Status>;
             fn call(&mut self, request: tonic::Request<super::CreateTrackRequest>) -> Self::Future {
-              let inner = self.0.clone();
+              let inner = Arc::clone(&self.0);
               let fut = async move { (*inner).create_track(request).await };
               Box::pin(fut)
             }
           }
           let accept_compression_encodings = self.accept_compression_encodings;
           let send_compression_encodings = self.send_compression_encodings;
+          let max_decoding_message_size = self.max_decoding_message_size;
+          let max_encoding_message_size = self.max_encoding_message_size;
           let inner = self.inner.clone();
           let fut = async move {
             let inner = inner.0;
             let method = createTrackSvc(inner);
             let codec = tonic::codec::ProstCodec::default();
             let mut grpc = tonic::server::Grpc::new(codec)
-              .apply_compression_config(accept_compression_encodings, send_compression_encodings);
+              .apply_compression_config(accept_compression_encodings, send_compression_encodings)
+              .apply_max_message_size_config(max_decoding_message_size, max_encoding_message_size);
             let res = grpc.unary(method, req).await;
             Ok(res)
           };
@@ -880,20 +1001,23 @@ pub mod musync_service_server {
             type ResponseStream = T::queryTracksStream;
             type Future = BoxFuture<tonic::Response<Self::ResponseStream>, tonic::Status>;
             fn call(&mut self, request: tonic::Request<super::QueryTracksRequest>) -> Self::Future {
-              let inner = self.0.clone();
+              let inner = Arc::clone(&self.0);
               let fut = async move { (*inner).query_tracks(request).await };
               Box::pin(fut)
             }
           }
           let accept_compression_encodings = self.accept_compression_encodings;
           let send_compression_encodings = self.send_compression_encodings;
+          let max_decoding_message_size = self.max_decoding_message_size;
+          let max_encoding_message_size = self.max_encoding_message_size;
           let inner = self.inner.clone();
           let fut = async move {
             let inner = inner.0;
             let method = queryTracksSvc(inner);
             let codec = tonic::codec::ProstCodec::default();
             let mut grpc = tonic::server::Grpc::new(codec)
-              .apply_compression_config(accept_compression_encodings, send_compression_encodings);
+              .apply_compression_config(accept_compression_encodings, send_compression_encodings)
+              .apply_max_message_size_config(max_decoding_message_size, max_encoding_message_size);
             let res = grpc.server_streaming(method, req).await;
             Ok(res)
           };
@@ -908,20 +1032,23 @@ pub mod musync_service_server {
             type Response = super::UpdateTrackResponse;
             type Future = BoxFuture<tonic::Response<Self::Response>, tonic::Status>;
             fn call(&mut self, request: tonic::Request<super::UpdateTrackRequest>) -> Self::Future {
-              let inner = self.0.clone();
+              let inner = Arc::clone(&self.0);
               let fut = async move { (*inner).update_track(request).await };
               Box::pin(fut)
             }
           }
           let accept_compression_encodings = self.accept_compression_encodings;
           let send_compression_encodings = self.send_compression_encodings;
+          let max_decoding_message_size = self.max_decoding_message_size;
+          let max_encoding_message_size = self.max_encoding_message_size;
           let inner = self.inner.clone();
           let fut = async move {
             let inner = inner.0;
             let method = updateTrackSvc(inner);
             let codec = tonic::codec::ProstCodec::default();
             let mut grpc = tonic::server::Grpc::new(codec)
-              .apply_compression_config(accept_compression_encodings, send_compression_encodings);
+              .apply_compression_config(accept_compression_encodings, send_compression_encodings)
+              .apply_max_message_size_config(max_decoding_message_size, max_encoding_message_size);
             let res = grpc.unary(method, req).await;
             Ok(res)
           };
@@ -940,20 +1067,23 @@ pub mod musync_service_server {
               &mut self,
               request: tonic::Request<super::DeleteTracksRequest>,
             ) -> Self::Future {
-              let inner = self.0.clone();
+              let inner = Arc::clone(&self.0);
               let fut = async move { (*inner).delete_tracks(request).await };
               Box::pin(fut)
             }
           }
           let accept_compression_encodings = self.accept_compression_encodings;
           let send_compression_encodings = self.send_compression_encodings;
+          let max_decoding_message_size = self.max_decoding_message_size;
+          let max_encoding_message_size = self.max_encoding_message_size;
           let inner = self.inner.clone();
           let fut = async move {
             let inner = inner.0;
             let method = deleteTracksSvc(inner);
             let codec = tonic::codec::ProstCodec::default();
             let mut grpc = tonic::server::Grpc::new(codec)
-              .apply_compression_config(accept_compression_encodings, send_compression_encodings);
+              .apply_compression_config(accept_compression_encodings, send_compression_encodings)
+              .apply_max_message_size_config(max_decoding_message_size, max_encoding_message_size);
             let res = grpc.server_streaming(method, req).await;
             Ok(res)
           };
@@ -966,20 +1096,23 @@ pub mod musync_service_server {
             type Response = super::CreateUserResponse;
             type Future = BoxFuture<tonic::Response<Self::Response>, tonic::Status>;
             fn call(&mut self, request: tonic::Request<super::CreateUserRequest>) -> Self::Future {
-              let inner = self.0.clone();
+              let inner = Arc::clone(&self.0);
               let fut = async move { (*inner).create_user(request).await };
               Box::pin(fut)
             }
           }
           let accept_compression_encodings = self.accept_compression_encodings;
           let send_compression_encodings = self.send_compression_encodings;
+          let max_decoding_message_size = self.max_decoding_message_size;
+          let max_encoding_message_size = self.max_encoding_message_size;
           let inner = self.inner.clone();
           let fut = async move {
             let inner = inner.0;
             let method = createUserSvc(inner);
             let codec = tonic::codec::ProstCodec::default();
             let mut grpc = tonic::server::Grpc::new(codec)
-              .apply_compression_config(accept_compression_encodings, send_compression_encodings);
+              .apply_compression_config(accept_compression_encodings, send_compression_encodings)
+              .apply_max_message_size_config(max_decoding_message_size, max_encoding_message_size);
             let res = grpc.unary(method, req).await;
             Ok(res)
           };
@@ -995,20 +1128,23 @@ pub mod musync_service_server {
             type ResponseStream = T::queryUsersStream;
             type Future = BoxFuture<tonic::Response<Self::ResponseStream>, tonic::Status>;
             fn call(&mut self, request: tonic::Request<super::QueryUsersRequest>) -> Self::Future {
-              let inner = self.0.clone();
+              let inner = Arc::clone(&self.0);
               let fut = async move { (*inner).query_users(request).await };
               Box::pin(fut)
             }
           }
           let accept_compression_encodings = self.accept_compression_encodings;
           let send_compression_encodings = self.send_compression_encodings;
+          let max_decoding_message_size = self.max_decoding_message_size;
+          let max_encoding_message_size = self.max_encoding_message_size;
           let inner = self.inner.clone();
           let fut = async move {
             let inner = inner.0;
             let method = queryUsersSvc(inner);
             let codec = tonic::codec::ProstCodec::default();
             let mut grpc = tonic::server::Grpc::new(codec)
-              .apply_compression_config(accept_compression_encodings, send_compression_encodings);
+              .apply_compression_config(accept_compression_encodings, send_compression_encodings)
+              .apply_max_message_size_config(max_decoding_message_size, max_encoding_message_size);
             let res = grpc.server_streaming(method, req).await;
             Ok(res)
           };
@@ -1021,20 +1157,23 @@ pub mod musync_service_server {
             type Response = super::UpdateUserResponse;
             type Future = BoxFuture<tonic::Response<Self::Response>, tonic::Status>;
             fn call(&mut self, request: tonic::Request<super::UpdateUserRequest>) -> Self::Future {
-              let inner = self.0.clone();
+              let inner = Arc::clone(&self.0);
               let fut = async move { (*inner).update_user(request).await };
               Box::pin(fut)
             }
           }
           let accept_compression_encodings = self.accept_compression_encodings;
           let send_compression_encodings = self.send_compression_encodings;
+          let max_decoding_message_size = self.max_decoding_message_size;
+          let max_encoding_message_size = self.max_encoding_message_size;
           let inner = self.inner.clone();
           let fut = async move {
             let inner = inner.0;
             let method = updateUserSvc(inner);
             let codec = tonic::codec::ProstCodec::default();
             let mut grpc = tonic::server::Grpc::new(codec)
-              .apply_compression_config(accept_compression_encodings, send_compression_encodings);
+              .apply_compression_config(accept_compression_encodings, send_compression_encodings)
+              .apply_max_message_size_config(max_decoding_message_size, max_encoding_message_size);
             let res = grpc.unary(method, req).await;
             Ok(res)
           };
@@ -1050,20 +1189,23 @@ pub mod musync_service_server {
             type ResponseStream = T::deleteUsersStream;
             type Future = BoxFuture<tonic::Response<Self::ResponseStream>, tonic::Status>;
             fn call(&mut self, request: tonic::Request<super::DeleteUsersRequest>) -> Self::Future {
-              let inner = self.0.clone();
+              let inner = Arc::clone(&self.0);
               let fut = async move { (*inner).delete_users(request).await };
               Box::pin(fut)
             }
           }
           let accept_compression_encodings = self.accept_compression_encodings;
           let send_compression_encodings = self.send_compression_encodings;
+          let max_decoding_message_size = self.max_decoding_message_size;
+          let max_encoding_message_size = self.max_encoding_message_size;
           let inner = self.inner.clone();
           let fut = async move {
             let inner = inner.0;
             let method = deleteUsersSvc(inner);
             let codec = tonic::codec::ProstCodec::default();
             let mut grpc = tonic::server::Grpc::new(codec)
-              .apply_compression_config(accept_compression_encodings, send_compression_encodings);
+              .apply_compression_config(accept_compression_encodings, send_compression_encodings)
+              .apply_max_message_size_config(max_decoding_message_size, max_encoding_message_size);
             let res = grpc.server_streaming(method, req).await;
             Ok(res)
           };
@@ -1089,12 +1231,14 @@ pub mod musync_service_server {
         inner,
         accept_compression_encodings: self.accept_compression_encodings,
         send_compression_encodings: self.send_compression_encodings,
+        max_decoding_message_size: self.max_decoding_message_size,
+        max_encoding_message_size: self.max_encoding_message_size,
       }
     }
   }
   impl<T: MusyncService> Clone for _Inner<T> {
     fn clone(&self) -> Self {
-      Self(self.0.clone())
+      Self(Arc::clone(&self.0))
     }
   }
   impl<T: std::fmt::Debug> std::fmt::Debug for _Inner<T> {
