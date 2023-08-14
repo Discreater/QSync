@@ -1,5 +1,5 @@
+use crate::google::protobuf::Timestamp;
 use chrono::{DateTime, Utc};
-use prost_types::Timestamp;
 
 pub fn convert_to_timestamp(dt: &DateTime<Utc>) -> Timestamp {
   Timestamp {

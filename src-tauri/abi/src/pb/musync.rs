@@ -1,4 +1,5 @@
 /// Playlist
+#[derive(serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Playlist {
@@ -19,12 +20,13 @@ pub struct Playlist {
   pub description: ::prost::alloc::string::String,
   /// time when the playlist is created
   #[prost(message, optional, tag = "6")]
-  pub created_at: ::core::option::Option<::prost_types::Timestamp>,
+  pub created_at: ::core::option::Option<super::google::protobuf::Timestamp>,
   /// time of the last update
   #[prost(message, optional, tag = "7")]
-  pub updated_at: ::core::option::Option<::prost_types::Timestamp>,
+  pub updated_at: ::core::option::Option<super::google::protobuf::Timestamp>,
 }
 /// CurrentPlaylist controller
+#[derive(serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Playback {
@@ -44,11 +46,12 @@ pub struct Playback {
   /// When not playing, it represents the progress directly.
   /// In milliseconds
   #[prost(message, optional, tag = "5")]
-  pub started_at: ::core::option::Option<::prost_types::Timestamp>,
+  pub started_at: ::core::option::Option<super::google::protobuf::Timestamp>,
   #[prost(uint32, tag = "6")]
   pub paused_at: u32,
 }
 /// Track
+#[derive(serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Track {
@@ -75,10 +78,10 @@ pub struct Track {
   pub year: ::core::option::Option<u32>,
   /// time when the track is created
   #[prost(message, optional, tag = "8")]
-  pub created_at: ::core::option::Option<::prost_types::Timestamp>,
+  pub created_at: ::core::option::Option<super::google::protobuf::Timestamp>,
   /// time of the last update
   #[prost(message, optional, tag = "9")]
-  pub updated_at: ::core::option::Option<::prost_types::Timestamp>,
+  pub updated_at: ::core::option::Option<super::google::protobuf::Timestamp>,
   /// local source of the track
   #[prost(message, optional, tag = "10")]
   pub local_src: ::core::option::Option<LocalSource>,
@@ -87,10 +90,12 @@ pub struct Track {
   pub netease_src: ::core::option::Option<NeteaseSource>,
 }
 /// NeteaseSource, not implemented yet
+#[derive(serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct NeteaseSource {}
 /// LocalSource
+#[derive(serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct LocalSource {
@@ -99,6 +104,7 @@ pub struct LocalSource {
   pub path: ::prost::alloc::string::String,
 }
 /// User
+#[derive(serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct User {
@@ -110,12 +116,13 @@ pub struct User {
   pub name: ::prost::alloc::string::String,
   /// time when the user is created
   #[prost(message, optional, tag = "3")]
-  pub created_at: ::core::option::Option<::prost_types::Timestamp>,
+  pub created_at: ::core::option::Option<super::google::protobuf::Timestamp>,
   /// time of the last update
   #[prost(message, optional, tag = "4")]
-  pub updated_at: ::core::option::Option<::prost_types::Timestamp>,
+  pub updated_at: ::core::option::Option<super::google::protobuf::Timestamp>,
 }
 /// Create playlist request
+#[derive(serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct CreatePlaylistRequest {
@@ -124,6 +131,7 @@ pub struct CreatePlaylistRequest {
   pub playlist: ::core::option::Option<Playlist>,
 }
 /// Create playlist response
+#[derive(serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct CreatePlaylistResponse {
@@ -132,6 +140,7 @@ pub struct CreatePlaylistResponse {
   pub playlist: ::core::option::Option<Playlist>,
 }
 /// Delete playlist request
+#[derive(serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct DeletePlaylistsRequest {
@@ -140,6 +149,7 @@ pub struct DeletePlaylistsRequest {
   pub ids: ::prost::alloc::vec::Vec<i32>,
 }
 /// Query playlist by user id and track id
+#[derive(serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct PlaylistQuery {
@@ -154,6 +164,7 @@ pub struct PlaylistQuery {
   pub name: ::core::option::Option<::prost::alloc::string::String>,
 }
 /// Query playlist request
+#[derive(serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct QueryPlaylistsRequest {
@@ -162,6 +173,7 @@ pub struct QueryPlaylistsRequest {
   pub query: ::core::option::Option<PlaylistQuery>,
 }
 /// Update playlist: add/remove tracks, update name and description
+#[derive(serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct PlaylistUpdate {
@@ -181,6 +193,7 @@ pub struct PlaylistUpdate {
   #[prost(string, optional, tag = "5")]
   pub description: ::core::option::Option<::prost::alloc::string::String>,
 }
+#[derive(serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct UpdatePlaylistRequest {
@@ -188,6 +201,7 @@ pub struct UpdatePlaylistRequest {
   pub update: ::core::option::Option<PlaylistUpdate>,
 }
 /// Updated playlist will be returned in response
+#[derive(serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct UpdatePlaylistResponse {
@@ -196,6 +210,7 @@ pub struct UpdatePlaylistResponse {
   pub playlist: ::core::option::Option<Playlist>,
 }
 /// Create track request
+#[derive(serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct CreateTrackRequest {
@@ -204,6 +219,7 @@ pub struct CreateTrackRequest {
   pub track: ::core::option::Option<Track>,
 }
 /// Create track response
+#[derive(serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct CreateTrackResponse {
@@ -212,6 +228,7 @@ pub struct CreateTrackResponse {
   pub track: ::core::option::Option<Track>,
 }
 /// Query track
+#[derive(serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct TrackQuery {
@@ -235,6 +252,7 @@ pub struct TrackQuery {
   pub year: ::core::option::Option<u32>,
 }
 /// Query track request
+#[derive(serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct QueryTracksRequest {
@@ -242,6 +260,7 @@ pub struct QueryTracksRequest {
   #[prost(message, optional, tag = "1")]
   pub query: ::core::option::Option<TrackQuery>,
 }
+#[derive(serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct TrackUpdate {
@@ -273,6 +292,7 @@ pub struct TrackUpdate {
   pub netease_src: ::core::option::Option<NeteaseSource>,
 }
 /// Update track request
+#[derive(serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct UpdateTrackRequest {
@@ -280,6 +300,7 @@ pub struct UpdateTrackRequest {
   pub update: ::core::option::Option<TrackUpdate>,
 }
 /// Update track response
+#[derive(serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct UpdateTrackResponse {
@@ -288,6 +309,7 @@ pub struct UpdateTrackResponse {
   pub track: ::core::option::Option<Track>,
 }
 /// Delete tracks request
+#[derive(serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct DeleteTracksRequest {
@@ -296,6 +318,7 @@ pub struct DeleteTracksRequest {
   pub track_ids: ::prost::alloc::vec::Vec<i32>,
 }
 /// Create user request
+#[derive(serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct CreateUserRequest {
@@ -304,6 +327,7 @@ pub struct CreateUserRequest {
   pub user: ::core::option::Option<User>,
 }
 /// Create user response
+#[derive(serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct CreateUserResponse {
@@ -311,6 +335,7 @@ pub struct CreateUserResponse {
   #[prost(message, optional, tag = "1")]
   pub user: ::core::option::Option<User>,
 }
+#[derive(serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct UserQuery {
@@ -319,12 +344,14 @@ pub struct UserQuery {
   pub name: ::core::option::Option<::prost::alloc::string::String>,
 }
 /// Query user
+#[derive(serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct QueryUsersRequest {
   #[prost(message, optional, tag = "1")]
   pub query: ::core::option::Option<UserQuery>,
 }
+#[derive(serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct UserUpdate {
@@ -336,6 +363,7 @@ pub struct UserUpdate {
   pub name: ::prost::alloc::string::String,
 }
 /// Update user request
+#[derive(serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct UpdateUserRequest {
@@ -343,6 +371,7 @@ pub struct UpdateUserRequest {
   pub update: ::core::option::Option<UserUpdate>,
 }
 /// Update user response
+#[derive(serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct UpdateUserResponse {
@@ -351,6 +380,7 @@ pub struct UpdateUserResponse {
   pub user: ::core::option::Option<User>,
 }
 /// Delete users request
+#[derive(serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct DeleteUsersRequest {

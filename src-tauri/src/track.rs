@@ -1,64 +1,86 @@
 use crate::error::Result;
 use lofty::{Accessor, AudioFile, ItemKey, Picture, TaggedFileExt};
-use serde::{
-  ser::{SerializeSeq, SerializeStruct},
-  Serialize,
-};
-use std::borrow::Cow;
+use musync::{Musync, Musyncer};
+use serde::{ser::SerializeStruct, Serialize};
+use std::{borrow::Cow, fs};
+use tauri::State;
 
-#[derive(Serialize, Default)]
-pub struct Track {
-  path: String,
-  /// milli seconds
-  duration: u64,
-  artist: Option<String>,
-  album: Option<String>,
-  title: Option<String>,
-  genre: Option<String>,
-  year: Option<u32>,
-
-  #[serde(serialize_with = "serialize_pictures")]
-  pictures: Vec<Picture>,
-}
-
-#[tauri::command]
-pub fn get_track_info(path: &str, full: bool) -> Result<Track> {
+pub fn get_track_info(path: &str) -> Result<abi::Track> {
   let probe = lofty::Probe::open(path)?;
-  let mut song = Track::new(path);
+  let mut song = abi::Track {
+    local_src: Some(abi::LocalSource {
+      path: path.to_string(),
+    }),
+    ..Default::default()
+  };
   if let Ok(mut tagged_file) = probe.read() {
     let properties = tagged_file.properties();
-    song.duration = properties.duration().as_millis() as u64;
+    song.duration = Some(properties.duration().as_millis() as u32);
     if let Some(tag) = tagged_file.primary_tag_mut() {
       // Check for a length tag (Ex. TLEN in ID3v2)
       if let Some(len_tag) = tag.get_string(&ItemKey::Length) {
-        song.duration = len_tag.parse::<u64>()?;
+        song.duration = Some(len_tag.parse::<u32>()?);
       }
       song.artist = tag.artist().map(Cow::into_owned);
       song.album = tag.album().map(Cow::into_owned);
-      song.title = tag.title().map(Cow::into_owned);
+      song.title = tag.title().map(Cow::into_owned).unwrap_or_else(|| {
+        let filename = std::path::Path::new(path).file_name().unwrap();
+        filename.to_str().unwrap().to_string()
+      });
       song.genre = tag.genre().map(Cow::into_owned);
       song.year = tag.year();
 
-      if full {
-        song.pictures = tag.pictures().to_vec();
-      }
+      // if full {
+      //   song.pictures = tag.pictures().to_vec();
+      // }
     }
   }
   Ok(song)
 }
 
-impl Track {
-  fn new(path: &str) -> Self {
-    Track {
-      path: path.to_string(),
-      ..Default::default()
+fn add_track(dir: &str, tracks: &mut Vec<abi::Track>) -> Result<()> {
+  let entries = fs::read_dir(dir).unwrap();
+  for entry in entries {
+    let entry = entry.unwrap();
+    let path = entry.path();
+    let path_str = path.to_str().unwrap();
+    if path.is_file() {
+      tracks.push(get_track_info(path_str)?);
+    } else if path.is_dir() {
+      add_track(path_str, tracks)?;
     }
   }
+  Ok(())
 }
 
-struct PictureSerializer<'a>(&'a Picture);
+#[tauri::command]
+pub async fn update_folder(dir: String, manager: State<'_, Musyncer>) -> Result<()> {
+  let mut tracks = vec![];
+  add_track(&dir, &mut tracks)?;
+  manager.create_tracks(tracks, &dir).await?;
+  Ok(())
+}
 
-impl<'a> Serialize for PictureSerializer<'a> {
+#[tauri::command]
+pub async fn get_track_pictures(
+  id: i32,
+  manager: State<'_, Musyncer>,
+) -> Result<Vec<PictureSerializer>> {
+  let track = manager.track(id).await?;
+  let path = track.local_src.as_ref().unwrap().path.clone();
+  let probe = lofty::Probe::open(path)?;
+  let mut pictures = vec![];
+  if let Ok(mut tagged_file) = probe.read() {
+    if let Some(tag) = tagged_file.primary_tag_mut() {
+      pictures = tag.pictures().to_vec();
+    }
+  }
+  Ok(pictures.into_iter().map(PictureSerializer).collect())
+}
+
+pub struct PictureSerializer(Picture);
+
+impl Serialize for PictureSerializer {
   fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
   where
     S: serde::Serializer,
@@ -67,20 +89,11 @@ impl<'a> Serialize for PictureSerializer<'a> {
     map.serialize_field("mime_type", &self.0.mime_type().to_string())?;
     map.serialize_field("picture_type", &self.0.pic_type().as_u8())?;
     map.serialize_field("description", &self.0.description())?;
-    map.serialize_field("data", &self.0.data())?;
+    use base64::{engine::general_purpose, Engine as _};
+    let data_base64: String = general_purpose::STANDARD_NO_PAD.encode(self.0.data());
+    map.serialize_field("data", &data_base64)?;
     map.end()
   }
-}
-
-fn serialize_pictures<S>(pictures: &[Picture], serializer: S) -> Result<S::Ok, S::Error>
-where
-  S: serde::Serializer,
-{
-  let mut seq = serializer.serialize_seq(Some(pictures.len()))?;
-  for pic in pictures {
-    seq.serialize_element(&PictureSerializer(pic))?;
-  }
-  seq.end()
 }
 
 // struct SerializeLyrics<'a>(&'a Lyrics);

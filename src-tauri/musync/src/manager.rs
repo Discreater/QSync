@@ -1,19 +1,26 @@
 use abi::convert_to_timestamp;
 use chrono::Utc;
 use entity::prelude::*;
+use migration::{Migrator, MigratorTrait};
 
 use async_trait::async_trait;
 use sea_orm::{
-  ActiveModelTrait, ColumnTrait, Condition, DatabaseConnection, EntityTrait, QueryFilter,
-  QueryTrait, Set,
+  ActiveModelTrait, ActiveValue::NotSet, ColumnTrait, Condition, Database, DatabaseConnection,
+  EntityTrait, QueryFilter, QueryTrait, Set, TransactionTrait,
 };
-use tracing::{trace, warn};
+use tracing::{info, trace, warn};
 
 use crate::{Musync, MusyncError, Musyncer, PlaylistId, TrackId, UserId};
 
 impl Musyncer {
   pub fn new(db: DatabaseConnection) -> Self {
     Self { db }
+  }
+
+  pub async fn from_url(db_url: &str) -> crate::error::Result<Self> {
+    let db = Database::connect(db_url).await?;
+    Migrator::up(&db, None).await?;
+    Ok(Self::new(db))
   }
 }
 
@@ -163,41 +170,80 @@ impl Musync for Musyncer {
   }
 
   async fn create_track(&self, track: abi::Track) -> Result<abi::Track, MusyncError> {
-    let mut updating = track.clone();
-    if track.netease_src.is_some() {
-      warn!("netease_src is not supported yet");
-    }
+    let txn = self.db.begin().await?;
     let now = Utc::now();
     let inserted = entity::track::ActiveModel {
-      title: Set(track.title),
-      artist: Set(track.artist),
-      album: Set(track.album),
+      id: NotSet,
+      title: Set(track.title.clone()),
+      artist: Set(track.artist.clone()),
+      album: Set(track.album.clone()),
       duration: Set(track.duration),
-      genre: Set(track.genre),
+      genre: Set(track.genre.clone()),
       year: Set(track.year),
       created_at: Set(now),
       updated_at: Set(now),
-      ..Default::default()
     }
-    .insert(&self.db)
+    .insert(&txn)
     .await?;
-
-    trace!("inserted track id: {}", inserted.id);
-
-    if let Some(src) = track.local_src.clone() {
+    if let Some(src) = track.local_src {
       entity::local_src::ActiveModel {
         track_id: Set(inserted.id),
         path: Set(src.path),
+        folder_id: NotSet,
       }
-      .insert(&self.db)
+      .insert(&txn)
       .await?;
     }
+    txn.commit().await?;
+    Ok(abi::Track::from_entity(inserted))
+  }
 
-    updating.id = inserted.id;
-    updating.created_at = Some(convert_to_timestamp(&now));
-    updating.updated_at = Some(convert_to_timestamp(&now));
-
-    Ok(updating)
+  async fn create_tracks(
+    &self,
+    tracks: Vec<abi::Track>,
+    folder: &str,
+  ) -> Result<TrackId, MusyncError> {
+    let txn = self.db.begin().await?;
+    let now = Utc::now();
+    let folder = entity::local_src_folder::ActiveModel {
+      id: NotSet,
+      path: Set(folder.to_owned()),
+      created_at: Set(now),
+      updated_at: Set(now),
+    }
+    .insert(&txn)
+    .await?;
+    let active_tracks = tracks.iter().map(|t| entity::track::ActiveModel {
+      id: NotSet,
+      title: Set(t.title.clone()),
+      artist: Set(t.artist.clone()),
+      album: Set(t.album.clone()),
+      duration: Set(t.duration),
+      genre: Set(t.genre.clone()),
+      year: Set(t.year),
+      created_at: Set(now),
+      updated_at: Set(now),
+    });
+    let inserted: sea_orm::InsertResult<entity::track::ActiveModel> =
+      Track::insert_many(active_tracks).exec(&txn).await?;
+    info!("inserted tracks: {:?}", inserted);
+    let start_id = tracks.len() as i32 - inserted.last_insert_id + 1;
+    let mut local_srcs = vec![];
+    for (idx, track) in tracks.iter().enumerate() {
+      if let Some(src) = track.local_src.as_ref() {
+        local_srcs.push(entity::local_src::ActiveModel {
+          track_id: Set(start_id + idx as i32),
+          path: Set(src.path.clone()),
+          folder_id: Set(Some(folder.id)),
+        });
+      }
+      if let Some(_src) = track.netease_src.as_ref() {
+        warn!("netease_src is not supported yet");
+      }
+    }
+    LocalSrc::insert_many(local_srcs).exec(&txn).await?;
+    txn.commit().await?;
+    Ok(inserted.last_insert_id)
   }
 
   async fn update_track(&self, update: abi::TrackUpdate) -> Result<abi::Track, MusyncError> {
@@ -242,6 +288,7 @@ impl Musync for Musyncer {
         let inserted = entity::local_src::ActiveModel {
           track_id: Set(update.id),
           path: Set(src.path),
+          folder_id: NotSet,
         };
         inserted.insert(&self.db).await?;
       }

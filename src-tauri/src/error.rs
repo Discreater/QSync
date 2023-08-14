@@ -11,6 +11,8 @@ pub enum Error {
   Lofty(#[from] lofty::LoftyError),
   #[error(transparent)]
   Parse(#[from] ParseIntError),
+  #[error(transparent)]
+  Musyncer(#[from] musync::MusyncError),
 }
 
 // we must manually implement serde::Serialize

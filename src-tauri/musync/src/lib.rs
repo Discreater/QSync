@@ -38,6 +38,12 @@ pub trait Musync {
 
   // create a track
   async fn create_track(&self, track: abi::Track) -> Result<abi::Track, MusyncError>;
+  // create multiple tracks
+  async fn create_tracks(
+    &self,
+    tracks: Vec<abi::Track>,
+    folder: &str,
+  ) -> Result<TrackId, MusyncError>;
   // update a track
   async fn update_track(&self, track: abi::TrackUpdate) -> Result<abi::Track, MusyncError>;
   // delete tracks

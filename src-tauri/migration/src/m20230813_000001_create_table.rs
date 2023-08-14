@@ -87,11 +87,19 @@ impl MigrationTrait for Migration {
               .primary_key(),
           )
           .col(ColumnDef::new(LocalSrc::Path).string().not_null())
+          .col(ColumnDef::new(LocalSrc::FolderId).integer())
           .foreign_key(
             ForeignKey::create()
               .name("fk-local_src-track_id")
               .from(LocalSrc::Table, LocalSrc::TrackId)
               .to(Track::Table, Track::Id)
+              .on_delete(ForeignKeyAction::Cascade),
+          )
+          .foreign_key(
+            ForeignKey::create()
+              .name("fk-local_src-folder_id")
+              .from(LocalSrc::Table, LocalSrc::FolderId)
+              .to(LocalSrcFolder::Table, LocalSrcFolder::Id)
               .on_delete(ForeignKeyAction::Cascade),
           )
           .to_owned(),
@@ -301,10 +309,58 @@ impl MigrationTrait for Migration {
       )
       .await?;
 
+    manager
+      .create_table(
+        Table::create()
+          .table(LocalSrcFolder::Table)
+          .col(
+            ColumnDef::new(LocalSrcFolder::Id)
+              .integer()
+              .not_null()
+              .auto_increment()
+              .primary_key(),
+          )
+          .col(
+            ColumnDef::new(LocalSrcFolder::Path)
+              .string()
+              .not_null()
+              .unique_key(),
+          )
+          .col(
+            ColumnDef::new(LocalSrcFolder::CreatedAt)
+              .timestamp()
+              .not_null(),
+          )
+          .col(
+            ColumnDef::new(LocalSrcFolder::UpdatedAt)
+              .timestamp()
+              .not_null(),
+          )
+          .to_owned(),
+      )
+      .await?;
+    manager
+      .create_index(
+        Index::create()
+          .name("idx-local_src_folder-path")
+          .table(LocalSrcFolder::Table)
+          .col(LocalSrcFolder::Path)
+          .to_owned(),
+      )
+      .await?;
+
     Ok(())
   }
 
   async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
+    manager
+      .drop_table(
+        Table::drop()
+          .if_exists()
+          .table(LocalSrcFolder::Table)
+          .to_owned(),
+      )
+      .await?;
     manager
       .drop_table(Table::drop().if_exists().table(Playback::Table).to_owned())
       .await?;
@@ -360,6 +416,7 @@ enum LocalSrc {
   Table,
   TrackId,
   Path,
+  FolderId,
 }
 
 #[derive(DeriveIden)]
@@ -406,6 +463,15 @@ enum Playback {
   Playing,
   StartedAt,
   PausedAt,
+  CreatedAt,
+  UpdatedAt,
+}
+
+#[derive(DeriveIden)]
+enum LocalSrcFolder {
+  Table,
+  Id,
+  Path,
   CreatedAt,
   UpdatedAt,
 }

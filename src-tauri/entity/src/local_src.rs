@@ -8,10 +8,19 @@ pub struct Model {
   #[sea_orm(primary_key, auto_increment = false)]
   pub track_id: i32,
   pub path: String,
+  pub folder_id: Option<i32>,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
 pub enum Relation {
+  #[sea_orm(
+    belongs_to = "super::local_src_folder::Entity",
+    from = "Column::FolderId",
+    to = "super::local_src_folder::Column::Id",
+    on_update = "NoAction",
+    on_delete = "Cascade"
+  )]
+  LocalSrcFolder,
   #[sea_orm(
     belongs_to = "super::track::Entity",
     from = "Column::TrackId",
@@ -20,6 +29,12 @@ pub enum Relation {
     on_delete = "Cascade"
   )]
   Track,
+}
+
+impl Related<super::local_src_folder::Entity> for Entity {
+  fn to() -> RelationDef {
+    Relation::LocalSrcFolder.def()
+  }
 }
 
 impl Related<super::track::Entity> for Entity {

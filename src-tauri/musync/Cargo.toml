@@ -18,6 +18,4 @@ chrono = "0.4.26"
 
 [dev-dependencies]
 tokio = { version = "1.25.0", features = ["full"] }
-# sqlx-db-tester = { path = "../../../sqlx-db-tester"}
-# sqlx-db-tester = { git = "https://github.com/Discreater/sqlx-db-tester", branch = "sqlite"}
 tracing-subscriber = "0.3.16"

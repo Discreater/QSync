@@ -5,7 +5,7 @@ pub enum MusyncError {
   #[error("Unknown error")]
   Unknown,
 
-  #[error("SeaOrm error")]
+  #[error("SeaOrm error: {0}")]
   SeaOrm(#[from] sea_orm::DbErr),
 
   #[error("Playlist {0} not found")]
