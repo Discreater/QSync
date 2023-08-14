@@ -352,12 +352,7 @@ impl Musync for Musyncer {
         .all(&self.db)
         .await?;
 
-      Ok(
-        rows
-          .into_iter()
-          .map(abi::User::from_entity)
-          .collect(),
-      )
+      Ok(rows.into_iter().map(abi::User::from_entity).collect())
     } else {
       Ok(vec![])
     }
