@@ -4,17 +4,17 @@ import QScrollbar from '~/components/QScrollbar.vue';
 import type { Column } from '~/components/QTable.vue';
 import H1 from '~/components/typo/H1.vue';
 import Basic from '~/layouts/Basic.vue';
-import { ViewTrack } from '~/sources/folder';
 import { usePlayerStore, useQSyncStore } from '~/store';
 import QTable from '~/components/QTable.vue';
 import QHoverButton from '~/components/QHoverButton.vue';
 import IconPlay from '~icons/fluent/play-24-regular';
 import { formatTime } from '~/utils';
+import { TrackExt } from "~/model_ext/track";
 
 const { t } = useI18n();
 const store = useQSyncStore();
 const playerStore = usePlayerStore();
-const views = store.playbackQueue.map(track => new ViewTrack(track));
+const views = store.playbackQueue;
 
 function playByIdx(idx: number) {
   playerStore.play(idx);
@@ -63,22 +63,22 @@ const columns: Column[] = [
             <QHoverButton :icon="IconPlay" class="text-passion" @click="playByIdx(rowIdx)" />
           </template>
           <template v-else-if="column.key === 'title'">
-            {{ row.name() }}
+            {{ row.title }}
           </template>
           <template v-else-if="column.key === 'artist'">
-            {{ row.artist() }}
+            {{ row.artist }}
           </template>
           <template v-else-if="column.key === 'album'">
-            {{ row.album() }}
+            {{ row.album }}
           </template>
           <template v-else-if="column.key === 'year'">
-            {{ row.year() }}
+            {{ row.year }}
           </template>
           <template v-else-if="column.key === 'genre'">
-            {{ row.genre() }}
+            {{ row.genre }}
           </template>
           <template v-else-if="column.key === 'duration'">
-            {{ formatTime(row.durationInSec()) }}
+            {{ formatTime(TrackExt.durationInSecs(track)) }}
           </template>
         </template>
       </QTable>

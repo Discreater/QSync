@@ -20,7 +20,7 @@ async function handleAddMusicFolder() {
   const selected = await open({
     directory: true,
   }) as string;
-  store.addMusicFolder(selected);
+  // store.addMusicFolder(selected);
 }
 </script>
 

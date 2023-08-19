@@ -1,65 +1,10 @@
 import { invoke } from '@tauri-apps/api';
-
-export class ViewTrack {
-  static empty = new ViewTrack({
-    path: '@undefined@',
-    duration: 0,
-  });
-
-  url: string | undefined;
-  constructor(public raw: RawTrack) {
-  }
-
-  key(): string {
-    return this.raw.path;
-  }
-
-  name(): string {
-    return this.raw.title ?? this.raw.path.split(/[\\/]/).pop() ?? this.raw.path;
-  }
-
-  artist(): string {
-    return this.raw.artist ?? '';
-  }
-
-  album(): string {
-    return this.raw.album ?? '';
-  }
-
-  genre(): string {
-    return this.raw.genre ?? '';
-  }
-
-  /** @returns in millisecond */
-  duration(): number {
-    return this.raw.duration;
-  }
-
-  durationInSec(): number {
-    return Math.floor(this.duration() / 1000);
-  }
-
-  year(): number | undefined {
-    return this.raw.year;
-  }
-
-  picture_url(): string | undefined {
-    if (this.url === undefined) {
-      if (!this.raw.pictures || this.raw.pictures?.length === 0)
-        return undefined;
-      const p1 = this.raw.pictures[0];
-      const blob = new Blob([Uint8Array.from(p1.data as unknown as number[]).buffer], { type: p1.mime_type });
-      this.url = URL.createObjectURL(blob);
-      return this.url;
-    }
-    return this.url;
-  }
-}
+import type { Track } from '~/generated/protos/musync';
 
 export interface LocalFolder {
   path: string
   updating: boolean
-  tracks: RawTrack[]
+  tracks: Track[]
 }
 
 export interface RawTrack {

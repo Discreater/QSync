@@ -12,7 +12,7 @@ pub enum Error {
   #[error(transparent)]
   Parse(#[from] ParseIntError),
   #[error(transparent)]
-  Musyncer(#[from] musync::MusyncError),
+  Musyncer(#[from] dbm::MusyncError),
 }
 
 // we must manually implement serde::Serialize

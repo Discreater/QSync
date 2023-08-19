@@ -93,7 +93,11 @@ pub struct Track {
 #[derive(serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct NeteaseSource {}
+pub struct NeteaseSource {
+  /// id of the track in netease
+  #[prost(string, tag = "1")]
+  pub id: ::prost::alloc::string::String,
+}
 /// LocalSource
 #[derive(serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -121,14 +125,46 @@ pub struct User {
   #[prost(message, optional, tag = "4")]
   pub updated_at: ::core::option::Option<super::google::protobuf::Timestamp>,
 }
+/// Token
+#[derive(serde::Serialize, serde::Deserialize)]
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct Token {
+  #[prost(string, tag = "1")]
+  pub data: ::prost::alloc::string::String,
+  #[prost(string, tag = "2")]
+  pub r#type: ::prost::alloc::string::String,
+}
+/// Cover
+#[derive(serde::Serialize, serde::Deserialize)]
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct Picture {
+  /// picture type according to ID3v2 APIC
+  #[prost(string, optional, tag = "1")]
+  pub pic_type: ::core::option::Option<::prost::alloc::string::String>,
+  #[prost(string, tag = "2")]
+  pub mime_type: ::prost::alloc::string::String,
+  #[prost(string, optional, tag = "3")]
+  pub description: ::core::option::Option<::prost::alloc::string::String>,
+  /// base64 picture data
+  #[prost(string, tag = "4")]
+  pub data: ::prost::alloc::string::String,
+}
 /// Create playlist request
 #[derive(serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct CreatePlaylistRequest {
-  /// Playlist to be created
-  #[prost(message, optional, tag = "1")]
-  pub playlist: ::core::option::Option<Playlist>,
+  /// ids of tracks in the playlist
+  #[prost(int32, repeated, tag = "1")]
+  pub track_ids: ::prost::alloc::vec::Vec<i32>,
+  /// name of the playlist
+  #[prost(string, tag = "2")]
+  pub name: ::prost::alloc::string::String,
+  /// description of the playlist
+  #[prost(string, tag = "3")]
+  pub description: ::prost::alloc::string::String,
 }
 /// Create playlist response
 #[derive(serde::Serialize, serde::Deserialize)]
@@ -152,7 +188,7 @@ pub struct DeletePlaylistsRequest {
 #[derive(serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct PlaylistQuery {
+pub struct QueryPlaylistsRequest {
   /// which user has the playlist
   #[prost(int32, optional, tag = "1")]
   pub user_id: ::core::option::Option<i32>,
@@ -163,20 +199,11 @@ pub struct PlaylistQuery {
   #[prost(string, optional, tag = "3")]
   pub name: ::core::option::Option<::prost::alloc::string::String>,
 }
-/// Query playlist request
-#[derive(serde::Serialize, serde::Deserialize)]
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct QueryPlaylistsRequest {
-  /// Query
-  #[prost(message, optional, tag = "1")]
-  pub query: ::core::option::Option<PlaylistQuery>,
-}
 /// Update playlist: add/remove tracks, update name and description
 #[derive(serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct PlaylistUpdate {
+pub struct UpdatePlaylistRequest {
   /// Id of the playlist to be updated
   #[prost(int32, tag = "1")]
   pub id: i32,
@@ -192,13 +219,6 @@ pub struct PlaylistUpdate {
   /// New description of the playlist
   #[prost(string, optional, tag = "5")]
   pub description: ::core::option::Option<::prost::alloc::string::String>,
-}
-#[derive(serde::Serialize, serde::Deserialize)]
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct UpdatePlaylistRequest {
-  #[prost(message, optional, tag = "1")]
-  pub update: ::core::option::Option<PlaylistUpdate>,
 }
 /// Updated playlist will be returned in response
 #[derive(serde::Serialize, serde::Deserialize)]
@@ -231,7 +251,7 @@ pub struct CreateTrackResponse {
 #[derive(serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct TrackQuery {
+pub struct QueryTracksRequest {
   /// Query by which playlist contains the track
   #[prost(int32, optional, tag = "1")]
   pub playlist_id: ::core::option::Option<i32>,
@@ -250,15 +270,6 @@ pub struct TrackQuery {
   /// Query by year
   #[prost(uint32, optional, tag = "6")]
   pub year: ::core::option::Option<u32>,
-}
-/// Query track request
-#[derive(serde::Serialize, serde::Deserialize)]
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct QueryTracksRequest {
-  /// Query
-  #[prost(message, optional, tag = "1")]
-  pub query: ::core::option::Option<TrackQuery>,
 }
 #[derive(serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -335,21 +346,14 @@ pub struct CreateUserResponse {
   #[prost(message, optional, tag = "1")]
   pub user: ::core::option::Option<User>,
 }
-#[derive(serde::Serialize, serde::Deserialize)]
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct UserQuery {
-  /// Query by name
-  #[prost(string, optional, tag = "1")]
-  pub name: ::core::option::Option<::prost::alloc::string::String>,
-}
 /// Query user
 #[derive(serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct QueryUsersRequest {
-  #[prost(message, optional, tag = "1")]
-  pub query: ::core::option::Option<UserQuery>,
+  /// Query by name
+  #[prost(string, optional, tag = "1")]
+  pub name: ::core::option::Option<::prost::alloc::string::String>,
 }
 #[derive(serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -387,6 +391,70 @@ pub struct DeleteUsersRequest {
   /// Ids of users to be deleted
   #[prost(int32, repeated, tag = "1")]
   pub ids: ::prost::alloc::vec::Vec<i32>,
+}
+#[derive(serde::Serialize, serde::Deserialize)]
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct LoginRequest {
+  #[prost(string, tag = "1")]
+  pub name: ::prost::alloc::string::String,
+  #[prost(string, tag = "2")]
+  pub r#type: ::prost::alloc::string::String,
+}
+#[derive(serde::Serialize, serde::Deserialize)]
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct AddLocalFolderRequest {
+  #[prost(string, tag = "1")]
+  pub path: ::prost::alloc::string::String,
+}
+#[derive(serde::Serialize, serde::Deserialize)]
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct RemoveLocalFolderRequest {
+  #[prost(string, tag = "1")]
+  pub path: ::prost::alloc::string::String,
+}
+#[derive(serde::Serialize, serde::Deserialize)]
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct AddLocalFolderResponse {
+  #[prost(uint32, tag = "1")]
+  pub added_tracks: u32,
+}
+#[derive(serde::Serialize, serde::Deserialize)]
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct RemoveLocalFolderResponse {
+  #[prost(uint32, tag = "1")]
+  pub removed_tracks: u32,
+}
+#[derive(serde::Serialize, serde::Deserialize)]
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct GetTrackRequest {
+  #[prost(int32, tag = "1")]
+  pub id: i32,
+}
+#[derive(serde::Serialize, serde::Deserialize)]
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct GetTrackCoverRequest {
+  #[prost(int32, tag = "1")]
+  pub track_id: i32,
+  #[prost(uint32, optional, tag = "2")]
+  pub cover_idx: ::core::option::Option<u32>,
+}
+#[derive(serde::Serialize, serde::Deserialize)]
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct QueryLocalFoldersRequest {}
+#[derive(serde::Serialize, serde::Deserialize)]
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct LocalFolder {
+  #[prost(string, tag = "1")]
+  pub path: ::prost::alloc::string::String,
 }
 /// Generated client implementations.
 pub mod musync_service_client {
@@ -473,6 +541,81 @@ pub mod musync_service_client {
       self.inner = self.inner.max_encoding_message_size(limit);
       self
     }
+    pub async fn login(
+      &mut self,
+      request: impl tonic::IntoRequest<super::LoginRequest>,
+    ) -> std::result::Result<tonic::Response<super::Token>, tonic::Status> {
+      self.inner.ready().await.map_err(|e| {
+        tonic::Status::new(
+          tonic::Code::Unknown,
+          format!("Service was not ready: {}", e.into()),
+        )
+      })?;
+      let codec = tonic::codec::ProstCodec::default();
+      let path = http::uri::PathAndQuery::from_static("/musync.MusyncService/Login");
+      let mut req = request.into_request();
+      req
+        .extensions_mut()
+        .insert(GrpcMethod::new("musync.MusyncService", "Login"));
+      self.inner.unary(req, path, codec).await
+    }
+    pub async fn add_local_folder(
+      &mut self,
+      request: impl tonic::IntoRequest<super::AddLocalFolderRequest>,
+    ) -> std::result::Result<tonic::Response<super::AddLocalFolderResponse>, tonic::Status> {
+      self.inner.ready().await.map_err(|e| {
+        tonic::Status::new(
+          tonic::Code::Unknown,
+          format!("Service was not ready: {}", e.into()),
+        )
+      })?;
+      let codec = tonic::codec::ProstCodec::default();
+      let path = http::uri::PathAndQuery::from_static("/musync.MusyncService/AddLocalFolder");
+      let mut req = request.into_request();
+      req
+        .extensions_mut()
+        .insert(GrpcMethod::new("musync.MusyncService", "AddLocalFolder"));
+      self.inner.unary(req, path, codec).await
+    }
+    pub async fn remove_local_folder(
+      &mut self,
+      request: impl tonic::IntoRequest<super::RemoveLocalFolderRequest>,
+    ) -> std::result::Result<tonic::Response<super::RemoveLocalFolderResponse>, tonic::Status> {
+      self.inner.ready().await.map_err(|e| {
+        tonic::Status::new(
+          tonic::Code::Unknown,
+          format!("Service was not ready: {}", e.into()),
+        )
+      })?;
+      let codec = tonic::codec::ProstCodec::default();
+      let path = http::uri::PathAndQuery::from_static("/musync.MusyncService/RemoveLocalFolder");
+      let mut req = request.into_request();
+      req
+        .extensions_mut()
+        .insert(GrpcMethod::new("musync.MusyncService", "RemoveLocalFolder"));
+      self.inner.unary(req, path, codec).await
+    }
+    pub async fn query_local_folders(
+      &mut self,
+      request: impl tonic::IntoRequest<super::QueryLocalFoldersRequest>,
+    ) -> std::result::Result<
+      tonic::Response<tonic::codec::Streaming<super::LocalFolder>>,
+      tonic::Status,
+    > {
+      self.inner.ready().await.map_err(|e| {
+        tonic::Status::new(
+          tonic::Code::Unknown,
+          format!("Service was not ready: {}", e.into()),
+        )
+      })?;
+      let codec = tonic::codec::ProstCodec::default();
+      let path = http::uri::PathAndQuery::from_static("/musync.MusyncService/QueryLocalFolders");
+      let mut req = request.into_request();
+      req
+        .extensions_mut()
+        .insert(GrpcMethod::new("musync.MusyncService", "QueryLocalFolders"));
+      self.inner.server_streaming(req, path, codec).await
+    }
     pub async fn create_playlist(
       &mut self,
       request: impl tonic::IntoRequest<super::CreatePlaylistRequest>,
@@ -484,11 +627,11 @@ pub mod musync_service_client {
         )
       })?;
       let codec = tonic::codec::ProstCodec::default();
-      let path = http::uri::PathAndQuery::from_static("/musync.MusyncService/createPlaylist");
+      let path = http::uri::PathAndQuery::from_static("/musync.MusyncService/CreatePlaylist");
       let mut req = request.into_request();
       req
         .extensions_mut()
-        .insert(GrpcMethod::new("musync.MusyncService", "createPlaylist"));
+        .insert(GrpcMethod::new("musync.MusyncService", "CreatePlaylist"));
       self.inner.unary(req, path, codec).await
     }
     pub async fn query_playlists(
@@ -503,11 +646,11 @@ pub mod musync_service_client {
         )
       })?;
       let codec = tonic::codec::ProstCodec::default();
-      let path = http::uri::PathAndQuery::from_static("/musync.MusyncService/queryPlaylists");
+      let path = http::uri::PathAndQuery::from_static("/musync.MusyncService/QueryPlaylists");
       let mut req = request.into_request();
       req
         .extensions_mut()
-        .insert(GrpcMethod::new("musync.MusyncService", "queryPlaylists"));
+        .insert(GrpcMethod::new("musync.MusyncService", "QueryPlaylists"));
       self.inner.server_streaming(req, path, codec).await
     }
     pub async fn update_playlist(
@@ -521,11 +664,11 @@ pub mod musync_service_client {
         )
       })?;
       let codec = tonic::codec::ProstCodec::default();
-      let path = http::uri::PathAndQuery::from_static("/musync.MusyncService/updatePlaylist");
+      let path = http::uri::PathAndQuery::from_static("/musync.MusyncService/UpdatePlaylist");
       let mut req = request.into_request();
       req
         .extensions_mut()
-        .insert(GrpcMethod::new("musync.MusyncService", "updatePlaylist"));
+        .insert(GrpcMethod::new("musync.MusyncService", "UpdatePlaylist"));
       self.inner.unary(req, path, codec).await
     }
     pub async fn delete_playlists(
@@ -540,12 +683,48 @@ pub mod musync_service_client {
         )
       })?;
       let codec = tonic::codec::ProstCodec::default();
-      let path = http::uri::PathAndQuery::from_static("/musync.MusyncService/deletePlaylists");
+      let path = http::uri::PathAndQuery::from_static("/musync.MusyncService/DeletePlaylists");
       let mut req = request.into_request();
       req
         .extensions_mut()
-        .insert(GrpcMethod::new("musync.MusyncService", "deletePlaylists"));
+        .insert(GrpcMethod::new("musync.MusyncService", "DeletePlaylists"));
       self.inner.server_streaming(req, path, codec).await
+    }
+    pub async fn get_track(
+      &mut self,
+      request: impl tonic::IntoRequest<super::GetTrackRequest>,
+    ) -> std::result::Result<tonic::Response<super::Track>, tonic::Status> {
+      self.inner.ready().await.map_err(|e| {
+        tonic::Status::new(
+          tonic::Code::Unknown,
+          format!("Service was not ready: {}", e.into()),
+        )
+      })?;
+      let codec = tonic::codec::ProstCodec::default();
+      let path = http::uri::PathAndQuery::from_static("/musync.MusyncService/GetTrack");
+      let mut req = request.into_request();
+      req
+        .extensions_mut()
+        .insert(GrpcMethod::new("musync.MusyncService", "GetTrack"));
+      self.inner.unary(req, path, codec).await
+    }
+    pub async fn get_track_cover(
+      &mut self,
+      request: impl tonic::IntoRequest<super::GetTrackCoverRequest>,
+    ) -> std::result::Result<tonic::Response<super::Picture>, tonic::Status> {
+      self.inner.ready().await.map_err(|e| {
+        tonic::Status::new(
+          tonic::Code::Unknown,
+          format!("Service was not ready: {}", e.into()),
+        )
+      })?;
+      let codec = tonic::codec::ProstCodec::default();
+      let path = http::uri::PathAndQuery::from_static("/musync.MusyncService/GetTrackCover");
+      let mut req = request.into_request();
+      req
+        .extensions_mut()
+        .insert(GrpcMethod::new("musync.MusyncService", "GetTrackCover"));
+      self.inner.unary(req, path, codec).await
     }
     pub async fn create_track(
       &mut self,
@@ -558,11 +737,11 @@ pub mod musync_service_client {
         )
       })?;
       let codec = tonic::codec::ProstCodec::default();
-      let path = http::uri::PathAndQuery::from_static("/musync.MusyncService/createTrack");
+      let path = http::uri::PathAndQuery::from_static("/musync.MusyncService/CreateTrack");
       let mut req = request.into_request();
       req
         .extensions_mut()
-        .insert(GrpcMethod::new("musync.MusyncService", "createTrack"));
+        .insert(GrpcMethod::new("musync.MusyncService", "CreateTrack"));
       self.inner.unary(req, path, codec).await
     }
     pub async fn query_tracks(
@@ -577,11 +756,11 @@ pub mod musync_service_client {
         )
       })?;
       let codec = tonic::codec::ProstCodec::default();
-      let path = http::uri::PathAndQuery::from_static("/musync.MusyncService/queryTracks");
+      let path = http::uri::PathAndQuery::from_static("/musync.MusyncService/QueryTracks");
       let mut req = request.into_request();
       req
         .extensions_mut()
-        .insert(GrpcMethod::new("musync.MusyncService", "queryTracks"));
+        .insert(GrpcMethod::new("musync.MusyncService", "QueryTracks"));
       self.inner.server_streaming(req, path, codec).await
     }
     pub async fn update_track(
@@ -595,11 +774,11 @@ pub mod musync_service_client {
         )
       })?;
       let codec = tonic::codec::ProstCodec::default();
-      let path = http::uri::PathAndQuery::from_static("/musync.MusyncService/updateTrack");
+      let path = http::uri::PathAndQuery::from_static("/musync.MusyncService/UpdateTrack");
       let mut req = request.into_request();
       req
         .extensions_mut()
-        .insert(GrpcMethod::new("musync.MusyncService", "updateTrack"));
+        .insert(GrpcMethod::new("musync.MusyncService", "UpdateTrack"));
       self.inner.unary(req, path, codec).await
     }
     pub async fn delete_tracks(
@@ -614,11 +793,11 @@ pub mod musync_service_client {
         )
       })?;
       let codec = tonic::codec::ProstCodec::default();
-      let path = http::uri::PathAndQuery::from_static("/musync.MusyncService/deleteTracks");
+      let path = http::uri::PathAndQuery::from_static("/musync.MusyncService/DeleteTracks");
       let mut req = request.into_request();
       req
         .extensions_mut()
-        .insert(GrpcMethod::new("musync.MusyncService", "deleteTracks"));
+        .insert(GrpcMethod::new("musync.MusyncService", "DeleteTracks"));
       self.inner.server_streaming(req, path, codec).await
     }
     pub async fn create_user(
@@ -632,11 +811,11 @@ pub mod musync_service_client {
         )
       })?;
       let codec = tonic::codec::ProstCodec::default();
-      let path = http::uri::PathAndQuery::from_static("/musync.MusyncService/createUser");
+      let path = http::uri::PathAndQuery::from_static("/musync.MusyncService/CreateUser");
       let mut req = request.into_request();
       req
         .extensions_mut()
-        .insert(GrpcMethod::new("musync.MusyncService", "createUser"));
+        .insert(GrpcMethod::new("musync.MusyncService", "CreateUser"));
       self.inner.unary(req, path, codec).await
     }
     pub async fn query_users(
@@ -651,11 +830,11 @@ pub mod musync_service_client {
         )
       })?;
       let codec = tonic::codec::ProstCodec::default();
-      let path = http::uri::PathAndQuery::from_static("/musync.MusyncService/queryUsers");
+      let path = http::uri::PathAndQuery::from_static("/musync.MusyncService/QueryUsers");
       let mut req = request.into_request();
       req
         .extensions_mut()
-        .insert(GrpcMethod::new("musync.MusyncService", "queryUsers"));
+        .insert(GrpcMethod::new("musync.MusyncService", "QueryUsers"));
       self.inner.server_streaming(req, path, codec).await
     }
     pub async fn update_user(
@@ -669,11 +848,11 @@ pub mod musync_service_client {
         )
       })?;
       let codec = tonic::codec::ProstCodec::default();
-      let path = http::uri::PathAndQuery::from_static("/musync.MusyncService/updateUser");
+      let path = http::uri::PathAndQuery::from_static("/musync.MusyncService/UpdateUser");
       let mut req = request.into_request();
       req
         .extensions_mut()
-        .insert(GrpcMethod::new("musync.MusyncService", "updateUser"));
+        .insert(GrpcMethod::new("musync.MusyncService", "UpdateUser"));
       self.inner.unary(req, path, codec).await
     }
     pub async fn delete_users(
@@ -688,11 +867,11 @@ pub mod musync_service_client {
         )
       })?;
       let codec = tonic::codec::ProstCodec::default();
-      let path = http::uri::PathAndQuery::from_static("/musync.MusyncService/deleteUsers");
+      let path = http::uri::PathAndQuery::from_static("/musync.MusyncService/DeleteUsers");
       let mut req = request.into_request();
       req
         .extensions_mut()
-        .insert(GrpcMethod::new("musync.MusyncService", "deleteUsers"));
+        .insert(GrpcMethod::new("musync.MusyncService", "DeleteUsers"));
       self.inner.server_streaming(req, path, codec).await
     }
   }
@@ -704,78 +883,106 @@ pub mod musync_service_server {
   /// Generated trait containing gRPC methods that should be implemented for use with MusyncServiceServer.
   #[async_trait]
   pub trait MusyncService: Send + Sync + 'static {
+    async fn login(
+      &self,
+      request: tonic::Request<super::LoginRequest>,
+    ) -> std::result::Result<tonic::Response<super::Token>, tonic::Status>;
+    async fn add_local_folder(
+      &self,
+      request: tonic::Request<super::AddLocalFolderRequest>,
+    ) -> std::result::Result<tonic::Response<super::AddLocalFolderResponse>, tonic::Status>;
+    async fn remove_local_folder(
+      &self,
+      request: tonic::Request<super::RemoveLocalFolderRequest>,
+    ) -> std::result::Result<tonic::Response<super::RemoveLocalFolderResponse>, tonic::Status>;
+    /// Server streaming response type for the QueryLocalFolders method.
+    type QueryLocalFoldersStream: futures_core::Stream<Item = std::result::Result<super::LocalFolder, tonic::Status>>
+      + Send
+      + 'static;
+    async fn query_local_folders(
+      &self,
+      request: tonic::Request<super::QueryLocalFoldersRequest>,
+    ) -> std::result::Result<tonic::Response<Self::QueryLocalFoldersStream>, tonic::Status>;
     async fn create_playlist(
       &self,
       request: tonic::Request<super::CreatePlaylistRequest>,
     ) -> std::result::Result<tonic::Response<super::CreatePlaylistResponse>, tonic::Status>;
-    /// Server streaming response type for the queryPlaylists method.
-    type queryPlaylistsStream: futures_core::Stream<Item = std::result::Result<super::Playlist, tonic::Status>>
+    /// Server streaming response type for the QueryPlaylists method.
+    type QueryPlaylistsStream: futures_core::Stream<Item = std::result::Result<super::Playlist, tonic::Status>>
       + Send
       + 'static;
     async fn query_playlists(
       &self,
       request: tonic::Request<super::QueryPlaylistsRequest>,
-    ) -> std::result::Result<tonic::Response<Self::queryPlaylistsStream>, tonic::Status>;
+    ) -> std::result::Result<tonic::Response<Self::QueryPlaylistsStream>, tonic::Status>;
     async fn update_playlist(
       &self,
       request: tonic::Request<super::UpdatePlaylistRequest>,
     ) -> std::result::Result<tonic::Response<super::UpdatePlaylistResponse>, tonic::Status>;
-    /// Server streaming response type for the deletePlaylists method.
-    type deletePlaylistsStream: futures_core::Stream<Item = std::result::Result<super::Playlist, tonic::Status>>
+    /// Server streaming response type for the DeletePlaylists method.
+    type DeletePlaylistsStream: futures_core::Stream<Item = std::result::Result<super::Playlist, tonic::Status>>
       + Send
       + 'static;
     async fn delete_playlists(
       &self,
       request: tonic::Request<super::DeletePlaylistsRequest>,
-    ) -> std::result::Result<tonic::Response<Self::deletePlaylistsStream>, tonic::Status>;
+    ) -> std::result::Result<tonic::Response<Self::DeletePlaylistsStream>, tonic::Status>;
+    async fn get_track(
+      &self,
+      request: tonic::Request<super::GetTrackRequest>,
+    ) -> std::result::Result<tonic::Response<super::Track>, tonic::Status>;
+    async fn get_track_cover(
+      &self,
+      request: tonic::Request<super::GetTrackCoverRequest>,
+    ) -> std::result::Result<tonic::Response<super::Picture>, tonic::Status>;
     async fn create_track(
       &self,
       request: tonic::Request<super::CreateTrackRequest>,
     ) -> std::result::Result<tonic::Response<super::CreateTrackResponse>, tonic::Status>;
-    /// Server streaming response type for the queryTracks method.
-    type queryTracksStream: futures_core::Stream<Item = std::result::Result<super::Track, tonic::Status>>
+    /// Server streaming response type for the QueryTracks method.
+    type QueryTracksStream: futures_core::Stream<Item = std::result::Result<super::Track, tonic::Status>>
       + Send
       + 'static;
     async fn query_tracks(
       &self,
       request: tonic::Request<super::QueryTracksRequest>,
-    ) -> std::result::Result<tonic::Response<Self::queryTracksStream>, tonic::Status>;
+    ) -> std::result::Result<tonic::Response<Self::QueryTracksStream>, tonic::Status>;
     async fn update_track(
       &self,
       request: tonic::Request<super::UpdateTrackRequest>,
     ) -> std::result::Result<tonic::Response<super::UpdateTrackResponse>, tonic::Status>;
-    /// Server streaming response type for the deleteTracks method.
-    type deleteTracksStream: futures_core::Stream<Item = std::result::Result<super::Track, tonic::Status>>
+    /// Server streaming response type for the DeleteTracks method.
+    type DeleteTracksStream: futures_core::Stream<Item = std::result::Result<super::Track, tonic::Status>>
       + Send
       + 'static;
     async fn delete_tracks(
       &self,
       request: tonic::Request<super::DeleteTracksRequest>,
-    ) -> std::result::Result<tonic::Response<Self::deleteTracksStream>, tonic::Status>;
+    ) -> std::result::Result<tonic::Response<Self::DeleteTracksStream>, tonic::Status>;
     async fn create_user(
       &self,
       request: tonic::Request<super::CreateUserRequest>,
     ) -> std::result::Result<tonic::Response<super::CreateUserResponse>, tonic::Status>;
-    /// Server streaming response type for the queryUsers method.
-    type queryUsersStream: futures_core::Stream<Item = std::result::Result<super::User, tonic::Status>>
+    /// Server streaming response type for the QueryUsers method.
+    type QueryUsersStream: futures_core::Stream<Item = std::result::Result<super::User, tonic::Status>>
       + Send
       + 'static;
     async fn query_users(
       &self,
       request: tonic::Request<super::QueryUsersRequest>,
-    ) -> std::result::Result<tonic::Response<Self::queryUsersStream>, tonic::Status>;
+    ) -> std::result::Result<tonic::Response<Self::QueryUsersStream>, tonic::Status>;
     async fn update_user(
       &self,
       request: tonic::Request<super::UpdateUserRequest>,
     ) -> std::result::Result<tonic::Response<super::UpdateUserResponse>, tonic::Status>;
-    /// Server streaming response type for the deleteUsers method.
-    type deleteUsersStream: futures_core::Stream<Item = std::result::Result<super::User, tonic::Status>>
+    /// Server streaming response type for the DeleteUsers method.
+    type DeleteUsersStream: futures_core::Stream<Item = std::result::Result<super::User, tonic::Status>>
       + Send
       + 'static;
     async fn delete_users(
       &self,
       request: tonic::Request<super::DeleteUsersRequest>,
-    ) -> std::result::Result<tonic::Response<Self::deleteUsersStream>, tonic::Status>;
+    ) -> std::result::Result<tonic::Response<Self::DeleteUsersStream>, tonic::Status>;
   }
   /// Musync service
   #[derive(Debug)]
@@ -851,11 +1058,144 @@ pub mod musync_service_server {
     fn call(&mut self, req: http::Request<B>) -> Self::Future {
       let inner = self.inner.clone();
       match req.uri().path() {
-        "/musync.MusyncService/createPlaylist" => {
+        "/musync.MusyncService/Login" => {
           #[allow(non_camel_case_types)]
-          struct createPlaylistSvc<T: MusyncService>(pub Arc<T>);
+          struct LoginSvc<T: MusyncService>(pub Arc<T>);
+          impl<T: MusyncService> tonic::server::UnaryService<super::LoginRequest> for LoginSvc<T> {
+            type Response = super::Token;
+            type Future = BoxFuture<tonic::Response<Self::Response>, tonic::Status>;
+            fn call(&mut self, request: tonic::Request<super::LoginRequest>) -> Self::Future {
+              let inner = Arc::clone(&self.0);
+              let fut = async move { (*inner).login(request).await };
+              Box::pin(fut)
+            }
+          }
+          let accept_compression_encodings = self.accept_compression_encodings;
+          let send_compression_encodings = self.send_compression_encodings;
+          let max_decoding_message_size = self.max_decoding_message_size;
+          let max_encoding_message_size = self.max_encoding_message_size;
+          let inner = self.inner.clone();
+          let fut = async move {
+            let inner = inner.0;
+            let method = LoginSvc(inner);
+            let codec = tonic::codec::ProstCodec::default();
+            let mut grpc = tonic::server::Grpc::new(codec)
+              .apply_compression_config(accept_compression_encodings, send_compression_encodings)
+              .apply_max_message_size_config(max_decoding_message_size, max_encoding_message_size);
+            let res = grpc.unary(method, req).await;
+            Ok(res)
+          };
+          Box::pin(fut)
+        }
+        "/musync.MusyncService/AddLocalFolder" => {
+          #[allow(non_camel_case_types)]
+          struct AddLocalFolderSvc<T: MusyncService>(pub Arc<T>);
+          impl<T: MusyncService> tonic::server::UnaryService<super::AddLocalFolderRequest>
+            for AddLocalFolderSvc<T>
+          {
+            type Response = super::AddLocalFolderResponse;
+            type Future = BoxFuture<tonic::Response<Self::Response>, tonic::Status>;
+            fn call(
+              &mut self,
+              request: tonic::Request<super::AddLocalFolderRequest>,
+            ) -> Self::Future {
+              let inner = Arc::clone(&self.0);
+              let fut = async move { (*inner).add_local_folder(request).await };
+              Box::pin(fut)
+            }
+          }
+          let accept_compression_encodings = self.accept_compression_encodings;
+          let send_compression_encodings = self.send_compression_encodings;
+          let max_decoding_message_size = self.max_decoding_message_size;
+          let max_encoding_message_size = self.max_encoding_message_size;
+          let inner = self.inner.clone();
+          let fut = async move {
+            let inner = inner.0;
+            let method = AddLocalFolderSvc(inner);
+            let codec = tonic::codec::ProstCodec::default();
+            let mut grpc = tonic::server::Grpc::new(codec)
+              .apply_compression_config(accept_compression_encodings, send_compression_encodings)
+              .apply_max_message_size_config(max_decoding_message_size, max_encoding_message_size);
+            let res = grpc.unary(method, req).await;
+            Ok(res)
+          };
+          Box::pin(fut)
+        }
+        "/musync.MusyncService/RemoveLocalFolder" => {
+          #[allow(non_camel_case_types)]
+          struct RemoveLocalFolderSvc<T: MusyncService>(pub Arc<T>);
+          impl<T: MusyncService> tonic::server::UnaryService<super::RemoveLocalFolderRequest>
+            for RemoveLocalFolderSvc<T>
+          {
+            type Response = super::RemoveLocalFolderResponse;
+            type Future = BoxFuture<tonic::Response<Self::Response>, tonic::Status>;
+            fn call(
+              &mut self,
+              request: tonic::Request<super::RemoveLocalFolderRequest>,
+            ) -> Self::Future {
+              let inner = Arc::clone(&self.0);
+              let fut = async move { (*inner).remove_local_folder(request).await };
+              Box::pin(fut)
+            }
+          }
+          let accept_compression_encodings = self.accept_compression_encodings;
+          let send_compression_encodings = self.send_compression_encodings;
+          let max_decoding_message_size = self.max_decoding_message_size;
+          let max_encoding_message_size = self.max_encoding_message_size;
+          let inner = self.inner.clone();
+          let fut = async move {
+            let inner = inner.0;
+            let method = RemoveLocalFolderSvc(inner);
+            let codec = tonic::codec::ProstCodec::default();
+            let mut grpc = tonic::server::Grpc::new(codec)
+              .apply_compression_config(accept_compression_encodings, send_compression_encodings)
+              .apply_max_message_size_config(max_decoding_message_size, max_encoding_message_size);
+            let res = grpc.unary(method, req).await;
+            Ok(res)
+          };
+          Box::pin(fut)
+        }
+        "/musync.MusyncService/QueryLocalFolders" => {
+          #[allow(non_camel_case_types)]
+          struct QueryLocalFoldersSvc<T: MusyncService>(pub Arc<T>);
+          impl<T: MusyncService>
+            tonic::server::ServerStreamingService<super::QueryLocalFoldersRequest>
+            for QueryLocalFoldersSvc<T>
+          {
+            type Response = super::LocalFolder;
+            type ResponseStream = T::QueryLocalFoldersStream;
+            type Future = BoxFuture<tonic::Response<Self::ResponseStream>, tonic::Status>;
+            fn call(
+              &mut self,
+              request: tonic::Request<super::QueryLocalFoldersRequest>,
+            ) -> Self::Future {
+              let inner = Arc::clone(&self.0);
+              let fut = async move { (*inner).query_local_folders(request).await };
+              Box::pin(fut)
+            }
+          }
+          let accept_compression_encodings = self.accept_compression_encodings;
+          let send_compression_encodings = self.send_compression_encodings;
+          let max_decoding_message_size = self.max_decoding_message_size;
+          let max_encoding_message_size = self.max_encoding_message_size;
+          let inner = self.inner.clone();
+          let fut = async move {
+            let inner = inner.0;
+            let method = QueryLocalFoldersSvc(inner);
+            let codec = tonic::codec::ProstCodec::default();
+            let mut grpc = tonic::server::Grpc::new(codec)
+              .apply_compression_config(accept_compression_encodings, send_compression_encodings)
+              .apply_max_message_size_config(max_decoding_message_size, max_encoding_message_size);
+            let res = grpc.server_streaming(method, req).await;
+            Ok(res)
+          };
+          Box::pin(fut)
+        }
+        "/musync.MusyncService/CreatePlaylist" => {
+          #[allow(non_camel_case_types)]
+          struct CreatePlaylistSvc<T: MusyncService>(pub Arc<T>);
           impl<T: MusyncService> tonic::server::UnaryService<super::CreatePlaylistRequest>
-            for createPlaylistSvc<T>
+            for CreatePlaylistSvc<T>
           {
             type Response = super::CreatePlaylistResponse;
             type Future = BoxFuture<tonic::Response<Self::Response>, tonic::Status>;
@@ -875,7 +1215,7 @@ pub mod musync_service_server {
           let inner = self.inner.clone();
           let fut = async move {
             let inner = inner.0;
-            let method = createPlaylistSvc(inner);
+            let method = CreatePlaylistSvc(inner);
             let codec = tonic::codec::ProstCodec::default();
             let mut grpc = tonic::server::Grpc::new(codec)
               .apply_compression_config(accept_compression_encodings, send_compression_encodings)
@@ -885,14 +1225,14 @@ pub mod musync_service_server {
           };
           Box::pin(fut)
         }
-        "/musync.MusyncService/queryPlaylists" => {
+        "/musync.MusyncService/QueryPlaylists" => {
           #[allow(non_camel_case_types)]
-          struct queryPlaylistsSvc<T: MusyncService>(pub Arc<T>);
+          struct QueryPlaylistsSvc<T: MusyncService>(pub Arc<T>);
           impl<T: MusyncService> tonic::server::ServerStreamingService<super::QueryPlaylistsRequest>
-            for queryPlaylistsSvc<T>
+            for QueryPlaylistsSvc<T>
           {
             type Response = super::Playlist;
-            type ResponseStream = T::queryPlaylistsStream;
+            type ResponseStream = T::QueryPlaylistsStream;
             type Future = BoxFuture<tonic::Response<Self::ResponseStream>, tonic::Status>;
             fn call(
               &mut self,
@@ -910,7 +1250,7 @@ pub mod musync_service_server {
           let inner = self.inner.clone();
           let fut = async move {
             let inner = inner.0;
-            let method = queryPlaylistsSvc(inner);
+            let method = QueryPlaylistsSvc(inner);
             let codec = tonic::codec::ProstCodec::default();
             let mut grpc = tonic::server::Grpc::new(codec)
               .apply_compression_config(accept_compression_encodings, send_compression_encodings)
@@ -920,11 +1260,11 @@ pub mod musync_service_server {
           };
           Box::pin(fut)
         }
-        "/musync.MusyncService/updatePlaylist" => {
+        "/musync.MusyncService/UpdatePlaylist" => {
           #[allow(non_camel_case_types)]
-          struct updatePlaylistSvc<T: MusyncService>(pub Arc<T>);
+          struct UpdatePlaylistSvc<T: MusyncService>(pub Arc<T>);
           impl<T: MusyncService> tonic::server::UnaryService<super::UpdatePlaylistRequest>
-            for updatePlaylistSvc<T>
+            for UpdatePlaylistSvc<T>
           {
             type Response = super::UpdatePlaylistResponse;
             type Future = BoxFuture<tonic::Response<Self::Response>, tonic::Status>;
@@ -944,7 +1284,7 @@ pub mod musync_service_server {
           let inner = self.inner.clone();
           let fut = async move {
             let inner = inner.0;
-            let method = updatePlaylistSvc(inner);
+            let method = UpdatePlaylistSvc(inner);
             let codec = tonic::codec::ProstCodec::default();
             let mut grpc = tonic::server::Grpc::new(codec)
               .apply_compression_config(accept_compression_encodings, send_compression_encodings)
@@ -954,15 +1294,15 @@ pub mod musync_service_server {
           };
           Box::pin(fut)
         }
-        "/musync.MusyncService/deletePlaylists" => {
+        "/musync.MusyncService/DeletePlaylists" => {
           #[allow(non_camel_case_types)]
-          struct deletePlaylistsSvc<T: MusyncService>(pub Arc<T>);
+          struct DeletePlaylistsSvc<T: MusyncService>(pub Arc<T>);
           impl<T: MusyncService>
             tonic::server::ServerStreamingService<super::DeletePlaylistsRequest>
-            for deletePlaylistsSvc<T>
+            for DeletePlaylistsSvc<T>
           {
             type Response = super::Playlist;
-            type ResponseStream = T::deletePlaylistsStream;
+            type ResponseStream = T::DeletePlaylistsStream;
             type Future = BoxFuture<tonic::Response<Self::ResponseStream>, tonic::Status>;
             fn call(
               &mut self,
@@ -980,7 +1320,7 @@ pub mod musync_service_server {
           let inner = self.inner.clone();
           let fut = async move {
             let inner = inner.0;
-            let method = deletePlaylistsSvc(inner);
+            let method = DeletePlaylistsSvc(inner);
             let codec = tonic::codec::ProstCodec::default();
             let mut grpc = tonic::server::Grpc::new(codec)
               .apply_compression_config(accept_compression_encodings, send_compression_encodings)
@@ -990,11 +1330,74 @@ pub mod musync_service_server {
           };
           Box::pin(fut)
         }
-        "/musync.MusyncService/createTrack" => {
+        "/musync.MusyncService/GetTrack" => {
           #[allow(non_camel_case_types)]
-          struct createTrackSvc<T: MusyncService>(pub Arc<T>);
+          struct GetTrackSvc<T: MusyncService>(pub Arc<T>);
+          impl<T: MusyncService> tonic::server::UnaryService<super::GetTrackRequest> for GetTrackSvc<T> {
+            type Response = super::Track;
+            type Future = BoxFuture<tonic::Response<Self::Response>, tonic::Status>;
+            fn call(&mut self, request: tonic::Request<super::GetTrackRequest>) -> Self::Future {
+              let inner = Arc::clone(&self.0);
+              let fut = async move { (*inner).get_track(request).await };
+              Box::pin(fut)
+            }
+          }
+          let accept_compression_encodings = self.accept_compression_encodings;
+          let send_compression_encodings = self.send_compression_encodings;
+          let max_decoding_message_size = self.max_decoding_message_size;
+          let max_encoding_message_size = self.max_encoding_message_size;
+          let inner = self.inner.clone();
+          let fut = async move {
+            let inner = inner.0;
+            let method = GetTrackSvc(inner);
+            let codec = tonic::codec::ProstCodec::default();
+            let mut grpc = tonic::server::Grpc::new(codec)
+              .apply_compression_config(accept_compression_encodings, send_compression_encodings)
+              .apply_max_message_size_config(max_decoding_message_size, max_encoding_message_size);
+            let res = grpc.unary(method, req).await;
+            Ok(res)
+          };
+          Box::pin(fut)
+        }
+        "/musync.MusyncService/GetTrackCover" => {
+          #[allow(non_camel_case_types)]
+          struct GetTrackCoverSvc<T: MusyncService>(pub Arc<T>);
+          impl<T: MusyncService> tonic::server::UnaryService<super::GetTrackCoverRequest>
+            for GetTrackCoverSvc<T>
+          {
+            type Response = super::Picture;
+            type Future = BoxFuture<tonic::Response<Self::Response>, tonic::Status>;
+            fn call(
+              &mut self,
+              request: tonic::Request<super::GetTrackCoverRequest>,
+            ) -> Self::Future {
+              let inner = Arc::clone(&self.0);
+              let fut = async move { (*inner).get_track_cover(request).await };
+              Box::pin(fut)
+            }
+          }
+          let accept_compression_encodings = self.accept_compression_encodings;
+          let send_compression_encodings = self.send_compression_encodings;
+          let max_decoding_message_size = self.max_decoding_message_size;
+          let max_encoding_message_size = self.max_encoding_message_size;
+          let inner = self.inner.clone();
+          let fut = async move {
+            let inner = inner.0;
+            let method = GetTrackCoverSvc(inner);
+            let codec = tonic::codec::ProstCodec::default();
+            let mut grpc = tonic::server::Grpc::new(codec)
+              .apply_compression_config(accept_compression_encodings, send_compression_encodings)
+              .apply_max_message_size_config(max_decoding_message_size, max_encoding_message_size);
+            let res = grpc.unary(method, req).await;
+            Ok(res)
+          };
+          Box::pin(fut)
+        }
+        "/musync.MusyncService/CreateTrack" => {
+          #[allow(non_camel_case_types)]
+          struct CreateTrackSvc<T: MusyncService>(pub Arc<T>);
           impl<T: MusyncService> tonic::server::UnaryService<super::CreateTrackRequest>
-            for createTrackSvc<T>
+            for CreateTrackSvc<T>
           {
             type Response = super::CreateTrackResponse;
             type Future = BoxFuture<tonic::Response<Self::Response>, tonic::Status>;
@@ -1011,7 +1414,7 @@ pub mod musync_service_server {
           let inner = self.inner.clone();
           let fut = async move {
             let inner = inner.0;
-            let method = createTrackSvc(inner);
+            let method = CreateTrackSvc(inner);
             let codec = tonic::codec::ProstCodec::default();
             let mut grpc = tonic::server::Grpc::new(codec)
               .apply_compression_config(accept_compression_encodings, send_compression_encodings)
@@ -1021,14 +1424,14 @@ pub mod musync_service_server {
           };
           Box::pin(fut)
         }
-        "/musync.MusyncService/queryTracks" => {
+        "/musync.MusyncService/QueryTracks" => {
           #[allow(non_camel_case_types)]
-          struct queryTracksSvc<T: MusyncService>(pub Arc<T>);
+          struct QueryTracksSvc<T: MusyncService>(pub Arc<T>);
           impl<T: MusyncService> tonic::server::ServerStreamingService<super::QueryTracksRequest>
-            for queryTracksSvc<T>
+            for QueryTracksSvc<T>
           {
             type Response = super::Track;
-            type ResponseStream = T::queryTracksStream;
+            type ResponseStream = T::QueryTracksStream;
             type Future = BoxFuture<tonic::Response<Self::ResponseStream>, tonic::Status>;
             fn call(&mut self, request: tonic::Request<super::QueryTracksRequest>) -> Self::Future {
               let inner = Arc::clone(&self.0);
@@ -1043,7 +1446,7 @@ pub mod musync_service_server {
           let inner = self.inner.clone();
           let fut = async move {
             let inner = inner.0;
-            let method = queryTracksSvc(inner);
+            let method = QueryTracksSvc(inner);
             let codec = tonic::codec::ProstCodec::default();
             let mut grpc = tonic::server::Grpc::new(codec)
               .apply_compression_config(accept_compression_encodings, send_compression_encodings)
@@ -1053,11 +1456,11 @@ pub mod musync_service_server {
           };
           Box::pin(fut)
         }
-        "/musync.MusyncService/updateTrack" => {
+        "/musync.MusyncService/UpdateTrack" => {
           #[allow(non_camel_case_types)]
-          struct updateTrackSvc<T: MusyncService>(pub Arc<T>);
+          struct UpdateTrackSvc<T: MusyncService>(pub Arc<T>);
           impl<T: MusyncService> tonic::server::UnaryService<super::UpdateTrackRequest>
-            for updateTrackSvc<T>
+            for UpdateTrackSvc<T>
           {
             type Response = super::UpdateTrackResponse;
             type Future = BoxFuture<tonic::Response<Self::Response>, tonic::Status>;
@@ -1074,7 +1477,7 @@ pub mod musync_service_server {
           let inner = self.inner.clone();
           let fut = async move {
             let inner = inner.0;
-            let method = updateTrackSvc(inner);
+            let method = UpdateTrackSvc(inner);
             let codec = tonic::codec::ProstCodec::default();
             let mut grpc = tonic::server::Grpc::new(codec)
               .apply_compression_config(accept_compression_encodings, send_compression_encodings)
@@ -1084,14 +1487,14 @@ pub mod musync_service_server {
           };
           Box::pin(fut)
         }
-        "/musync.MusyncService/deleteTracks" => {
+        "/musync.MusyncService/DeleteTracks" => {
           #[allow(non_camel_case_types)]
-          struct deleteTracksSvc<T: MusyncService>(pub Arc<T>);
+          struct DeleteTracksSvc<T: MusyncService>(pub Arc<T>);
           impl<T: MusyncService> tonic::server::ServerStreamingService<super::DeleteTracksRequest>
-            for deleteTracksSvc<T>
+            for DeleteTracksSvc<T>
           {
             type Response = super::Track;
-            type ResponseStream = T::deleteTracksStream;
+            type ResponseStream = T::DeleteTracksStream;
             type Future = BoxFuture<tonic::Response<Self::ResponseStream>, tonic::Status>;
             fn call(
               &mut self,
@@ -1109,7 +1512,7 @@ pub mod musync_service_server {
           let inner = self.inner.clone();
           let fut = async move {
             let inner = inner.0;
-            let method = deleteTracksSvc(inner);
+            let method = DeleteTracksSvc(inner);
             let codec = tonic::codec::ProstCodec::default();
             let mut grpc = tonic::server::Grpc::new(codec)
               .apply_compression_config(accept_compression_encodings, send_compression_encodings)
@@ -1119,10 +1522,10 @@ pub mod musync_service_server {
           };
           Box::pin(fut)
         }
-        "/musync.MusyncService/createUser" => {
+        "/musync.MusyncService/CreateUser" => {
           #[allow(non_camel_case_types)]
-          struct createUserSvc<T: MusyncService>(pub Arc<T>);
-          impl<T: MusyncService> tonic::server::UnaryService<super::CreateUserRequest> for createUserSvc<T> {
+          struct CreateUserSvc<T: MusyncService>(pub Arc<T>);
+          impl<T: MusyncService> tonic::server::UnaryService<super::CreateUserRequest> for CreateUserSvc<T> {
             type Response = super::CreateUserResponse;
             type Future = BoxFuture<tonic::Response<Self::Response>, tonic::Status>;
             fn call(&mut self, request: tonic::Request<super::CreateUserRequest>) -> Self::Future {
@@ -1138,7 +1541,7 @@ pub mod musync_service_server {
           let inner = self.inner.clone();
           let fut = async move {
             let inner = inner.0;
-            let method = createUserSvc(inner);
+            let method = CreateUserSvc(inner);
             let codec = tonic::codec::ProstCodec::default();
             let mut grpc = tonic::server::Grpc::new(codec)
               .apply_compression_config(accept_compression_encodings, send_compression_encodings)
@@ -1148,14 +1551,14 @@ pub mod musync_service_server {
           };
           Box::pin(fut)
         }
-        "/musync.MusyncService/queryUsers" => {
+        "/musync.MusyncService/QueryUsers" => {
           #[allow(non_camel_case_types)]
-          struct queryUsersSvc<T: MusyncService>(pub Arc<T>);
+          struct QueryUsersSvc<T: MusyncService>(pub Arc<T>);
           impl<T: MusyncService> tonic::server::ServerStreamingService<super::QueryUsersRequest>
-            for queryUsersSvc<T>
+            for QueryUsersSvc<T>
           {
             type Response = super::User;
-            type ResponseStream = T::queryUsersStream;
+            type ResponseStream = T::QueryUsersStream;
             type Future = BoxFuture<tonic::Response<Self::ResponseStream>, tonic::Status>;
             fn call(&mut self, request: tonic::Request<super::QueryUsersRequest>) -> Self::Future {
               let inner = Arc::clone(&self.0);
@@ -1170,7 +1573,7 @@ pub mod musync_service_server {
           let inner = self.inner.clone();
           let fut = async move {
             let inner = inner.0;
-            let method = queryUsersSvc(inner);
+            let method = QueryUsersSvc(inner);
             let codec = tonic::codec::ProstCodec::default();
             let mut grpc = tonic::server::Grpc::new(codec)
               .apply_compression_config(accept_compression_encodings, send_compression_encodings)
@@ -1180,10 +1583,10 @@ pub mod musync_service_server {
           };
           Box::pin(fut)
         }
-        "/musync.MusyncService/updateUser" => {
+        "/musync.MusyncService/UpdateUser" => {
           #[allow(non_camel_case_types)]
-          struct updateUserSvc<T: MusyncService>(pub Arc<T>);
-          impl<T: MusyncService> tonic::server::UnaryService<super::UpdateUserRequest> for updateUserSvc<T> {
+          struct UpdateUserSvc<T: MusyncService>(pub Arc<T>);
+          impl<T: MusyncService> tonic::server::UnaryService<super::UpdateUserRequest> for UpdateUserSvc<T> {
             type Response = super::UpdateUserResponse;
             type Future = BoxFuture<tonic::Response<Self::Response>, tonic::Status>;
             fn call(&mut self, request: tonic::Request<super::UpdateUserRequest>) -> Self::Future {
@@ -1199,7 +1602,7 @@ pub mod musync_service_server {
           let inner = self.inner.clone();
           let fut = async move {
             let inner = inner.0;
-            let method = updateUserSvc(inner);
+            let method = UpdateUserSvc(inner);
             let codec = tonic::codec::ProstCodec::default();
             let mut grpc = tonic::server::Grpc::new(codec)
               .apply_compression_config(accept_compression_encodings, send_compression_encodings)
@@ -1209,14 +1612,14 @@ pub mod musync_service_server {
           };
           Box::pin(fut)
         }
-        "/musync.MusyncService/deleteUsers" => {
+        "/musync.MusyncService/DeleteUsers" => {
           #[allow(non_camel_case_types)]
-          struct deleteUsersSvc<T: MusyncService>(pub Arc<T>);
+          struct DeleteUsersSvc<T: MusyncService>(pub Arc<T>);
           impl<T: MusyncService> tonic::server::ServerStreamingService<super::DeleteUsersRequest>
-            for deleteUsersSvc<T>
+            for DeleteUsersSvc<T>
           {
             type Response = super::User;
-            type ResponseStream = T::deleteUsersStream;
+            type ResponseStream = T::DeleteUsersStream;
             type Future = BoxFuture<tonic::Response<Self::ResponseStream>, tonic::Status>;
             fn call(&mut self, request: tonic::Request<super::DeleteUsersRequest>) -> Self::Future {
               let inner = Arc::clone(&self.0);
@@ -1231,7 +1634,7 @@ pub mod musync_service_server {
           let inner = self.inner.clone();
           let fut = async move {
             let inner = inner.0;
-            let method = deleteUsersSvc(inner);
+            let method = DeleteUsersSvc(inner);
             let codec = tonic::codec::ProstCodec::default();
             let mut grpc = tonic::server::Grpc::new(codec)
               .apply_compression_config(accept_compression_encodings, send_compression_encodings)

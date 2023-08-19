@@ -62,11 +62,13 @@ message Track {
   optional LocalSource local_src = 10;
   // netease source of the track
   optional NeteaseSource netease_src = 11;
-
 }
 
 // NeteaseSource, not implemented yet
-message NeteaseSource {}
+message NeteaseSource {
+  // id of the track in netease
+  string id = 1;
+}
 
 // LocalSource
 message LocalSource {
@@ -86,10 +88,30 @@ message User {
   google.protobuf.Timestamp updated_at = 4;
 }
 
+// Token
+message Token {
+  string data = 1;
+  string type = 2;
+}
+
+// Cover
+message Picture {
+  // picture type according to ID3v2 APIC
+  optional string pic_type = 1;
+  string mime_type = 2;
+  optional string description = 3;
+  // base64 picture data
+  string data = 4;
+}
+
 // Create playlist request
 message CreatePlaylistRequest {
-  // Playlist to be created
-  Playlist playlist = 1;
+  // ids of tracks in the playlist
+  repeated int32 track_ids = 1;
+  // name of the playlist
+  string name = 2;
+  // description of the playlist
+  string description = 3;
 }
 
 // Create playlist response
@@ -105,7 +127,7 @@ message DeletePlaylistsRequest {
 }
 
 // Query playlist by user id and track id
-message PlaylistQuery {
+message QueryPlaylistsRequest {
   // which user has the playlist
   optional int32 user_id = 1;
   // Query by contained track id
@@ -114,14 +136,8 @@ message PlaylistQuery {
   optional string name = 3;
 }
 
-// Query playlist request
-message QueryPlaylistsRequest {
-  // Query
-  PlaylistQuery query = 1;
-}
-
 // Update playlist: add/remove tracks, update name and description
-message PlaylistUpdate {
+message UpdatePlaylistRequest {
   // Id of the playlist to be updated
   int32 id = 1;
   // Ids of tracks to be added
@@ -133,8 +149,6 @@ message PlaylistUpdate {
   // New description of the playlist
   optional string description = 5;
 }
-
-message UpdatePlaylistRequest { PlaylistUpdate update = 1; }
 
 // Updated playlist will be returned in response
 message UpdatePlaylistResponse {
@@ -155,7 +169,7 @@ message CreateTrackResponse {
 }
 
 // Query track
-message TrackQuery {
+message QueryTracksRequest {
   // Query by which playlist contains the track
   optional int32 playlist_id = 1;
   // Query by title
@@ -168,12 +182,6 @@ message TrackQuery {
   optional string genre = 5;
   // Query by year
   optional uint32 year = 6;
-}
-
-// Query track request
-message QueryTracksRequest {
-  // Query
-  TrackQuery query = 1;
 }
 
 message TrackUpdate {
@@ -223,13 +231,11 @@ message CreateUserResponse {
   User user = 1;
 }
 
-message UserQuery {
+// Query user
+message QueryUsersRequest {
   // Query by name
   optional string name = 1;
 }
-
-// Query user
-message QueryUsersRequest { UserQuery query = 1; }
 
 message UserUpdate {
   // Id of the user to be updated
@@ -253,20 +259,48 @@ message DeleteUsersRequest {
   repeated int32 ids = 1;
 }
 
+message LoginRequest {
+  string name = 1;
+  string type = 2;
+}
+
+message AddLocalFolderRequest { string path = 1; }
+message RemoveLocalFolderRequest { string path = 1; }
+message AddLocalFolderResponse { uint32 added_tracks = 1; }
+message RemoveLocalFolderResponse { uint32 removed_tracks = 1; }
+
+message GetTrackRequest { int32 id = 1; }
+message GetTrackCoverRequest {
+  int32 track_id = 1;
+  optional uint32 cover_idx = 2;
+}
+
+message QueryLocalFoldersRequest {}
+message LocalFolder { string path = 1; }
+
 // Musync service
 service MusyncService {
-  rpc createPlaylist(CreatePlaylistRequest) returns (CreatePlaylistResponse);
-  rpc queryPlaylists(QueryPlaylistsRequest) returns (stream Playlist);
-  rpc updatePlaylist(UpdatePlaylistRequest) returns (UpdatePlaylistResponse);
-  rpc deletePlaylists(DeletePlaylistsRequest) returns (stream Playlist);
+  rpc Login(LoginRequest) returns (Token);
 
-  rpc createTrack(CreateTrackRequest) returns (CreateTrackResponse);
-  rpc queryTracks(QueryTracksRequest) returns (stream Track);
-  rpc updateTrack(UpdateTrackRequest) returns (UpdateTrackResponse);
-  rpc deleteTracks(DeleteTracksRequest) returns (stream Track);
+  rpc AddLocalFolder(AddLocalFolderRequest) returns (AddLocalFolderResponse);
+  rpc RemoveLocalFolder(RemoveLocalFolderRequest)
+      returns (RemoveLocalFolderResponse);
+  rpc QueryLocalFolders(QueryLocalFoldersRequest) returns (stream LocalFolder);
 
-  rpc createUser(CreateUserRequest) returns (CreateUserResponse);
-  rpc queryUsers(QueryUsersRequest) returns (stream User);
-  rpc updateUser(UpdateUserRequest) returns (UpdateUserResponse);
-  rpc deleteUsers(DeleteUsersRequest) returns (stream User);
+  rpc CreatePlaylist(CreatePlaylistRequest) returns (CreatePlaylistResponse);
+  rpc QueryPlaylists(QueryPlaylistsRequest) returns (stream Playlist);
+  rpc UpdatePlaylist(UpdatePlaylistRequest) returns (UpdatePlaylistResponse);
+  rpc DeletePlaylists(DeletePlaylistsRequest) returns (stream Playlist);
+
+  rpc GetTrack(GetTrackRequest) returns (Track);
+  rpc GetTrackCover(GetTrackCoverRequest) returns (Picture);
+  rpc CreateTrack(CreateTrackRequest) returns (CreateTrackResponse);
+  rpc QueryTracks(QueryTracksRequest) returns (stream Track);
+  rpc UpdateTrack(UpdateTrackRequest) returns (UpdateTrackResponse);
+  rpc DeleteTracks(DeleteTracksRequest) returns (stream Track);
+
+  rpc CreateUser(CreateUserRequest) returns (CreateUserResponse);
+  rpc QueryUsers(QueryUsersRequest) returns (stream User);
+  rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse);
+  rpc DeleteUsers(DeleteUsersRequest) returns (stream User);
 }

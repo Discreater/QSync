@@ -7,7 +7,6 @@ import IconArrowShuffle from '~icons/fluent/arrow-shuffle-24-regular';
 import H1 from '~/components/typo/H1.vue';
 import Basic from '~/layouts/Basic.vue';
 import { usePlayerStore, useQSyncStore } from '~/store';
-import { ViewTrack } from '~/sources/folder';
 import QButton from '~/components/QButton.vue';
 import { formatTime, shuffle } from '~/utils';
 import QHoverButton from '~/components/QHoverButton.vue';
@@ -16,6 +15,7 @@ import IconLocation from '~icons/fluent/my-location-24-regular';
 import IconTop from '~icons/fluent/arrow-upload-24-regular';
 import QTable from '~/components/QTable.vue';
 import type { Column } from '~/components/QTable.vue';
+import type { Track } from '~/generated/protos/musync';
 
 const { t } = useI18n();
 const store = useQSyncStore();
@@ -33,18 +33,18 @@ onMounted(() => {
     }, 50);
   }
 });
-const views = ref(store.musicFolders.flatMap(folder => folder.tracks.map(track => new ViewTrack(track))));
+const views = ref(store.musicFolders.flatMap(folder => folder.tracks));
 onUnmounted(() => {
   if (container.value)
     scrollbar.value?.destroy();
 });
 
 function shufflePlay() {
-  store.play(shuffle([...views.value.map(v => v.raw)]));
+  store.play(shuffle([...views.value]));
 }
 
 function playByIdx(idx: number) {
-  store.play(views.value.map(v => v.raw), idx);
+  store.play(views.value, idx);
 }
 
 function locateToPlaying() {
@@ -66,8 +66,8 @@ function locateToTop() {
   }
 }
 
-function rowClassName(row: ViewTrack) {
-  if (store.playbackQueue[playerStore.current]?.path === row.raw.path)
+function rowClassName(row: Track) {
+  if (store.playbackQueue[playerStore.current]?.id === row.id)
     return 'playing';
   return '';
 }
@@ -123,25 +123,25 @@ const columns: Column[] = [
           </template>
           <template v-else-if="column.key === 'title'">
             <div>
-              {{ row.name() }}
+              {{ row.title }}
             </div>
           </template>
           <template v-else-if="column.key === 'artist'">
             <div>
-              {{ row.artist() }}
+              {{ row.artist }}
             </div>
           </template>
           <template v-else-if="column.key === 'album'">
-            {{ row.album() }}
+            {{ row.album }}
           </template>
           <template v-else-if="column.key === 'year'">
-            {{ row.year() }}
+            {{ row.year }}
           </template>
           <template v-else-if="column.key === 'genre'">
-            {{ row.genre() }}
+            {{ row.genre }}
           </template>
           <template v-else-if="column.key === 'duration'">
-            {{ formatTime(row.durationInSec()) }}
+            {{ row.duration != null ? formatTime(Math.floor(row.duration / 1000)) : '' }}
           </template>
         </template>
       </QTable>
@@ -153,9 +153,11 @@ const columns: Column[] = [
 :deep(.playing td) {
   color: rgb(249 115 22);
 }
+
 :deep(td[data-col-key="actions"] button) {
   visibility: hidden;
 }
+
 :deep(tr:hover td[data-col-key="actions"] button) {
   visibility: visible;
 }

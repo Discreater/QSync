@@ -3,12 +3,13 @@
   windows_subsystem = "windows"
 )]
 
-use musync::Musyncer;
-use tauri::Manager;
+use std::net::SocketAddr;
+
+use server::Server;
+use tauri::{Manager, State};
 use tracing::{info, Level};
 
 mod error;
-mod track;
 
 #[tauri::command]
 fn greet(name: &str) -> String {
@@ -25,11 +26,7 @@ fn main() {
   init_tracing();
   tauri::Builder::default()
     .plugin(tauri_plugin_window_state::Builder::default().build())
-    .invoke_handler(tauri::generate_handler![
-      greet,
-      track::update_folder,
-      track::get_track_pictures,
-    ])
+    .invoke_handler(tauri::generate_handler![greet, get_server,])
     .setup(|app| {
       let _data_dir = app
         .path_resolver()
@@ -41,15 +38,25 @@ fn main() {
       }
       let db_url = format!("sqlite://{}", db_file.to_string_lossy());
       info!("db_url: {}", db_url);
-      let server = tauri::async_runtime::block_on(Musyncer::from_url(&db_url))?;
-      app.manage(server);
+      let addr = SocketAddr::from(([127, 0, 0, 1], 8396));
+      let server = tauri::async_runtime::block_on(Server::serve(&addr, &db_url)).unwrap();
+      app.manage(ServerState { server });
       Ok(())
     })
     .run(tauri::generate_context!())
     .expect("error while running tauri application");
 }
 
-#[derive(Default)]
-pub struct MusyncServer {
-  pub manager: Option<Musyncer>,
+struct ServerState {
+  server: Server,
+}
+
+#[tauri::command]
+async fn get_server(manager: State<'_, ServerState>) -> Result<String, String> {
+  let addr = manager.server.handle.listening().await;
+  if let Some(addr) = addr {
+    Ok(addr.to_string())
+  } else {
+    Err(String::from("Server not binded"))
+  }
 }

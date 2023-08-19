@@ -71,7 +71,7 @@ input[type="range"]::-webkit-slider-thumb {
   /* creating a custom design */
   height: 1.5rem;
   width: 1.5rem;
-  background-color: rgb(249 115 22 / 1);
+  background-color: #f97316;
   border-radius: 50%;
   border: 0.4rem solid #454545;
   /*  slider progress trick  */
@@ -80,14 +80,15 @@ input[type="range"]::-webkit-slider-thumb {
 
 /* Thumb: Firefox */
 input[type="range"]::-moz-range-thumb {
-  height: 1.5rem;
-  width: 1.5rem;
+  appearance: none;
+  height: 0.75rem;
+  width: 0.75rem;
   background-color: #f97316;
   border-radius: 50%;
   border: 0.4rem solid #454545;
 
   /* box-shadow: -407px 0 0 400px #f50; emove this line */
-  transition: .2s ease-in-out;
+  transition: all .2s ease-in-out;
 }
 
 /* Thumb: webkit */
@@ -97,6 +98,8 @@ input[type="range"]::-webkit-slider-thumb:hover {
 
 /* Thumb: Firefox */
 input[type="range"]::-moz-range-thumb:hover {
+  height: 0.85rem;
+  width: 0.85rem;
   border: 0.3rem solid #454545;
 }
 </style>

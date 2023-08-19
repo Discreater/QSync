@@ -1,7 +1,8 @@
 import { createPinia, defineStore } from 'pinia';
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate';
-import type { LocalFolder, RawTrack } from '~/sources/folder';
-import { ViewTrack, getTrackInfo, updateFolder } from '~/sources/folder';
+import { ApiClient } from '~/api/client';
+import type { Track } from '~/generated/protos/musync';
+import type { LocalFolder } from '~/sources/folder';
 
 import type { JellyfinClientOptions } from '~/sources/jellyfin';
 import { mod, shuffle } from '~/utils';
@@ -9,12 +10,10 @@ import { mod, shuffle } from '~/utils';
 import { generateDeviceId, getDeviceName } from '~/utils/apphost';
 import { logger } from '~/utils/logger';
 
-export type Track = RawTrack;
-
 export function sameTrack(a: Track | undefined, b: Track | undefined): boolean {
   if (!a || !b)
     return false;
-  return a.path === b.path;
+  return a.id === b.id;
 }
 
 interface JellyfinSource {
@@ -23,24 +22,6 @@ interface JellyfinSource {
   clients: {
     jellyfin: JellyfinClientOptions[]
   }
-}
-
-const viewTracks = new Map<string, ViewTrack>();
-
-export async function getShowTrack(path: string): Promise<ViewTrack> {
-  const viewed = viewTracks.get(path);
-  if (viewed)
-    return viewed;
-  let full: RawTrack;
-  try {
-    full = await getTrackInfo(path, true);
-  } catch {
-    logger.error("can't find track", path);
-    return ViewTrack.empty;
-  }
-  const view = new ViewTrack(full);
-  viewTracks.set(path, view);
-  return view;
 }
 
 export interface PlayerStore {
@@ -130,24 +111,48 @@ export const useQSyncStore = defineStore('qsync', {
     } as JellyfinSource,
   }),
   actions: {
-    addMusicFolder(folder: string) {
+    async addMusicFolder(folder: string) {
       if (this.musicFolders.find(v => v.path === folder))
         return;
-      this.musicFolders.push({
-        path: folder,
-        updating: true,
-        tracks: [],
-      });
-      this.updateFolder(folder);
+      try {
+        await ApiClient.get().grpcClient.AddLocalFolder({
+          path: folder,
+        });
+      } catch (e) {
+        console.error(e);
+      }
+      this.updateFolders();
     },
-    async updateFolder(folder: string) {
-      const f = this.musicFolders.find(v => v.path === folder);
-      if (!f)
+    async updateFolders() {
+      await ApiClient.get().grpcClient.QueryLocalFolders({}).forEach((folder) => {
+        let f = this.musicFolders.find(v => v.path === folder.path);
+        if (!f) {
+          this.musicFolders.push({
+            path: folder.path,
+            updating: true,
+            tracks: [],
+          });
+          f = this.musicFolders[this.musicFolders.length - 1];
+        }
+        this.updateFolder(f);
+      });
+    },
+    async updateFolder(folder: string | LocalFolder) {
+      let f: LocalFolder | undefined;
+      if (typeof folder === 'string')
+        f = this.musicFolders.find(v => v.path === folder);
+      else
+        f = folder;
+
+      if (f === undefined)
         return;
       f.updating = true;
-      const tracks = await updateFolder(folder);
-      f.tracks = tracks;
-      f.updating = false;
+      f.tracks = [];
+      ApiClient.grpc().QueryTracks({}).forEach((track) => {
+        f!.tracks.push(track);
+      }).then(() => {
+        f!.updating = false;
+      });
     },
     removeFolder(folder: string) {
       const f = this.musicFolders.findIndex(v => v.path === folder);

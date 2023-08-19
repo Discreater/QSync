@@ -1,18 +1,17 @@
-use abi::convert_to_timestamp;
+use abi::{CreatePlaylistRequest, LocalFolder, LoginRequest, QueryLocalFoldersRequest};
 use chrono::Utc;
 use entity::prelude::*;
 use migration::{Migrator, MigratorTrait};
 
-use async_trait::async_trait;
 use sea_orm::{
   ActiveModelTrait, ActiveValue::NotSet, ColumnTrait, Condition, Database, DatabaseConnection,
   EntityTrait, QueryFilter, QueryTrait, Set, TransactionTrait,
 };
 use tracing::{info, trace, warn};
 
-use crate::{Musync, MusyncError, Musyncer, PlaylistId, TrackId, UserId};
+use crate::{DbManager, MusyncError, PlaylistId, TrackId, UserId};
 
-impl Musyncer {
+impl DbManager {
   pub fn new(db: DatabaseConnection) -> Self {
     Self { db }
   }
@@ -22,21 +21,28 @@ impl Musyncer {
     Migrator::up(&db, None).await?;
     Ok(Self::new(db))
   }
-}
 
-#[async_trait]
-impl Musync for Musyncer {
-  async fn create_playlist(
+  pub async fn login(&self, req: LoginRequest) -> Result<abi::User, MusyncError> {
+    let user = User::find()
+      .filter(entity::user::Column::Name.eq(&req.name))
+      .one(&self.db)
+      .await?;
+    user
+      .map(abi::User::from_entity)
+      .ok_or(MusyncError::LoginFailed(req.name))
+  }
+
+  pub async fn create_playlist(
     &self,
-    mut playlist: abi::Playlist,
-    tracks: &[TrackId],
+    owner_id: UserId,
+    create: CreatePlaylistRequest,
   ) -> Result<abi::Playlist, MusyncError> {
     let now = Utc::now();
     // create playlist
     let inserted = entity::playlist::ActiveModel {
-      owner_id: Set(playlist.owner_id),
-      name: Set(playlist.name.clone()),
-      description: Set(playlist.description.clone()),
+      owner_id: Set(owner_id),
+      name: Set(create.name.clone()),
+      description: Set(create.description.clone()),
       created_at: Set(now),
       updated_at: Set(now),
       ..Default::default()
@@ -46,15 +52,14 @@ impl Musync for Musyncer {
 
     trace!("playlist inserted, id: {}", inserted.id);
 
-    playlist.id = inserted.id;
-    playlist.created_at = Some(convert_to_timestamp(&inserted.created_at));
-    playlist.updated_at = Some(convert_to_timestamp(&inserted.updated_at));
+    let mut playlist = abi::Playlist::from_entity(inserted, vec![]);
 
-    if tracks.is_empty() {
+    if create.track_ids.is_empty() {
       return Ok(playlist);
     }
 
-    let track_list = tracks
+    let track_list = create
+      .track_ids
       .iter()
       .map(|track_id| entity::playlist_track::ActiveModel {
         playlist_id: Set(playlist.id),
@@ -64,14 +69,14 @@ impl Musync for Musyncer {
       .exec(&self.db)
       .await?;
 
-    playlist.track_ids.extend(tracks);
+    playlist.track_ids.extend(create.track_ids);
 
     Ok(playlist)
   }
 
-  async fn update_playlist(
+  pub async fn update_playlist(
     &self,
-    playlist: abi::PlaylistUpdate,
+    playlist: abi::UpdatePlaylistRequest,
   ) -> Result<abi::Playlist, MusyncError> {
     let now = Utc::now();
 
@@ -118,7 +123,7 @@ impl Musync for Musyncer {
     self.playlist(playlist.id).await
   }
 
-  async fn delete_playlists(&self, ids: &[PlaylistId]) -> Result<u64, MusyncError> {
+  pub async fn delete_playlists(&self, ids: &[PlaylistId]) -> Result<u64, MusyncError> {
     if ids.is_empty() {
       return Ok(0);
     }
@@ -131,9 +136,9 @@ impl Musync for Musyncer {
     Ok(deleted.rows_affected)
   }
 
-  async fn query_playlists(
+  pub async fn query_playlists(
     &self,
-    query: abi::PlaylistQuery,
+    query: abi::QueryPlaylistsRequest,
   ) -> Result<Vec<abi::Playlist>, MusyncError> {
     let playlists = Playlist::find()
       .apply_if(query.name, |builder, name| {
@@ -158,7 +163,7 @@ impl Musync for Musyncer {
     )
   }
 
-  async fn playlist(&self, id: PlaylistId) -> Result<abi::Playlist, MusyncError> {
+  pub async fn playlist(&self, id: PlaylistId) -> Result<abi::Playlist, MusyncError> {
     let queried = Playlist::find_by_id(id)
       .one(&self.db)
       .await?
@@ -169,7 +174,7 @@ impl Musync for Musyncer {
     Ok(abi::Playlist::from_entity(queried, tracks))
   }
 
-  async fn create_track(&self, track: abi::Track) -> Result<abi::Track, MusyncError> {
+  pub async fn create_track(&self, track: abi::Track) -> Result<abi::Track, MusyncError> {
     let txn = self.db.begin().await?;
     let now = Utc::now();
     let inserted = entity::track::ActiveModel {
@@ -198,7 +203,7 @@ impl Musync for Musyncer {
     Ok(abi::Track::from_entity(inserted))
   }
 
-  async fn create_tracks(
+  pub async fn create_tracks(
     &self,
     tracks: Vec<abi::Track>,
     folder: &str,
@@ -212,7 +217,8 @@ impl Musync for Musyncer {
       updated_at: Set(now),
     }
     .insert(&txn)
-    .await?;
+    .await
+    .map_err(|_| MusyncError::FolderExists(folder.to_owned()))?;
     let active_tracks = tracks.iter().map(|t| entity::track::ActiveModel {
       id: NotSet,
       title: Set(t.title.clone()),
@@ -246,7 +252,40 @@ impl Musync for Musyncer {
     Ok(inserted.last_insert_id)
   }
 
-  async fn update_track(&self, update: abi::TrackUpdate) -> Result<abi::Track, MusyncError> {
+  pub async fn remove_folder(&self, folder: &str) -> Result<u64, MusyncError> {
+    let txn = self.db.begin().await?;
+    // delete cascade
+    LocalSrcFolder::find()
+      .filter(entity::local_src_folder::Column::Path.eq(folder))
+      .one(&txn)
+      .await?
+      .ok_or(MusyncError::FolderNotFound(folder.to_owned()))?;
+    // delete tracks without local_src and netease_src
+    use sea_orm::query::*;
+    let deleted = Track::delete_many()
+      .filter(
+        entity::track::Column::Id.not_in_subquery(
+          LocalSrc::find()
+            .select()
+            .column(entity::local_src::Column::TrackId)
+            .into_query(),
+        ),
+      )
+      .exec(&txn)
+      .await?;
+    txn.commit().await?;
+    Ok(deleted.rows_affected)
+  }
+
+  pub async fn query_local_folders(
+    &self,
+    _query: QueryLocalFoldersRequest,
+  ) -> Result<Vec<LocalFolder>, MusyncError> {
+    let folders = LocalSrcFolder::find().all(&self.db).await?;
+    Ok(folders.into_iter().map(LocalFolder::from_entity).collect())
+  }
+
+  pub async fn update_track(&self, update: abi::TrackUpdate) -> Result<abi::Track, MusyncError> {
     if update.netease_src.is_some() {
       warn!("netease_src is not supported yet");
     }
@@ -297,7 +336,7 @@ impl Musync for Musyncer {
     self.track(update.id).await
   }
 
-  async fn delete_tracks(&self, ids: &[TrackId]) -> Result<u64, MusyncError> {
+  pub async fn delete_tracks(&self, ids: &[TrackId]) -> Result<u64, MusyncError> {
     if ids.is_empty() {
       return Ok(0);
     }
@@ -309,7 +348,10 @@ impl Musync for Musyncer {
     Ok(deleted.rows_affected)
   }
 
-  async fn query_tracks(&self, query: abi::TrackQuery) -> Result<Vec<abi::Track>, MusyncError> {
+  pub async fn query_tracks(
+    &self,
+    query: abi::QueryTracksRequest,
+  ) -> Result<Vec<abi::Track>, MusyncError> {
     let rows = Track::find()
       .apply_if(query.title, |b, title| {
         b.filter(entity::track::Column::Title.like(format!("%{}%", title)))
@@ -333,7 +375,7 @@ impl Musync for Musyncer {
       .collect()
   }
 
-  async fn track(&self, id: TrackId) -> Result<abi::Track, MusyncError> {
+  pub async fn track(&self, id: TrackId) -> Result<abi::Track, MusyncError> {
     let row = Track::find_by_id(id)
       .one(&self.db)
       .await?
@@ -348,7 +390,7 @@ impl Musync for Musyncer {
     Ok(abi_track)
   }
 
-  async fn create_user(&self, user: abi::User) -> Result<abi::User, MusyncError> {
+  pub async fn create_user(&self, user: abi::User) -> Result<abi::User, MusyncError> {
     let mut updating = user.clone();
     let now = Utc::now();
     let inserted = entity::user::ActiveModel {
@@ -365,7 +407,7 @@ impl Musync for Musyncer {
     Ok(updating)
   }
 
-  async fn update_user(&self, update: abi::UserUpdate) -> Result<abi::User, MusyncError> {
+  pub async fn update_user(&self, update: abi::UserUpdate) -> Result<abi::User, MusyncError> {
     let now = Utc::now();
 
     let old = User::find_by_id(update.id)
@@ -380,7 +422,7 @@ impl Musync for Musyncer {
     self.user(update.id).await
   }
 
-  async fn delete_users(&self, ids: &[UserId]) -> Result<u64, MusyncError> {
+  pub async fn delete_users(&self, ids: &[UserId]) -> Result<u64, MusyncError> {
     if ids.is_empty() {
       return Ok(0);
     }
@@ -392,7 +434,10 @@ impl Musync for Musyncer {
     Ok(deleted.rows_affected)
   }
 
-  async fn query_users(&self, query: abi::UserQuery) -> Result<Vec<abi::User>, MusyncError> {
+  pub async fn query_users(
+    &self,
+    query: abi::QueryUsersRequest,
+  ) -> Result<Vec<abi::User>, MusyncError> {
     if let Some(name) = query.name {
       let rows = User::find()
         .filter(entity::user::Column::Name.like(format!("%{}%", name)))
@@ -405,7 +450,7 @@ impl Musync for Musyncer {
     }
   }
 
-  async fn user(&self, id: UserId) -> Result<abi::User, MusyncError> {
+  pub async fn user(&self, id: UserId) -> Result<abi::User, MusyncError> {
     let row = User::find_by_id(id)
       .one(&self.db)
       .await?
@@ -414,8 +459,8 @@ impl Musync for Musyncer {
   }
 }
 
-impl Musyncer {
-  async fn get_tracks_in_playlist(
+impl DbManager {
+  pub async fn get_tracks_in_playlist(
     &self,
     playlist_id: PlaylistId,
   ) -> Result<Vec<TrackId>, MusyncError> {
@@ -446,42 +491,42 @@ mod tests {
       .init();
   }
 
-  async fn init_manager() -> Musyncer {
+  pub async fn init_manager() -> DbManager {
     let db = Database::connect("sqlite::memory:").await.unwrap();
     Migrator::refresh(&db).await.unwrap();
-    Musyncer::new(db)
+    DbManager::new(db)
   }
 
-  async fn create_test_user(manager: &Musyncer) -> abi::User {
+  pub async fn create_test_user(manager: &DbManager) -> abi::User {
     manager.create_user(abi::User::new("test")).await.unwrap()
   }
 
   #[tokio::test]
-  async fn create_playlist_should_work() {
+  pub async fn create_playlist_should_work() {
     init_tracing();
     let manager = init_manager().await;
 
     let user = create_test_user(&manager).await;
 
-    let playlist = abi::Playlist::new(user.id, "test".to_string(), "test".to_string(), vec![]);
-    let playlist = manager.create_playlist(playlist, &[]).await.unwrap();
+    let playlist = abi::CreatePlaylistRequest::new("test".to_string(), "test".to_string(), vec![]);
+    let playlist = manager.create_playlist(user.id, playlist).await.unwrap();
     assert_ne!(playlist.id, 0);
     assert!(playlist.created_at.is_some());
     assert!(playlist.updated_at.is_some());
   }
 
   #[tokio::test]
-  async fn update_playlist_info_should_work() {
+  pub async fn update_playlist_info_should_work() {
     init_tracing();
     let manager = init_manager().await;
 
     let user = create_test_user(&manager).await;
 
-    let playlist = abi::Playlist::new(user.id, "test".to_string(), "test".to_string(), vec![]);
-    let playlist = manager.create_playlist(playlist, &[]).await.unwrap();
+    let playlist = abi::CreatePlaylistRequest::new("test".to_string(), "test".to_string(), vec![]);
+    let playlist = manager.create_playlist(user.id, playlist).await.unwrap();
 
     let playlist = manager
-      .update_playlist(abi::PlaylistUpdate {
+      .update_playlist(abi::UpdatePlaylistRequest {
         id: playlist.id,
         name: Some("test2".to_string()),
         description: Some("test2".to_string()),
@@ -499,14 +544,14 @@ mod tests {
   }
 
   #[tokio::test]
-  async fn delete_playlists_should_work() {
+  pub async fn delete_playlists_should_work() {
     init_tracing();
     let manager = init_manager().await;
 
     let user = create_test_user(&manager).await;
 
-    let playlist = abi::Playlist::new(user.id, "test".to_string(), "test".to_string(), vec![]);
-    let playlist = manager.create_playlist(playlist, &[]).await.unwrap();
+    let playlist = abi::CreatePlaylistRequest::new("test".to_string(), "test".to_string(), vec![]);
+    let playlist = manager.create_playlist(user.id, playlist).await.unwrap();
 
     let deleted = manager.delete_playlists(&[playlist.id]).await.unwrap();
     assert_eq!(deleted, 1);
@@ -515,17 +560,17 @@ mod tests {
   }
 
   #[tokio::test]
-  async fn query_playlists_should_work() {
+  pub async fn query_playlists_should_work() {
     init_tracing();
     let manager = init_manager().await;
 
     let user = create_test_user(&manager).await;
 
-    let playlist = abi::Playlist::new(user.id, "test".to_string(), "test".to_string(), vec![]);
-    let playlist = manager.create_playlist(playlist, &[]).await.unwrap();
+    let playlist = abi::CreatePlaylistRequest::new("test".to_string(), "test".to_string(), vec![]);
+    let playlist = manager.create_playlist(user.id, playlist).await.unwrap();
 
     let playlists = manager
-      .query_playlists(abi::PlaylistQuery {
+      .query_playlists(abi::QueryPlaylistsRequest {
         name: Some("test".to_string()),
         ..Default::default()
       })
@@ -536,7 +581,7 @@ mod tests {
   }
 
   #[tokio::test]
-  async fn create_track_should_work() {
+  pub async fn create_track_should_work() {
     init_tracing();
     let manager = init_manager().await;
 
@@ -557,7 +602,7 @@ mod tests {
   }
 
   #[tokio::test]
-  async fn update_track_should_work() {
+  pub async fn update_track_should_work() {
     init_tracing();
     let manager = init_manager().await;
 
@@ -598,7 +643,7 @@ mod tests {
   }
 
   #[tokio::test]
-  async fn delete_tracks_should_work() {
+  pub async fn delete_tracks_should_work() {
     init_tracing();
     let manager = init_manager().await;
 
@@ -623,7 +668,7 @@ mod tests {
   }
 
   #[tokio::test]
-  async fn query_tracks_should_work() {
+  pub async fn query_tracks_should_work() {
     init_tracing();
     let manager = init_manager().await;
 
@@ -642,7 +687,7 @@ mod tests {
       .unwrap();
 
     let tracks = manager
-      .query_tracks(abi::TrackQuery {
+      .query_tracks(abi::QueryTracksRequest {
         title: Some("track_title".to_owned()),
         album: Some("discc".to_owned()),
         artist: Some("cras".to_owned()),
@@ -655,7 +700,7 @@ mod tests {
   }
 
   #[tokio::test]
-  async fn create_user_should_work() {
+  pub async fn create_user_should_work() {
     init_tracing();
     let manager = init_manager().await;
 
@@ -664,7 +709,7 @@ mod tests {
   }
 
   #[tokio::test]
-  async fn update_user_should_work() {
+  pub async fn update_user_should_work() {
     init_tracing();
     let manager = init_manager().await;
 
@@ -682,7 +727,7 @@ mod tests {
   }
 
   #[tokio::test]
-  async fn delete_users_should_work() {
+  pub async fn delete_users_should_work() {
     init_tracing();
     let manager = init_manager().await;
 
@@ -695,14 +740,14 @@ mod tests {
   }
 
   #[tokio::test]
-  async fn query_users_should_work() {
+  pub async fn query_users_should_work() {
     init_tracing();
     let manager = init_manager().await;
 
     let user = manager.create_user(abi::User::new("user1")).await.unwrap();
 
     let users = manager
-      .query_users(abi::UserQuery {
+      .query_users(abi::QueryUsersRequest {
         name: Some("user1".to_owned()),
       })
       .await

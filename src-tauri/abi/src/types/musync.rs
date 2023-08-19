@@ -1,20 +1,20 @@
-use crate::{convert_to_timestamp, Playlist, Track};
+use crate::{convert_to_timestamp, CreatePlaylistRequest, LocalFolder, Playlist, Track};
 
-impl Playlist {
-  pub fn new<SN, SD>(owner_id: i32, name: SN, description: SD, track_ids: Vec<i32>) -> Playlist
+impl CreatePlaylistRequest {
+  pub fn new<SN, SD>(name: SN, description: SD, track_ids: Vec<i32>) -> CreatePlaylistRequest
   where
     SN: Into<String>,
     SD: Into<String>,
   {
-    Playlist {
-      owner_id,
+    CreatePlaylistRequest {
       track_ids,
       name: name.into(),
       description: description.into(),
-      ..Default::default()
     }
   }
+}
 
+impl Playlist {
   pub fn from_entity(row: entity::playlist::Model, track_ids: Vec<i32>) -> Playlist {
     Playlist {
       id: row.id,
@@ -43,5 +43,11 @@ impl Track {
       local_src: None,
       netease_src: None,
     }
+  }
+}
+
+impl LocalFolder {
+  pub fn from_entity(row: entity::local_src_folder::Model) -> LocalFolder {
+    LocalFolder { path: row.path }
   }
 }

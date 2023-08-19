@@ -6,6 +6,9 @@ import { pinia, useQSyncStore } from './store';
 
 import App from './App.vue';
 import { router } from './router';
+import { ApiClient } from './api/client';
+
+ApiClient.set('http://127.0.0.1:8396');
 
 const app = createApp(App);
 

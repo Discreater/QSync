@@ -2,5 +2,5 @@
 # will have compiled files and executables
 /target/
 .env
-db/
 .sqlx/
+*.sqlite

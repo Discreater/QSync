@@ -1,15 +1,12 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
-import { convertFileSrc } from '@tauri-apps/api/tauri';
 import { useRoute, useRouter } from 'vue-router';
 import QHoverButton from './QHoverButton.vue';
 import QSlider from './QSlider.vue';
 import QPopover from './QPopover.vue';
 import HoverLayer from './HoverLayer.vue';
 import H2 from './typo/H2.vue';
-import type { ViewTrack } from '~/sources/folder';
-import type { Track } from '~/store';
-import { getShowTrack, sameTrack, useConfigStore, usePlayerStore, useQSyncStore } from '~/store';
+import { sameTrack, useConfigStore, usePlayerStore, useQSyncStore } from '~/store';
 import { logger } from '~/utils/logger';
 import IconArrowShuffle from '~icons/fluent/arrow-shuffle-24-regular';
 import IconPrevious from '~icons/fluent/previous-24-filled';
@@ -20,6 +17,8 @@ import IconRepeat from '~icons/fluent/arrow-repeat-all-24-regular';
 import IconVolume from '~icons/fluent/speaker-2-24-regular';
 import IconMore from '~icons/fluent/more-horizontal-24-regular';
 import { formatTime } from '~/utils';
+import { ApiClient } from '~/api/client';
+import type { Track } from '~/generated/protos/musync';
 
 const router = useRouter();
 const route = useRoute();
@@ -36,14 +35,15 @@ const localProgress = ref(0);
 const duration = ref(0);
 
 function loadTrack(track: Track) {
-  logger.trace(`load new track: ${track.path}`);
+  logger.trace(`load new track: ${track.title}`);
+  const uri = ApiClient.get().track_uri(track.id);
   currentTrack.value = track;
-  audio.src = convertFileSrc(track.path);
+  audio.src = uri;
   if (route.name === 'lyric') {
     router.replace({
       name: 'lyric',
       query: {
-        path: track.path,
+        id: track.id,
       },
     });
   }
@@ -94,15 +94,6 @@ audio.onloadedmetadata = () => {
   duration.value = audio.duration;
 };
 
-const viewTrack = ref<ViewTrack>();
-watch(currentTrack, (track) => {
-  if (track) {
-    getShowTrack(track.path).then((t) => {
-      viewTrack.value = t;
-    });
-  }
-});
-
 function handlePrevious() {
   qsyncStore.previousTrack();
 }
@@ -135,14 +126,14 @@ function onInfoCardClick() {
     else
       router.push({ name: 'main' });
   } else {
-    router.push({ name: 'lyric', query: { path: currentTrack.value?.path } });
+    router.push({ name: 'lyric', query: { id: currentTrack.value?.id } });
   }
 }
 const showCardImg = computed(() => route.name !== 'lyric');
 
-function artistAlbum(view: ViewTrack | undefined) {
+function artistAlbum(view: Track | undefined) {
   if (view)
-    return `${view.artist()} • ${view.album()}`;
+    return `${view.artist} • ${view.album}`;
 }
 </script>
 
@@ -153,7 +144,8 @@ function artistAlbum(view: ViewTrack | undefined) {
         <span class="text-xs w-14"> {{ formatTime(value, 'hh:mm:ss') }} </span>
       </template>
       <template #right="{ value }">
-        <span class="text-xs text-right w-14">{{ duration && value != null ? `${formatTime(duration - value, 'hh:mm:ss')}` : ''
+        <span class="text-xs text-right w-14">{{ duration && value != null ? `${formatTime(duration - value, 'hh:mm:ss')}`
+          : ''
         }}</span>
       </template>
     </QSlider>
@@ -161,15 +153,15 @@ function artistAlbum(view: ViewTrack | undefined) {
       <div class="flex-1 h-full flex">
         <HoverLayer class="flex select-none cursor-default min-w-0" @click="onInfoCardClick()">
           <img
-            v-if="showCardImg" :src="viewTrack?.picture_url()"
-            :class="`object-scale-down w-20 border-white/10 border ${viewTrack?.picture_url() ? '' : 'invisible'}`"
+            v-if="showCardImg" :src="currentTrack ? ApiClient.get().cover_uri(currentTrack.id) : ''"
+            class="object-scale-down w-20 border-white/10 border"
           >
           <div :class="`flex flex-col min-w-0 transition-all duration-300 ${showCardImg ? 'ml-5' : 'ml-2 mr-3'}`">
-            <H2 class="truncate" :title="viewTrack?.name()">
-              {{ viewTrack?.name() }}
+            <H2 class="truncate" :title="currentTrack?.title">
+              {{ currentTrack?.title }}
             </H2>
-            <p class="truncate font-thin" :title="artistAlbum(viewTrack)">
-              {{ artistAlbum(viewTrack) }}
+            <p class="truncate font-thin" :title="artistAlbum(currentTrack)">
+              {{ artistAlbum(currentTrack) }}
             </p>
           </div>
         </HoverLayer>

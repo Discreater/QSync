@@ -17,6 +17,7 @@ import QSelect from '~/components/QSelect.vue';
 import LongButton from '~/components/LongButton.vue';
 import type { Item } from '~/components/types';
 import { logger } from '~/utils/logger';
+import { getPlatform } from '~/platforms';
 
 const { t } = useI18n();
 const store = useQSyncStore();
@@ -34,7 +35,7 @@ const password = ref<string>();
 const directory = ref<string>();
 
 const showAddModel = ref(false);
-function addAccount() {
+async function addAccount() {
   if (sourceType.value === 'jellyfin') {
     if (server.value !== undefined && username.value !== undefined && password.value !== undefined) {
       const opt = {
@@ -54,10 +55,15 @@ function addAccount() {
     //   logger.error(reason);
     // });
   } else if (sourceType.value === 'local') {
-    if (directory.value) {
-      store.addMusicFolder(directory.value);
-      showAddModel.value = false;
-    }
+    let path;
+    if (getPlatform() === 'web')
+      path = 'D:\\media\\music';
+    else if (directory.value)
+      path = directory.value;
+    else
+      return;
+
+    store.addMusicFolder(path);
   }
 }
 </script>
@@ -70,7 +76,10 @@ function addAccount() {
     </div>
     <H2>{{ t('source.types.local') }}</H2>
     <div>
-      <LongButton v-for="dir in store.musicFolders" :key="dir.path" :text="dir.path" :icon="IconFolder" @click="store.updateFolder(dir.path)">
+      <LongButton
+        v-for="dir in store.musicFolders" :key="dir.path" :text="dir.path" :icon="IconFolder"
+        @click="store.updateFolder(dir.path)"
+      >
         <template #extra>
           <IconSpinner :class="dir.updating ? 'animate-spin' : ''" />
           <QButton :icon="IconDelete" @click="store.removeFolder(dir.path)" />
@@ -107,12 +116,13 @@ function addAccount() {
 </template>
 
 <style>
-  @keyframes rotating {
-    from {
-      transform: rotate(0deg);
-    }
-    to {
-      transform: rotate(360deg);
-    }
+@keyframes rotating {
+  from {
+    transform: rotate(0deg);
   }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
 </style>

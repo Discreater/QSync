@@ -1,5 +1,5 @@
 [package]
-name = "musync"
+name = "dbm"
 version = "0.1.0"
 edition = "2021"
 
@@ -15,6 +15,7 @@ sea-orm = { version = "0.12", features = [ "sqlx-sqlite", "runtime-tokio-rustls"
 migration = { path = "../migration" }
 entity = { path = "../entity" }
 chrono = "0.4.26"
+tonic = "0.9.2"
 
 [dev-dependencies]
 tokio = { version = "1.25.0", features = ["full"] }

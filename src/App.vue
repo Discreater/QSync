@@ -4,7 +4,7 @@ import { computed, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import SmoothScrollbar from 'smooth-scrollbar';
 import { useRoute } from 'vue-router';
-import { inTauri } from './platforms';
+import { getPlatform, inTauri } from './platforms';
 import { useQSyncStore } from './store';
 import QPlayer from './components/QPlayer.vue';
 import TitleBar from '~/components/TitleBar.vue';
@@ -43,11 +43,11 @@ const denseTitle = computed(() => route.name === 'lyric');
 
 <template>
   <div
-    class="w-full h-full max-h-screen flex flex-col
-     text-black dark:text-white bg-main_w_bg dark:bg-main_d_bg border-white/10 border"
+    :class="`w-full h-full max-h-screen flex flex-col
+     text-black dark:text-white bg-main_w_bg dark:bg-main_d_bg ${getPlatform() !== 'web' ? 'border-white/10 border' : ''} `"
   >
     <RouterView />
-    <TitleBar :dense="denseTitle" />
+    <TitleBar v-if="getPlatform() !== 'web'" :dense="denseTitle" />
     <QPlayer class="shrink-0" />
   </div>
 </template>

@@ -10,6 +10,7 @@ import IconMusicNote from '~icons/fluent/music-note-2-24-regular';
 import IconSettings from '~icons/fluent/settings-24-regular';
 import IconAccount from '~icons/fluent/person-circle-24-regular';
 import IconPLayback from '~icons/fluent/navigation-play-20-regular';
+import { getPlatform } from '~/platforms';
 
 const menu = {
   top: [
@@ -59,7 +60,7 @@ function onItemClick(item: Item) {
 </script>
 
 <template>
-  <div class="bg-menu_w_bg dark:bg-menu_d_bg  sm:w-12 md:w-[23rem] px-0 sm:px-1 pt-14">
+  <div :class="`bg-menu_w_bg dark:bg-menu_d_bg  sm:w-12 md:w-[23rem] px-0 sm:px-1 ${getPlatform() !== 'web' ? 'pt-14' : 'pt-2'}`">
     <QMenu :activated="activated" :top="menu.top" :bottom="menu.bottom" :responsible="true" @item-click="onItemClick" />
   </div>
 </template>

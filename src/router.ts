@@ -15,7 +15,7 @@ export const router = createRouter({
       path: '/lyric',
       component: Lyric,
       name: 'lyric',
-      props: route => ({ path: route.query.path }),
+      props: route => ({ id: route.query.id }),
     },
   ],
   history: createWebHistory(),
