@@ -4,7 +4,7 @@ export interface Column {
   title?: string
 };
 
-const { columns, data, showHead } = defineProps<{ columns: Column[]; data: Row[]; showHead?: boolean; rowClassName?: (row: Row) => string }>();
+defineProps<{ columns: Column[]; data: Row[]; showHead?: boolean; rowClassName?: (row: Row) => string }>();
 </script>
 
 <template>

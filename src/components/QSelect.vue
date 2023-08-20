@@ -4,7 +4,7 @@ import QButton from './QButton.vue';
 import type { Item, ItemKey } from './types';
 import QMenu from './QMenu.vue';
 
-const { value, options } = defineProps<{
+const props = defineProps<{
   value?: string
   options: Item[]
 }>();
@@ -12,7 +12,7 @@ const emit = defineEmits<{
   'update:value': [value: ItemKey]
 }>();
 const open = ref(false);
-const selected = ref<Item | undefined>(options.find(v => v.key === value));
+const selected = ref<Item | undefined>(props.options.find(v => v.key === props.value));
 
 function onValueChange(opt: Item) {
   selected.value = opt;
@@ -21,7 +21,7 @@ function onValueChange(opt: Item) {
 }
 
 const menuOffset = computed(() => {
-  const idx = options.findIndex(opt => opt.key === selected.value?.key);
+  const idx = props.options.findIndex(opt => opt.key === selected.value?.key);
   return `-${(idx * 11) / 4 + 0.5}rem`;
 });
 </script>

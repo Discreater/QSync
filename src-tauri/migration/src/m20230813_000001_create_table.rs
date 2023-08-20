@@ -355,6 +355,18 @@ impl MigrationTrait for Migration {
       )
       .await?;
 
+    let now = chrono::Utc::now();
+
+    let insert = Query::insert()
+      .into_table(User::Table)
+      .columns([User::Name, User::CreatedAt, User::UpdatedAt])
+      .values_panic([
+        "Kerse".into(),
+        now.to_rfc3339().into(),
+        now.to_rfc3339().into(),
+      ])
+      .to_owned();
+    manager.exec_stmt(insert).await?;
     Ok(())
   }
 

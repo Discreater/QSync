@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const { selected, name } = defineProps<{
+defineProps<{
   selected: boolean
   name: string
   responsible?: boolean

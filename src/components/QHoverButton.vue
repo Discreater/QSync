@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Component } from 'vue';
 
-const { icon, text, disabled } = withDefaults(defineProps<{ icon?: Component; text?: string; disabled?: boolean }>(), {
+withDefaults(defineProps<{ icon?: Component; text?: string; disabled?: boolean }>(), {
   disabled: false,
 });
 </script>

@@ -169,12 +169,12 @@ export const useQSyncStore = defineStore('qsync', {
       this.$patch({
         playQueue: tracks,
       });
-      let { playlist } = await ApiClient.grpc().CreatePlaylist({
-        trackIds: tracks.map(v => v.id),
-        name: 'temp',
-        description: 'temp',
-        temp: true,
-      });
+      // let { playlist } = await ApiClient.grpc().CreatePlaylist({
+      //   trackIds: tracks.map(v => v.id),
+      //   name: 'temp',
+      //   description: 'temp',
+      //   temp: true,
+      // });
       const playerStatus = usePlayerStore();
       playerStatus.play(current);
     },

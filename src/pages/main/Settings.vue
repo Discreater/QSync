@@ -27,7 +27,7 @@ async function handleAddMusicFolder() {
 <template>
   <Basic>
     <H1>{{ t('menu.settings') }}</H1>
-    <H2>{{ t("settings.library") }}</H2>
+    <H2>{{ t("settings.user") }}</H2>
     <LongButton :icon="IconFolder" :droppable="true" :text="t('settings.music-lib-position')">
       <template #extra>
         <QButton :icon="IconFolderAdd" :text="t('settings.add-folder')" @click.stop="handleAddMusicFolder()" />

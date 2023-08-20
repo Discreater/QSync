@@ -239,6 +239,7 @@ pub fn check_auth(mut req: Request<()>) -> Result<Request<()>, Status> {
       .map_err(|_| Status::new(tonic::Code::Unauthenticated, "Invalid token format"))?;
     let token_data = decode::<Claims>(bearer, &KEYS.decoding, &Validation::default())
       .map_err(|_| Status::unauthenticated("Invalid token format"))?;
+    trace!("auth {} success", token_data.claims.id);
     req.extensions_mut().insert(token_data.claims);
   }
   Ok(req)

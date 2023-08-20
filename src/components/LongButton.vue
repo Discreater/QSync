@@ -5,7 +5,7 @@ import { useToggle } from '@vueuse/core';
 import IconDown from '~icons/fluent/chevron-down-24-regular';
 import IconUp from '~icons/fluent/chevron-up-24-regular';
 
-const { icon, text, droppable } = withDefaults(defineProps<{ icon?: Component; text?: string; droppable?: boolean }>(), {
+withDefaults(defineProps<{ icon?: Component; text?: string; droppable?: boolean }>(), {
   droppable: false,
 });
 

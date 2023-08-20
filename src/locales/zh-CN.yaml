@@ -2,6 +2,7 @@ menu:
   settings: 设置
   home: 主页
   music-lib: 音乐库
+  account: 账号
   source: 源
   play-queue: 播放队列
 settings:
@@ -9,6 +10,7 @@ settings:
   music-lib-position: 音乐库位置
   add-folder: 添加文件夹
   lib-no-folder: 此库中不包含任何文件夹
+  user: 用户
 source:
   add: 添加源
   user: 用户
@@ -26,3 +28,9 @@ music-lib:
 btn:
   shuffle: 随机播放
   location: 正在播放
+account:
+  qsync: QSync 账号
+  not-login: 未登录
+  logout: 注销
+  login: 登录
+  username: 用户名

@@ -1,9 +1,21 @@
+import { grpc } from '@improbable-eng/grpc-web';
 import { GrpcWebImpl, MusyncServiceClientImpl } from '~/generated/protos/musync';
+import type { Token } from '~/generated/protos/musync';
+import { useAccountStore } from '~/store/user';
 
 export class ApiClient {
   grpcClient: MusyncServiceClientImpl;
-  constructor(private addr: string) {
-    const rpc = new GrpcWebImpl(addr, {});
+  private constructor(private addr: string, token?: Token) {
+    const rpc = new GrpcWebImpl(addr, {
+      metadata: token !== undefined ? new grpc.Metadata({ authorization: `${token?.data}` }) : undefined,
+    });
+    this.grpcClient = new MusyncServiceClientImpl(rpc);
+  }
+
+  setToken(token: Token) {
+    const rpc = new GrpcWebImpl(this.addr, {
+      metadata: new grpc.Metadata({ authorization: `${token.data}` }),
+    });
     this.grpcClient = new MusyncServiceClientImpl(rpc);
   }
 
@@ -20,7 +32,8 @@ export class ApiClient {
   }
 
   static set(addr: string) {
-    ApiClient.apiClient = new ApiClient(addr);
+    const accountStore = useAccountStore();
+    ApiClient.apiClient = new ApiClient(addr, accountStore.token);
   }
 
   track_uri(id: number): string {

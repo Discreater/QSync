@@ -5,7 +5,10 @@ use axum::{routing::get, Router};
 
 use axum_server::Handle;
 use error::Result;
-use http::{header::CONTENT_TYPE, Request};
+use http::{
+  header::{ACCEPT, AUTHORIZATION, CONTENT_TYPE},
+  HeaderName, Request,
+};
 use hyper::Body;
 use tokio::task::JoinHandle;
 use tonic_web::GrpcWebLayer;
@@ -31,7 +34,12 @@ impl Server {
     let manager = dbm::DbManager::from_url(db_url).await?;
 
     let cors = CorsLayer::new()
-      .allow_headers(AllowHeaders::any())
+      .allow_headers([
+        AUTHORIZATION,
+        ACCEPT,
+        CONTENT_TYPE,
+        HeaderName::from_static("x-grpc-web"),
+      ])
       .allow_methods(AllowMethods::any())
       .allow_origin(AllowOrigin::any())
       .max_age(Duration::from_secs(60) * 10);

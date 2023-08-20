@@ -5,12 +5,12 @@ import LongButton from './LongButton.vue';
 import { logger } from '~/utils/logger';
 import { open } from '~/platforms/dialog';
 
-const { id, type, placeholder, value } = defineProps<{ id: string; type: 'url' | 'directory' | 'text' | 'password'; placeholder?: string; value?: string; label?: string }>();
+const props = defineProps<{ id: string; type: 'url' | 'directory' | 'text' | 'password'; placeholder?: string; value?: string; label?: string }>();
 const emit = defineEmits<{
   (e: 'update:value', value: string): void
 }>();
 
-const inputType = type === 'directory' ? 'file' : type;
+const inputType = props.type === 'directory' ? 'file' : props.type;
 function onValueChange(e: Event) {
   emit('update:value', (e.target as HTMLInputElement).value);
 }

@@ -12,7 +12,7 @@ async fn main() {
   // load envrionment
   dotenvy::dotenv().expect(".env file not found");
   let addr = SocketAddr::from(([127, 0, 0, 1], 8396));
-  let sqlite_file = "./db.sqlite";
+  let sqlite_file = "../target/db.sqlite3";
   if !std::path::Path::new(sqlite_file).exists() {
     std::fs::File::create(sqlite_file).unwrap();
   }

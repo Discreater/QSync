@@ -2,7 +2,7 @@
 import type { Component } from 'vue';
 import IconDown from '~icons/fluent/chevron-down-24-regular';
 
-const { text, icon, dropdown, disabled } = withDefaults(defineProps<{ text?: string; icon?: Component; dropdown?: boolean; disabled?: boolean }>(), {
+withDefaults(defineProps<{ text?: string; icon?: Component; dropdown?: boolean; disabled?: boolean }>(), {
   dropdown: false,
   disabled: false,
 });

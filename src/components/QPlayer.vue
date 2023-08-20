@@ -64,7 +64,7 @@ async function updatePlayer(pState: typeof playerStore) {
     loadTrack(playQueue[pState.current]);
 
   if (Math.abs(pState.progress - audio.currentTime * 1000) > 1000) {
-    logger.debug('update time');
+    logger.debug(`update time, from ${audio.currentTime * 1000} to ${pState.progress / 1000}`);
     localProgress.value = pState.progress / 1000;
     audio.currentTime = localProgress.value;
   }
@@ -183,8 +183,10 @@ function toggleMute(mute?: boolean) {
     <div class="grow flex justify-between items-center p-1">
       <div class="flex-1 h-full flex">
         <HoverLayer class="flex select-none cursor-default min-w-0" @click="onInfoCardClick()">
-          <img v-if="showCardImg" :src="currentTrack ? ApiClient.get().cover_uri(currentTrack.id) : ''"
-            class="object-scale-down w-20 border-white/10 bord er">
+          <img
+            v-if="showCardImg" :src="currentTrack ? ApiClient.get().cover_uri(currentTrack.id) : ''"
+            class="object-scale-down w-20 border-white/10 bord er"
+          >
           <div :class="`flex flex-col min-w-0 transition-all duration-300 ${showCardImg ? 'ml-5' : 'ml-2 mr-3'}`">
             <H2 class="truncate" :title="currentTrack?.title">
               {{ currentTrack?.title }}
@@ -200,7 +202,8 @@ function toggleMute(mute?: boolean) {
         <QHoverButton :icon="IconPrevious" @click="handlePrevious" />
         <button
           class="rounded-full w-14 h-14 text-2xl flex justify-center items-center bg-gradient-to-br from-orange-500 to-purple-500"
-          @click="togglePlay">
+          @click="togglePlay"
+        >
           <IconPause v-if="playerStore.playing" />
           <IconPlay v-else />
         </button>
