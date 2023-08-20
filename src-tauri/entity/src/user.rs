@@ -8,7 +8,7 @@ pub struct Model {
   #[sea_orm(primary_key)]
   pub id: i32,
   pub name: String,
-  pub playback_id: Option<i32>,
+  pub play_queue_id: Option<i32>,
   pub created_at: DateTimeUtc,
   pub updated_at: DateTimeUtc,
 }
@@ -16,22 +16,22 @@ pub struct Model {
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
 pub enum Relation {
   #[sea_orm(
-    belongs_to = "super::playback::Entity",
-    from = "Column::PlaybackId",
-    to = "super::playback::Column::Id",
+    belongs_to = "super::play_queue::Entity",
+    from = "Column::PlayQueueId",
+    to = "super::play_queue::Column::Id",
     on_update = "NoAction",
     on_delete = "Cascade"
   )]
-  Playback,
+  PlayQueue,
   #[sea_orm(has_many = "super::playlist::Entity")]
   Playlist,
   #[sea_orm(has_many = "super::user_playlist::Entity")]
   UserPlaylist,
 }
 
-impl Related<super::playback::Entity> for Entity {
+impl Related<super::play_queue::Entity> for Entity {
   fn to() -> RelationDef {
-    Relation::Playback.def()
+    Relation::PlayQueue.def()
   }
 }
 

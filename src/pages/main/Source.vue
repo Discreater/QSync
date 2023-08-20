@@ -64,6 +64,7 @@ async function addAccount() {
       return;
 
     store.addMusicFolder(path);
+    showAddModel.value = false;
   }
 }
 </script>

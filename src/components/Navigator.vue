@@ -9,8 +9,9 @@ import IconHome from '~icons/fluent/home-24-regular';
 import IconMusicNote from '~icons/fluent/music-note-2-24-regular';
 import IconSettings from '~icons/fluent/settings-24-regular';
 import IconAccount from '~icons/fluent/person-circle-24-regular';
-import IconPLayback from '~icons/fluent/navigation-play-20-regular';
+import IconPlayQueue from '~icons/fluent/navigation-play-20-regular';
 import { getPlatform } from '~/platforms';
+import { logger } from '~/utils/logger';
 
 const menu = {
   top: [
@@ -25,9 +26,9 @@ const menu = {
       name: 'menu.music-lib',
     },
     {
-      key: 'playback',
-      icon: IconPLayback,
-      name: 'menu.playback',
+      key: 'play-queue',
+      icon: IconPlayQueue,
+      name: 'menu.play-queue',
     },
   ],
   bottom: [
@@ -46,7 +47,8 @@ const menu = {
 
 const route = useRoute();
 const router = useRouter();
-const activated = ref<ItemKey>();
+
+const activated = ref<ItemKey | undefined>(route.name ?? undefined);
 watch(
   () => route.name,
   (name) => {

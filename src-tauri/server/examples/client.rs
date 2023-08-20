@@ -1,7 +1,6 @@
 use abi::AddLocalFolderResponse;
 use http::header::{ACCEPT, CONTENT_TYPE};
 use prost::bytes::{Buf, BufMut, Bytes, BytesMut};
-use tonic::transport::Endpoint;
 
 #[tokio::main]
 async fn main() {

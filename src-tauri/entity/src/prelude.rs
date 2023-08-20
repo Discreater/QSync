@@ -2,7 +2,7 @@
 
 pub use super::local_src::Entity as LocalSrc;
 pub use super::local_src_folder::Entity as LocalSrcFolder;
-pub use super::playback::Entity as Playback;
+pub use super::play_queue::Entity as PlayQueue;
 pub use super::playlist::Entity as Playlist;
 pub use super::playlist_track::Entity as PlaylistTrack;
 pub use super::track::Entity as Track;

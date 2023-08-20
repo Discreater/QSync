@@ -22,7 +22,7 @@ message Playlist {
 }
 
 // CurrentPlaylist controller
-message Playback {
+message PlayQueue {
   // unique id for the current playlist
   int32 id = 1;
   // id of the playlist
@@ -112,6 +112,7 @@ message CreatePlaylistRequest {
   string name = 2;
   // description of the playlist
   string description = 3;
+  bool temp = 4;
 }
 
 // Create playlist response

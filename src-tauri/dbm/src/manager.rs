@@ -40,12 +40,13 @@ impl DbManager {
     let now = Utc::now();
     // create playlist
     let inserted = entity::playlist::ActiveModel {
+      id: NotSet,
       owner_id: Set(owner_id),
       name: Set(create.name.clone()),
       description: Set(create.description.clone()),
       created_at: Set(now),
       updated_at: Set(now),
-      ..Default::default()
+      temp: Set(create.temp)
     }
     .insert(&self.db)
     .await?;
@@ -230,10 +231,12 @@ impl DbManager {
       created_at: Set(now),
       updated_at: Set(now),
     });
-    let inserted: sea_orm::InsertResult<entity::track::ActiveModel> =
-      Track::insert_many(active_tracks).exec(&txn).await?;
-    info!("inserted tracks: {:?}", inserted);
-    let start_id = tracks.len() as i32 - inserted.last_insert_id + 1;
+    let inserted = Track::insert_many(active_tracks).exec(&txn).await?;
+    info!(
+      "inserted tracks: {}",
+      inserted.last_insert_id - tracks.len() as i32
+    );
+    let start_id = inserted.last_insert_id - tracks.len() as i32 + 1;
     let mut local_srcs = vec![];
     for (idx, track) in tracks.iter().enumerate() {
       if let Some(src) = track.local_src.as_ref() {
@@ -255,18 +258,18 @@ impl DbManager {
   pub async fn remove_folder(&self, folder: &str) -> Result<u64, MusyncError> {
     let txn = self.db.begin().await?;
     // delete cascade
-    LocalSrcFolder::find()
+    LocalSrcFolder::delete_many()
       .filter(entity::local_src_folder::Column::Path.eq(folder))
-      .one(&txn)
-      .await?
-      .ok_or(MusyncError::FolderNotFound(folder.to_owned()))?;
+      .exec(&txn)
+      .await
+      .map_err(|_| (MusyncError::FolderNotFound(folder.to_owned())))?;
     // delete tracks without local_src and netease_src
     use sea_orm::query::*;
     let deleted = Track::delete_many()
       .filter(
         entity::track::Column::Id.not_in_subquery(
           LocalSrc::find()
-            .select()
+            .select_only()
             .column(entity::local_src::Column::TrackId)
             .into_query(),
         ),
@@ -274,13 +277,15 @@ impl DbManager {
       .exec(&txn)
       .await?;
     txn.commit().await?;
+    trace!("deleted tracks: {:?}", deleted);
     Ok(deleted.rows_affected)
   }
 
   pub async fn query_local_folders(
     &self,
-    _query: QueryLocalFoldersRequest,
+    query: QueryLocalFoldersRequest,
   ) -> Result<Vec<LocalFolder>, MusyncError> {
+    let QueryLocalFoldersRequest {} = query;
     let folders = LocalSrcFolder::find().all(&self.db).await?;
     Ok(folders.into_iter().map(LocalFolder::from_entity).collect())
   }

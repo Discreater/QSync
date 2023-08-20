@@ -2,7 +2,7 @@ import Home from './Home.vue';
 import MusicLib from './MusicLib.vue';
 import Settings from './Settings.vue';
 import Source from './Source.vue';
-import Playback from './Playback.vue';
+import PlayQueue from './PlayQueue.vue';
 
 export const routes = [
   {
@@ -18,6 +18,6 @@ export const routes = [
     path: '/source', component: Source, name: 'source',
   },
   {
-    path: '/playback', component: Playback, name: 'playback',
+    path: '/play-queue', component: PlayQueue, name: 'play-queue',
   },
 ];

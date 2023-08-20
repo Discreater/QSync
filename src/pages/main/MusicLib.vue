@@ -67,7 +67,7 @@ function locateToTop() {
 }
 
 function rowClassName(row: Track) {
-  if (store.playbackQueue[playerStore.current]?.id === row.id)
+  if (store.playQueue[playerStore.current]?.id === row.id)
     return 'playing';
   return '';
 }

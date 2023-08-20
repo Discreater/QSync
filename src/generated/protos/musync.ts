@@ -29,7 +29,7 @@ export interface Playlist {
 }
 
 /** CurrentPlaylist controller */
-export interface Playback {
+export interface PlayQueue {
   /** unique id for the current playlist */
   id: number;
   /** id of the playlist */
@@ -141,6 +141,7 @@ export interface CreatePlaylistRequest {
   name: string;
   /** description of the playlist */
   description: string;
+  temp: boolean;
 }
 
 /** Create playlist response */
@@ -518,12 +519,12 @@ export const Playlist = {
   },
 };
 
-function createBasePlayback(): Playback {
+function createBasePlayQueue(): PlayQueue {
   return { id: 0, playlistId: 0, position: 0, playing: false, startedAt: undefined, pausedAt: 0 };
 }
 
-export const Playback = {
-  encode(message: Playback, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+export const PlayQueue = {
+  encode(message: PlayQueue, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.id !== 0) {
       writer.uint32(8).int32(message.id);
     }
@@ -545,10 +546,10 @@ export const Playback = {
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): Playback {
+  decode(input: _m0.Reader | Uint8Array, length?: number): PlayQueue {
     const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBasePlayback();
+    const message = createBasePlayQueue();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -603,7 +604,7 @@ export const Playback = {
     return message;
   },
 
-  fromJSON(object: any): Playback {
+  fromJSON(object: any): PlayQueue {
     return {
       id: isSet(object.id) ? Number(object.id) : 0,
       playlistId: isSet(object.playlistId) ? Number(object.playlistId) : 0,
@@ -614,7 +615,7 @@ export const Playback = {
     };
   },
 
-  toJSON(message: Playback): unknown {
+  toJSON(message: PlayQueue): unknown {
     const obj: any = {};
     if (message.id !== 0) {
       obj.id = Math.round(message.id);
@@ -637,11 +638,11 @@ export const Playback = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<Playback>, I>>(base?: I): Playback {
-    return Playback.fromPartial(base ?? ({} as any));
+  create<I extends Exact<DeepPartial<PlayQueue>, I>>(base?: I): PlayQueue {
+    return PlayQueue.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<Playback>, I>>(object: I): Playback {
-    const message = createBasePlayback();
+  fromPartial<I extends Exact<DeepPartial<PlayQueue>, I>>(object: I): PlayQueue {
+    const message = createBasePlayQueue();
     message.id = object.id ?? 0;
     message.playlistId = object.playlistId ?? 0;
     message.position = object.position ?? 0;
@@ -1271,7 +1272,7 @@ export const Picture = {
 };
 
 function createBaseCreatePlaylistRequest(): CreatePlaylistRequest {
-  return { trackIds: [], name: "", description: "" };
+  return { trackIds: [], name: "", description: "", temp: false };
 }
 
 export const CreatePlaylistRequest = {
@@ -1286,6 +1287,9 @@ export const CreatePlaylistRequest = {
     }
     if (message.description !== "") {
       writer.uint32(26).string(message.description);
+    }
+    if (message.temp === true) {
+      writer.uint32(32).bool(message.temp);
     }
     return writer;
   },
@@ -1328,6 +1332,13 @@ export const CreatePlaylistRequest = {
 
           message.description = reader.string();
           continue;
+        case 4:
+          if (tag !== 32) {
+            break;
+          }
+
+          message.temp = reader.bool();
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -1342,6 +1353,7 @@ export const CreatePlaylistRequest = {
       trackIds: Array.isArray(object?.trackIds) ? object.trackIds.map((e: any) => Number(e)) : [],
       name: isSet(object.name) ? String(object.name) : "",
       description: isSet(object.description) ? String(object.description) : "",
+      temp: isSet(object.temp) ? Boolean(object.temp) : false,
     };
   },
 
@@ -1356,6 +1368,9 @@ export const CreatePlaylistRequest = {
     if (message.description !== "") {
       obj.description = message.description;
     }
+    if (message.temp === true) {
+      obj.temp = message.temp;
+    }
     return obj;
   },
 
@@ -1367,6 +1382,7 @@ export const CreatePlaylistRequest = {
     message.trackIds = object.trackIds?.map((e) => e) || [];
     message.name = object.name ?? "";
     message.description = object.description ?? "";
+    message.temp = object.temp ?? false;
     return message;
   },
 };

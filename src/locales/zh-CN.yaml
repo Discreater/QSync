@@ -3,7 +3,7 @@ menu:
   home: 主页
   music-lib: 音乐库
   source: 源
-  playback: 播放队列
+  play-queue: 播放队列
 settings:
   library: 库
   music-lib-position: 音乐库位置

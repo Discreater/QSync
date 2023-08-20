@@ -32,7 +32,7 @@ export interface PlayerStore {
   repeat: boolean
 }
 
-export const usePlayerStore = defineStore('playbackStatus', {
+export const usePlayerStore = defineStore('playQueueStatus', {
   state: () => ({
     playing: false,
     current: 0,
@@ -96,6 +96,7 @@ export const usePlayerStore = defineStore('playbackStatus', {
 export const useConfigStore = defineStore('config', {
   state: () => ({
     volume: 100,
+    muted: false,
   }),
   persist: true,
 });
@@ -104,7 +105,7 @@ export const useQSyncStore = defineStore('qsync', {
   state: () => ({
     musicFolders: [] as LocalFolder[],
     locale: 'zh-CN' as 'zh-CN' | 'en',
-    playbackQueue: [] as Track[],
+    playQueue: [] as Track[],
     jellyfinSource: {
       deviceId: generateDeviceId(),
       deviceName: getDeviceName(),
@@ -121,7 +122,7 @@ export const useQSyncStore = defineStore('qsync', {
       } catch (e) {
         console.error(e);
       }
-      this.updateFolders();
+      await this.updateFolders();
     },
     async updateFolders() {
       await ApiClient.get().grpcClient.QueryLocalFolders({}).forEach((folder) => {
@@ -154,16 +155,25 @@ export const useQSyncStore = defineStore('qsync', {
         f!.updating = false;
       });
     },
-    removeFolder(folder: string) {
+    async removeFolder(folder: string) {
       const f = this.musicFolders.findIndex(v => v.path === folder);
       if (f === -1)
         return;
+      await ApiClient.grpc().RemoveLocalFolder({
+        path: folder,
+      });
       this.musicFolders.splice(f, 1);
     },
-    play(tracks: Track[], current: number = 0) {
+    async play(tracks: Track[], current: number = 0) {
       logger.debug('play tracks');
       this.$patch({
-        playbackQueue: tracks,
+        playQueue: tracks,
+      });
+      let { playlist } = await ApiClient.grpc().CreatePlaylist({
+        trackIds: tracks.map(v => v.id),
+        name: 'temp',
+        description: 'temp',
+        temp: true,
       });
       const playerStatus = usePlayerStore();
       playerStatus.play(current);
@@ -172,7 +182,7 @@ export const useQSyncStore = defineStore('qsync', {
       logger.trace('next track');
       const playerStore = usePlayerStore();
       playerStore.$patch((state) => {
-        const nextCurrent = mod(state.current + 1, this.playbackQueue.length);
+        const nextCurrent = mod(state.current + 1, this.playQueue.length);
         state.current = nextCurrent;
         state.startAt = Date.now();
       });
@@ -181,13 +191,13 @@ export const useQSyncStore = defineStore('qsync', {
       logger.trace('previous track');
       const playerStore = usePlayerStore();
       playerStore.$patch((state) => {
-        const nextCurrent = mod(state.current - 1, this.playbackQueue.length);
+        const nextCurrent = mod(state.current - 1, this.playQueue.length);
         state.current = nextCurrent;
         state.startAt = Date.now();
       });
     },
-    shufflePLayback() {
-      this.playbackQueue = shuffle([...this.playbackQueue]);
+    shufflePLayQueue() {
+      this.playQueue = shuffle([...this.playQueue]);
       const playerStore = usePlayerStore();
       playerStore.$patch({
         current: 0,

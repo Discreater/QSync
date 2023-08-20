@@ -81,14 +81,15 @@ input[type="range"]::-webkit-slider-thumb {
 /* Thumb: Firefox */
 input[type="range"]::-moz-range-thumb {
   appearance: none;
-  height: 0.75rem;
-  width: 0.75rem;
+  height: 1.5rem;
+  width: 1.5rem;
   background-color: #f97316;
   border-radius: 50%;
   border: 0.4rem solid #454545;
 
   /* box-shadow: -407px 0 0 400px #f50; emove this line */
   transition: all .2s ease-in-out;
+  box-sizing: border-box;
 }
 
 /* Thumb: webkit */
@@ -98,8 +99,6 @@ input[type="range"]::-webkit-slider-thumb:hover {
 
 /* Thumb: Firefox */
 input[type="range"]::-moz-range-thumb:hover {
-  height: 0.85rem;
-  width: 0.85rem;
   border: 0.3rem solid #454545;
 }
 </style>

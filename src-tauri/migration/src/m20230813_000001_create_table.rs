@@ -128,6 +128,12 @@ impl MigrationTrait for Migration {
           )
           .col(ColumnDef::new(Playlist::CreatedAt).timestamp().not_null())
           .col(ColumnDef::new(Playlist::UpdatedAt).timestamp().not_null())
+          .col(
+            ColumnDef::new(Playlist::Temp)
+              .boolean()
+              .not_null()
+              .default(false),
+          )
           .foreign_key(
             ForeignKey::create()
               .name("fk-playlist-owner_id")
@@ -170,14 +176,14 @@ impl MigrationTrait for Migration {
               .primary_key(),
           )
           .col(ColumnDef::new(User::Name).string().not_null())
-          .col(ColumnDef::new(User::PlaybackId).integer())
+          .col(ColumnDef::new(User::PlayQueueId).integer())
           .col(ColumnDef::new(User::CreatedAt).timestamp().not_null())
           .col(ColumnDef::new(User::UpdatedAt).timestamp().not_null())
           .foreign_key(
             ForeignKey::create()
-              .name("fk-user-playback_id")
-              .from(User::Table, User::PlaybackId)
-              .to(Playback::Table, Playback::Id)
+              .name("fk-user-play_queue_id")
+              .from(User::Table, User::PlayQueueId)
+              .to(PlayQueue::Table, PlayQueue::Id)
               .on_delete(ForeignKeyAction::Cascade),
           )
           .to_owned(),
@@ -282,26 +288,26 @@ impl MigrationTrait for Migration {
     manager
       .create_table(
         Table::create()
-          .table(Playback::Table)
+          .table(PlayQueue::Table)
           .if_not_exists()
           .col(
-            ColumnDef::new(Playback::Id)
+            ColumnDef::new(PlayQueue::Id)
               .integer()
               .not_null()
               .auto_increment()
               .primary_key(),
           )
-          .col(ColumnDef::new(Playback::PlaylistId).integer().not_null())
-          .col(ColumnDef::new(Playback::Position).integer().not_null())
-          .col(ColumnDef::new(Playback::Playing).boolean().not_null())
-          .col(ColumnDef::new(Playback::StartedAt).timestamp().not_null())
-          .col(ColumnDef::new(Playback::PausedAt).unsigned().not_null())
-          .col(ColumnDef::new(Playback::CreatedAt).timestamp().not_null())
-          .col(ColumnDef::new(Playback::UpdatedAt).timestamp().not_null())
+          .col(ColumnDef::new(PlayQueue::PlaylistId).integer().not_null())
+          .col(ColumnDef::new(PlayQueue::Position).integer().not_null())
+          .col(ColumnDef::new(PlayQueue::Playing).boolean().not_null())
+          .col(ColumnDef::new(PlayQueue::StartedAt).timestamp().not_null())
+          .col(ColumnDef::new(PlayQueue::PausedAt).unsigned().not_null())
+          .col(ColumnDef::new(PlayQueue::CreatedAt).timestamp().not_null())
+          .col(ColumnDef::new(PlayQueue::UpdatedAt).timestamp().not_null())
           .foreign_key(
             ForeignKey::create()
-              .name("fk-playback-playlist_id")
-              .from(Playback::Table, Playback::PlaylistId)
+              .name("fk-play_queue-playlist_id")
+              .from(PlayQueue::Table, PlayQueue::PlaylistId)
               .to(Playlist::Table, Playlist::Id)
               .on_delete(ForeignKeyAction::Cascade),
           )
@@ -362,7 +368,7 @@ impl MigrationTrait for Migration {
       )
       .await?;
     manager
-      .drop_table(Table::drop().if_exists().table(Playback::Table).to_owned())
+      .drop_table(Table::drop().if_exists().table(PlayQueue::Table).to_owned())
       .await?;
     manager
       .drop_table(
@@ -428,6 +434,7 @@ enum Playlist {
   Description,
   CreatedAt,
   UpdatedAt,
+  Temp,
 }
 
 #[derive(DeriveIden)]
@@ -435,7 +442,7 @@ enum User {
   Table,
   Id,
   Name,
-  PlaybackId,
+  PlayQueueId,
   CreatedAt,
   UpdatedAt,
 }
@@ -455,7 +462,7 @@ enum UserPlaylist {
 }
 
 #[derive(DeriveIden)]
-enum Playback {
+enum PlayQueue {
   Table,
   Id,
   PlaylistId,

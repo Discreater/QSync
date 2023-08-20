@@ -9,12 +9,12 @@ import QTable from '~/components/QTable.vue';
 import QHoverButton from '~/components/QHoverButton.vue';
 import IconPlay from '~icons/fluent/play-24-regular';
 import { formatTime } from '~/utils';
-import { TrackExt } from "~/model_ext/track";
+import { TrackExt } from '~/model_ext/track';
 
 const { t } = useI18n();
 const store = useQSyncStore();
 const playerStore = usePlayerStore();
-const views = store.playbackQueue;
+const views = store.playQueue;
 
 function playByIdx(idx: number) {
   playerStore.play(idx);
@@ -54,7 +54,7 @@ const columns: Column[] = [
 <template>
   <Basic :custom-padding="true">
     <H1 class="px-16">
-      {{ t('menu.playback') }}
+      {{ t('menu.play-queue') }}
     </H1>
     <QScrollbar class="flex-1 grow relative px-16">
       <QTable :columns="columns" :data="views">
@@ -78,7 +78,7 @@ const columns: Column[] = [
             {{ row.genre }}
           </template>
           <template v-else-if="column.key === 'duration'">
-            {{ formatTime(TrackExt.durationInSecs(track)) }}
+            {{ row.duration != null ? formatTime(TrackExt.durationInSecs(row.duration)) : '' }}
           </template>
         </template>
       </QTable>

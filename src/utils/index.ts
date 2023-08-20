@@ -38,7 +38,7 @@ export function formatTime(time: number, formatter: 'mm:ss' | 'hh:mm:ss' = 'mm:s
     return `${hour}:${min}:${sec}`;
   } else {
     const minutes = pad(Math.floor(time / 60), 2);
-    const seconds = pad(time % 60, 2);
+    const seconds = pad(Math.floor(time % 60), 2);
     return `${minutes}:${seconds}`;
   }
 }
