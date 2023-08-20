@@ -17,6 +17,9 @@ dependencies:
   '@tauri-apps/api':
     specifier: ^1.4.0
     version: 1.4.0
+  '@types/lodash':
+    specifier: ^4.14.197
+    version: 4.14.197
   '@vitejs/plugin-vue-jsx':
     specifier: ^3.0.1
     version: 3.0.1(vite@4.4.4)(vue@3.3.4)
@@ -29,6 +32,9 @@ dependencies:
   jellyfin-apiclient:
     specifier: ^1.10.0
     version: 1.10.0
+  lodash:
+    specifier: ^4.17.21
+    version: 4.17.21
   long:
     specifier: ^5.2.3
     version: 5.2.3
@@ -1210,11 +1216,11 @@ packages:
   /@types/lodash-es@4.17.8:
     resolution: {integrity: sha512-euY3XQcZmIzSy7YH5+Unb3b2X12Wtk54YWINBvvGQ5SmMvwb11JQskGsfkH/5HXK77Kr8GF0wkVDIxzAisWtog==}
     dependencies:
-      '@types/lodash': 4.14.196
+      '@types/lodash': 4.14.197
     dev: false
 
-  /@types/lodash@4.14.196:
-    resolution: {integrity: sha512-22y3o88f4a94mKljsZcanlNWPzO0uBsBdzLAngf2tp533LzZcQzb6+eZPJ+vCTt+bqF2XnvT9gejTLsAcJAJyQ==}
+  /@types/lodash@4.14.197:
+    resolution: {integrity: sha512-BMVOiWs0uNxHVlHBgzTIqJYmj+PgCo4euloGF+5m4okL3rEYzM2EEv78mw8zWSMM57dM7kVIgJ2QDvwHSoCI5g==}
     dev: false
 
   /@types/mdast@3.0.12:
@@ -3395,7 +3401,7 @@ packages:
       '@css-render/plugin-bem': 0.15.12(css-render@0.15.12)
       '@css-render/vue3-ssr': 0.15.12(vue@3.3.4)
       '@types/katex': 0.14.0
-      '@types/lodash': 4.14.196
+      '@types/lodash': 4.14.197
       '@types/lodash-es': 4.17.8
       async-validator: 4.2.5
       css-render: 0.15.12

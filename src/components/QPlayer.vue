@@ -63,27 +63,30 @@ async function updatePlayer(pState: typeof playerStore) {
   if (!currentTrack.value || !sameTrack(playQueue[pState.current], currentTrack.value))
     loadTrack(playQueue[pState.current]);
 
-  if (Math.abs(pState.progress - audio.currentTime * 1000) > 1000) {
-    logger.debug(`update time, from ${audio.currentTime * 1000} to ${pState.progress / 1000}`);
-    localProgress.value = pState.progress / 1000;
-    audio.currentTime = localProgress.value;
-  }
-
-  if (pState.playing && audio.paused) {
-    try {
-      await audio.play();
-    } catch (e) {
-      if (e instanceof DOMException) {
-        logger.info('mute play');
-        toggleMute(true);
-        await audio.play();
-      } else {
-        throw e;
-      }
+  audio.oncanplay = async () => {
+    const progress = pState.progress();
+    if (Math.abs(progress - audio.currentTime * 1000) > 1000) {
+      const progresInSec = progress / 1000;
+      logger.debug(`update time, from ${audio.currentTime} to ${progresInSec}`);
+      localProgress.value = progresInSec;
+      audio.currentTime = localProgress.value;
     }
-  } else if (!pState.playing && !audio.paused) {
-    audio.pause();
-  }
+    if (pState.playing && audio.paused) {
+      try {
+        await audio.play();
+      } catch (e) {
+        if (e instanceof DOMException) {
+          logger.info('mute play');
+          toggleMute(true);
+          await audio.play();
+        } else {
+          throw e;
+        }
+      }
+    } else if (!pState.playing && !audio.paused) {
+      audio.pause();
+    }
+  };
 }
 
 watch(playerStore, async (pState) => {
@@ -101,7 +104,7 @@ audio.onended = () => {
   audio.pause();
   qsyncStore.nextTrack();
 };
-localProgress.value = playerStore.progress;
+localProgress.value = playerStore.progress();
 audio.ontimeupdate = () => {
   localProgress.value = audio.currentTime;
 };

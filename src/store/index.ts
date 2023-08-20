@@ -39,12 +39,11 @@ export const usePlayerStore = defineStore('playQueueStatus', {
     startAt: 0,
     repeat: false,
   } as PlayerStore),
-  getters: {
-    progress: (state) => {
-      return state.playing ? Date.now() - state.startAt : state.startAt;
-    },
-  },
   actions: {
+    progress(): number {
+      const now = Date.now();
+      return this.playing ? now - this.startAt : this.startAt;
+    },
     play(current: number) {
       this.$patch({
         current,
