@@ -21,6 +21,8 @@ pub struct Model {
 pub enum Relation {
   #[sea_orm(has_many = "super::local_src::Entity")]
   LocalSrc,
+  #[sea_orm(has_many = "super::play_queue_track::Entity")]
+  PlayQueueTrack,
   #[sea_orm(has_many = "super::playlist_track::Entity")]
   PlaylistTrack,
 }
@@ -28,6 +30,12 @@ pub enum Relation {
 impl Related<super::local_src::Entity> for Entity {
   fn to() -> RelationDef {
     Relation::LocalSrc.def()
+  }
+}
+
+impl Related<super::play_queue_track::Entity> for Entity {
+  fn to() -> RelationDef {
+    Relation::PlayQueueTrack.def()
   }
 }
 

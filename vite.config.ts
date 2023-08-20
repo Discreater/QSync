@@ -10,7 +10,7 @@ import vueJsx from '@vitejs/plugin-vue-jsx';
 export default defineConfig({
   server: {
     watch: {
-      ignored: ['src-tarui/'],
+      ignored: [string => string.includes('src-tauri')],
     },
   },
   resolve: {

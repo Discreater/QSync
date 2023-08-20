@@ -46,7 +46,6 @@ impl DbManager {
       description: Set(create.description.clone()),
       created_at: Set(now),
       updated_at: Set(now),
-      temp: Set(create.temp)
     }
     .insert(&self.db)
     .await?;

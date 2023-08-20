@@ -12,7 +12,7 @@ const app = createApp(App);
 
 app.use(pinia);
 
-ApiClient.set('http://127.0.0.1:8396');
+ApiClient.set('127.0.0.1:8396');
 
 const store = useQSyncStore();
 

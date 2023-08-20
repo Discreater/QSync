@@ -5,6 +5,7 @@ pub mod prelude;
 pub mod local_src;
 pub mod local_src_folder;
 pub mod play_queue;
+pub mod play_queue_track;
 pub mod playlist;
 pub mod playlist_track;
 pub mod track;

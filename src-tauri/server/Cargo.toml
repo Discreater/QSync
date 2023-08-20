@@ -11,6 +11,7 @@ tokio-util = { version = "0.7.8", features = ["io"] }
 
 axum = { version = "0.6.20", features = ["ws"] }
 axum-server = "0.5.1"
+axum-typed-websockets = "0.5.0"
 tower = { version = "0.4.13", features = ["make", "steer"] }
 tower-http = { version = "0.4.3", features = ["cors"] }
 

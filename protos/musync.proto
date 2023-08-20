@@ -25,16 +25,15 @@ message Playlist {
 message PlayQueue {
   // unique id for the current playlist
   int32 id = 1;
-  // id of the playlist
-  int32 playlist_id = 2;
+  // ids of tracks in the playlist
+  repeated int32 track_ids = 2;
   // index of the current playing track in the playlist
   uint32 position = 3;
   // is the playlist playing
   bool playing = 4;
   // time when the current track started playing.
-  // When not playing, it represents the progress directly.
-  // In milliseconds
   google.protobuf.Timestamp started_at = 5;
+  // progress of the current track when the play queu is paused. In milliseconds
   uint32 paused_at = 6;
 }
 
@@ -112,7 +111,6 @@ message CreatePlaylistRequest {
   string name = 2;
   // description of the playlist
   string description = 3;
-  bool temp = 4;
 }
 
 // Create playlist response
@@ -279,6 +277,17 @@ message GetTrackCoverRequest {
 message QueryLocalFoldersRequest {}
 message LocalFolder { string path = 1; }
 
+message CreatePlayQueueRequest {
+  repeated int32 track_ids = 1;
+}
+
+message CreatePlayQueueResponse {
+  PlayQueue play_queue = 1;
+}
+
+// Currently, users can only get thier own play queue
+message GetPlayQueueRequest {}
+
 // Musync service
 service MusyncService {
   rpc Login(LoginRequest) returns (Token);
@@ -287,6 +296,9 @@ service MusyncService {
   rpc RemoveLocalFolder(RemoveLocalFolderRequest)
       returns (RemoveLocalFolderResponse);
   rpc QueryLocalFolders(QueryLocalFoldersRequest) returns (stream LocalFolder);
+
+  rpc CreatePlayQueue(CreatePlayQueueRequest) returns (CreatePlayQueueResponse);
+  rpc GetPlayQueue(GetPlayQueueRequest) returns (PlayQueue);
 
   rpc CreatePlaylist(CreatePlaylistRequest) returns (CreatePlaylistResponse);
   rpc QueryPlaylists(QueryPlaylistsRequest) returns (stream Playlist);

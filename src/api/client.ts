@@ -2,14 +2,41 @@ import { grpc } from '@improbable-eng/grpc-web';
 import { GrpcWebImpl, MusyncServiceClientImpl } from '~/generated/protos/musync';
 import type { Token } from '~/generated/protos/musync';
 import { useAccountStore } from '~/store/user';
+import { logger } from '~/utils/logger';
+
+class WsClient {
+  constructor(private wsClient: WebSocket) {
+    this.wsClient.onopen = () => {
+    };
+    this.wsClient.onmessage = (e) => {
+      (e.data as Blob).text().then((data) => {
+        logger.trace(`ws got message: ${data}`);
+        this.wsClient.send(JSON.stringify(
+          'Pong',
+        ));
+      });
+    };
+  }
+}
 
 export class ApiClient {
   grpcClient: MusyncServiceClientImpl;
+  wsClient: WsClient;
   private constructor(private addr: string, token?: Token) {
-    const rpc = new GrpcWebImpl(addr, {
+    logger.trace(addr);
+    const rpc = new GrpcWebImpl(this.http_addr, {
       metadata: token !== undefined ? new grpc.Metadata({ authorization: `${token?.data}` }) : undefined,
     });
     this.grpcClient = new MusyncServiceClientImpl(rpc);
+    this.wsClient = new WsClient(new WebSocket(this.ws_addr));
+  }
+
+  public get http_addr(): string {
+    return `http://${this.addr}`;
+  }
+
+  public get ws_addr(): string {
+    return `ws://${this.addr}/ws`;
   }
 
   setToken(token: Token) {
@@ -37,10 +64,10 @@ export class ApiClient {
   }
 
   track_uri(id: number): string {
-    return `${this.addr}/assets/track/${id}`;
+    return `${this.http_addr}/assets/track/${id}`;
   }
 
   cover_uri(id?: number): string {
-    return id ? `${this.addr}/assets/track/${id}/cover` : '';
+    return id ? `${this.http_addr}/assets/track/${id}/cover` : '';
   }
 }

@@ -33,9 +33,9 @@ pub struct PlayQueue {
   /// unique id for the current playlist
   #[prost(int32, tag = "1")]
   pub id: i32,
-  /// id of the playlist
-  #[prost(int32, tag = "2")]
-  pub playlist_id: i32,
+  /// ids of tracks in the playlist
+  #[prost(int32, repeated, tag = "2")]
+  pub track_ids: ::prost::alloc::vec::Vec<i32>,
   /// index of the current playing track in the playlist
   #[prost(uint32, tag = "3")]
   pub position: u32,
@@ -43,10 +43,9 @@ pub struct PlayQueue {
   #[prost(bool, tag = "4")]
   pub playing: bool,
   /// time when the current track started playing.
-  /// When not playing, it represents the progress directly.
-  /// In milliseconds
   #[prost(message, optional, tag = "5")]
   pub started_at: ::core::option::Option<super::google::protobuf::Timestamp>,
+  /// progress of the current track when the play queu is paused. In milliseconds
   #[prost(uint32, tag = "6")]
   pub paused_at: u32,
 }
@@ -165,8 +164,6 @@ pub struct CreatePlaylistRequest {
   /// description of the playlist
   #[prost(string, tag = "3")]
   pub description: ::prost::alloc::string::String,
-  #[prost(bool, tag = "4")]
-  pub temp: bool,
 }
 /// Create playlist response
 #[derive(serde::Serialize, serde::Deserialize)]
@@ -458,6 +455,25 @@ pub struct LocalFolder {
   #[prost(string, tag = "1")]
   pub path: ::prost::alloc::string::String,
 }
+#[derive(serde::Serialize, serde::Deserialize)]
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct CreatePlayQueueRequest {
+  #[prost(int32, repeated, tag = "1")]
+  pub track_ids: ::prost::alloc::vec::Vec<i32>,
+}
+#[derive(serde::Serialize, serde::Deserialize)]
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct CreatePlayQueueResponse {
+  #[prost(message, optional, tag = "1")]
+  pub play_queue: ::core::option::Option<PlayQueue>,
+}
+/// Currently, users can only get thier own play queue
+#[derive(serde::Serialize, serde::Deserialize)]
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct GetPlayQueueRequest {}
 /// Generated client implementations.
 pub mod musync_service_client {
   #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
@@ -617,6 +633,42 @@ pub mod musync_service_client {
         .extensions_mut()
         .insert(GrpcMethod::new("musync.MusyncService", "QueryLocalFolders"));
       self.inner.server_streaming(req, path, codec).await
+    }
+    pub async fn create_play_queue(
+      &mut self,
+      request: impl tonic::IntoRequest<super::CreatePlayQueueRequest>,
+    ) -> std::result::Result<tonic::Response<super::CreatePlayQueueResponse>, tonic::Status> {
+      self.inner.ready().await.map_err(|e| {
+        tonic::Status::new(
+          tonic::Code::Unknown,
+          format!("Service was not ready: {}", e.into()),
+        )
+      })?;
+      let codec = tonic::codec::ProstCodec::default();
+      let path = http::uri::PathAndQuery::from_static("/musync.MusyncService/CreatePlayQueue");
+      let mut req = request.into_request();
+      req
+        .extensions_mut()
+        .insert(GrpcMethod::new("musync.MusyncService", "CreatePlayQueue"));
+      self.inner.unary(req, path, codec).await
+    }
+    pub async fn get_play_queue(
+      &mut self,
+      request: impl tonic::IntoRequest<super::GetPlayQueueRequest>,
+    ) -> std::result::Result<tonic::Response<super::PlayQueue>, tonic::Status> {
+      self.inner.ready().await.map_err(|e| {
+        tonic::Status::new(
+          tonic::Code::Unknown,
+          format!("Service was not ready: {}", e.into()),
+        )
+      })?;
+      let codec = tonic::codec::ProstCodec::default();
+      let path = http::uri::PathAndQuery::from_static("/musync.MusyncService/GetPlayQueue");
+      let mut req = request.into_request();
+      req
+        .extensions_mut()
+        .insert(GrpcMethod::new("musync.MusyncService", "GetPlayQueue"));
+      self.inner.unary(req, path, codec).await
     }
     pub async fn create_playlist(
       &mut self,
@@ -905,6 +957,14 @@ pub mod musync_service_server {
       &self,
       request: tonic::Request<super::QueryLocalFoldersRequest>,
     ) -> std::result::Result<tonic::Response<Self::QueryLocalFoldersStream>, tonic::Status>;
+    async fn create_play_queue(
+      &self,
+      request: tonic::Request<super::CreatePlayQueueRequest>,
+    ) -> std::result::Result<tonic::Response<super::CreatePlayQueueResponse>, tonic::Status>;
+    async fn get_play_queue(
+      &self,
+      request: tonic::Request<super::GetPlayQueueRequest>,
+    ) -> std::result::Result<tonic::Response<super::PlayQueue>, tonic::Status>;
     async fn create_playlist(
       &self,
       request: tonic::Request<super::CreatePlaylistRequest>,
@@ -1189,6 +1249,74 @@ pub mod musync_service_server {
               .apply_compression_config(accept_compression_encodings, send_compression_encodings)
               .apply_max_message_size_config(max_decoding_message_size, max_encoding_message_size);
             let res = grpc.server_streaming(method, req).await;
+            Ok(res)
+          };
+          Box::pin(fut)
+        }
+        "/musync.MusyncService/CreatePlayQueue" => {
+          #[allow(non_camel_case_types)]
+          struct CreatePlayQueueSvc<T: MusyncService>(pub Arc<T>);
+          impl<T: MusyncService> tonic::server::UnaryService<super::CreatePlayQueueRequest>
+            for CreatePlayQueueSvc<T>
+          {
+            type Response = super::CreatePlayQueueResponse;
+            type Future = BoxFuture<tonic::Response<Self::Response>, tonic::Status>;
+            fn call(
+              &mut self,
+              request: tonic::Request<super::CreatePlayQueueRequest>,
+            ) -> Self::Future {
+              let inner = Arc::clone(&self.0);
+              let fut = async move { (*inner).create_play_queue(request).await };
+              Box::pin(fut)
+            }
+          }
+          let accept_compression_encodings = self.accept_compression_encodings;
+          let send_compression_encodings = self.send_compression_encodings;
+          let max_decoding_message_size = self.max_decoding_message_size;
+          let max_encoding_message_size = self.max_encoding_message_size;
+          let inner = self.inner.clone();
+          let fut = async move {
+            let inner = inner.0;
+            let method = CreatePlayQueueSvc(inner);
+            let codec = tonic::codec::ProstCodec::default();
+            let mut grpc = tonic::server::Grpc::new(codec)
+              .apply_compression_config(accept_compression_encodings, send_compression_encodings)
+              .apply_max_message_size_config(max_decoding_message_size, max_encoding_message_size);
+            let res = grpc.unary(method, req).await;
+            Ok(res)
+          };
+          Box::pin(fut)
+        }
+        "/musync.MusyncService/GetPlayQueue" => {
+          #[allow(non_camel_case_types)]
+          struct GetPlayQueueSvc<T: MusyncService>(pub Arc<T>);
+          impl<T: MusyncService> tonic::server::UnaryService<super::GetPlayQueueRequest>
+            for GetPlayQueueSvc<T>
+          {
+            type Response = super::PlayQueue;
+            type Future = BoxFuture<tonic::Response<Self::Response>, tonic::Status>;
+            fn call(
+              &mut self,
+              request: tonic::Request<super::GetPlayQueueRequest>,
+            ) -> Self::Future {
+              let inner = Arc::clone(&self.0);
+              let fut = async move { (*inner).get_play_queue(request).await };
+              Box::pin(fut)
+            }
+          }
+          let accept_compression_encodings = self.accept_compression_encodings;
+          let send_compression_encodings = self.send_compression_encodings;
+          let max_decoding_message_size = self.max_decoding_message_size;
+          let max_encoding_message_size = self.max_encoding_message_size;
+          let inner = self.inner.clone();
+          let fut = async move {
+            let inner = inner.0;
+            let method = GetPlayQueueSvc(inner);
+            let codec = tonic::codec::ProstCodec::default();
+            let mut grpc = tonic::server::Grpc::new(codec)
+              .apply_compression_config(accept_compression_encodings, send_compression_encodings)
+              .apply_max_message_size_config(max_decoding_message_size, max_encoding_message_size);
+            let res = grpc.unary(method, req).await;
             Ok(res)
           };
           Box::pin(fut)

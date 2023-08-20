@@ -12,13 +12,10 @@ pub struct Model {
   pub description: String,
   pub created_at: DateTimeUtc,
   pub updated_at: DateTimeUtc,
-  pub temp: bool,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
 pub enum Relation {
-  #[sea_orm(has_many = "super::play_queue::Entity")]
-  PlayQueue,
   #[sea_orm(has_many = "super::playlist_track::Entity")]
   PlaylistTrack,
   #[sea_orm(
@@ -31,12 +28,6 @@ pub enum Relation {
   User,
   #[sea_orm(has_many = "super::user_playlist::Entity")]
   UserPlaylist,
-}
-
-impl Related<super::play_queue::Entity> for Entity {
-  fn to() -> RelationDef {
-    Relation::PlayQueue.def()
-  }
 }
 
 impl Related<super::playlist_track::Entity> for Entity {

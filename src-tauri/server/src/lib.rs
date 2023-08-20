@@ -22,6 +22,7 @@ mod error;
 mod grpc;
 mod musync;
 mod user;
+mod ws;
 
 pub struct Server {
   pub join_handle: JoinHandle<std::result::Result<(), std::io::Error>>,
@@ -56,18 +57,6 @@ impl Server {
       .map_response(|r| r.map(axum::body::boxed))
       .boxed_clone();
 
-    let user_routes = Router::new().route("/:id", get(|| async {}));
-    let api_routes = Router::new()
-      // .nest(
-      //   "/musync",
-      //   Router::new()
-      //     .route("/folders", post(musync::create_folder_handler))
-      //     .route("/tracks", post(musync::get_tracks))
-      //     .route("/tracks/:id", get(musync::get_track))
-      //     .route("/tracks/:id/cover", get(musync::get_track_cover))
-      //     .with_state(manager.clone()),
-      // )
-      .nest("/user", user_routes);
     let http_app = Router::new()
       .nest(
         "/assets",
@@ -76,7 +65,7 @@ impl Server {
           .route("/track/:id/cover", get(musync::get_cover))
           .with_state(manager.clone()),
       )
-      .nest("/api", api_routes)
+      .route("/ws", get(ws::handler).with_state(manager.clone()))
       .layer(cors);
 
     let http_service = http_app.map_err(BoxError::from).boxed_clone();

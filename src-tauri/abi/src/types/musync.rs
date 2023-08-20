@@ -10,7 +10,6 @@ impl CreatePlaylistRequest {
       track_ids,
       name: name.into(),
       description: description.into(),
-      temp: false,
     }
   }
 }

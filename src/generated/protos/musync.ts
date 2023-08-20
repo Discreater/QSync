@@ -32,18 +32,17 @@ export interface Playlist {
 export interface PlayQueue {
   /** unique id for the current playlist */
   id: number;
-  /** id of the playlist */
-  playlistId: number;
+  /** ids of tracks in the playlist */
+  trackIds: number[];
   /** index of the current playing track in the playlist */
   position: number;
   /** is the playlist playing */
   playing: boolean;
-  /**
-   * time when the current track started playing.
-   * When not playing, it represents the progress directly.
-   * In milliseconds
-   */
-  startedAt: Date | undefined;
+  /** time when the current track started playing. */
+  startedAt:
+    | Date
+    | undefined;
+  /** progress of the current track when the play queu is paused. In milliseconds */
   pausedAt: number;
 }
 
@@ -141,7 +140,6 @@ export interface CreatePlaylistRequest {
   name: string;
   /** description of the playlist */
   description: string;
-  temp: boolean;
 }
 
 /** Create playlist response */
@@ -358,6 +356,18 @@ export interface LocalFolder {
   path: string;
 }
 
+export interface CreatePlayQueueRequest {
+  trackIds: number[];
+}
+
+export interface CreatePlayQueueResponse {
+  playQueue: PlayQueue | undefined;
+}
+
+/** Currently, users can only get thier own play queue */
+export interface GetPlayQueueRequest {
+}
+
 function createBasePlaylist(): Playlist {
   return { id: 0, ownerId: 0, trackIds: [], name: "", description: "", createdAt: undefined, updatedAt: undefined };
 }
@@ -520,7 +530,7 @@ export const Playlist = {
 };
 
 function createBasePlayQueue(): PlayQueue {
-  return { id: 0, playlistId: 0, position: 0, playing: false, startedAt: undefined, pausedAt: 0 };
+  return { id: 0, trackIds: [], position: 0, playing: false, startedAt: undefined, pausedAt: 0 };
 }
 
 export const PlayQueue = {
@@ -528,9 +538,11 @@ export const PlayQueue = {
     if (message.id !== 0) {
       writer.uint32(8).int32(message.id);
     }
-    if (message.playlistId !== 0) {
-      writer.uint32(16).int32(message.playlistId);
+    writer.uint32(18).fork();
+    for (const v of message.trackIds) {
+      writer.int32(v);
     }
+    writer.ldelim();
     if (message.position !== 0) {
       writer.uint32(24).uint32(message.position);
     }
@@ -561,12 +573,22 @@ export const PlayQueue = {
           message.id = reader.int32();
           continue;
         case 2:
-          if (tag !== 16) {
-            break;
+          if (tag === 16) {
+            message.trackIds.push(reader.int32());
+
+            continue;
           }
 
-          message.playlistId = reader.int32();
-          continue;
+          if (tag === 18) {
+            const end2 = reader.uint32() + reader.pos;
+            while (reader.pos < end2) {
+              message.trackIds.push(reader.int32());
+            }
+
+            continue;
+          }
+
+          break;
         case 3:
           if (tag !== 24) {
             break;
@@ -607,7 +629,7 @@ export const PlayQueue = {
   fromJSON(object: any): PlayQueue {
     return {
       id: isSet(object.id) ? Number(object.id) : 0,
-      playlistId: isSet(object.playlistId) ? Number(object.playlistId) : 0,
+      trackIds: Array.isArray(object?.trackIds) ? object.trackIds.map((e: any) => Number(e)) : [],
       position: isSet(object.position) ? Number(object.position) : 0,
       playing: isSet(object.playing) ? Boolean(object.playing) : false,
       startedAt: isSet(object.startedAt) ? fromJsonTimestamp(object.startedAt) : undefined,
@@ -620,8 +642,8 @@ export const PlayQueue = {
     if (message.id !== 0) {
       obj.id = Math.round(message.id);
     }
-    if (message.playlistId !== 0) {
-      obj.playlistId = Math.round(message.playlistId);
+    if (message.trackIds?.length) {
+      obj.trackIds = message.trackIds.map((e) => Math.round(e));
     }
     if (message.position !== 0) {
       obj.position = Math.round(message.position);
@@ -644,7 +666,7 @@ export const PlayQueue = {
   fromPartial<I extends Exact<DeepPartial<PlayQueue>, I>>(object: I): PlayQueue {
     const message = createBasePlayQueue();
     message.id = object.id ?? 0;
-    message.playlistId = object.playlistId ?? 0;
+    message.trackIds = object.trackIds?.map((e) => e) || [];
     message.position = object.position ?? 0;
     message.playing = object.playing ?? false;
     message.startedAt = object.startedAt ?? undefined;
@@ -1272,7 +1294,7 @@ export const Picture = {
 };
 
 function createBaseCreatePlaylistRequest(): CreatePlaylistRequest {
-  return { trackIds: [], name: "", description: "", temp: false };
+  return { trackIds: [], name: "", description: "" };
 }
 
 export const CreatePlaylistRequest = {
@@ -1287,9 +1309,6 @@ export const CreatePlaylistRequest = {
     }
     if (message.description !== "") {
       writer.uint32(26).string(message.description);
-    }
-    if (message.temp === true) {
-      writer.uint32(32).bool(message.temp);
     }
     return writer;
   },
@@ -1332,13 +1351,6 @@ export const CreatePlaylistRequest = {
 
           message.description = reader.string();
           continue;
-        case 4:
-          if (tag !== 32) {
-            break;
-          }
-
-          message.temp = reader.bool();
-          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -1353,7 +1365,6 @@ export const CreatePlaylistRequest = {
       trackIds: Array.isArray(object?.trackIds) ? object.trackIds.map((e: any) => Number(e)) : [],
       name: isSet(object.name) ? String(object.name) : "",
       description: isSet(object.description) ? String(object.description) : "",
-      temp: isSet(object.temp) ? Boolean(object.temp) : false,
     };
   },
 
@@ -1368,9 +1379,6 @@ export const CreatePlaylistRequest = {
     if (message.description !== "") {
       obj.description = message.description;
     }
-    if (message.temp === true) {
-      obj.temp = message.temp;
-    }
     return obj;
   },
 
@@ -1382,7 +1390,6 @@ export const CreatePlaylistRequest = {
     message.trackIds = object.trackIds?.map((e) => e) || [];
     message.name = object.name ?? "";
     message.description = object.description ?? "";
-    message.temp = object.temp ?? false;
     return message;
   },
 };
@@ -3396,6 +3403,177 @@ export const LocalFolder = {
   },
 };
 
+function createBaseCreatePlayQueueRequest(): CreatePlayQueueRequest {
+  return { trackIds: [] };
+}
+
+export const CreatePlayQueueRequest = {
+  encode(message: CreatePlayQueueRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    writer.uint32(10).fork();
+    for (const v of message.trackIds) {
+      writer.int32(v);
+    }
+    writer.ldelim();
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): CreatePlayQueueRequest {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseCreatePlayQueueRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag === 8) {
+            message.trackIds.push(reader.int32());
+
+            continue;
+          }
+
+          if (tag === 10) {
+            const end2 = reader.uint32() + reader.pos;
+            while (reader.pos < end2) {
+              message.trackIds.push(reader.int32());
+            }
+
+            continue;
+          }
+
+          break;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): CreatePlayQueueRequest {
+    return { trackIds: Array.isArray(object?.trackIds) ? object.trackIds.map((e: any) => Number(e)) : [] };
+  },
+
+  toJSON(message: CreatePlayQueueRequest): unknown {
+    const obj: any = {};
+    if (message.trackIds?.length) {
+      obj.trackIds = message.trackIds.map((e) => Math.round(e));
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<CreatePlayQueueRequest>, I>>(base?: I): CreatePlayQueueRequest {
+    return CreatePlayQueueRequest.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<CreatePlayQueueRequest>, I>>(object: I): CreatePlayQueueRequest {
+    const message = createBaseCreatePlayQueueRequest();
+    message.trackIds = object.trackIds?.map((e) => e) || [];
+    return message;
+  },
+};
+
+function createBaseCreatePlayQueueResponse(): CreatePlayQueueResponse {
+  return { playQueue: undefined };
+}
+
+export const CreatePlayQueueResponse = {
+  encode(message: CreatePlayQueueResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.playQueue !== undefined) {
+      PlayQueue.encode(message.playQueue, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): CreatePlayQueueResponse {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseCreatePlayQueueResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.playQueue = PlayQueue.decode(reader, reader.uint32());
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): CreatePlayQueueResponse {
+    return { playQueue: isSet(object.playQueue) ? PlayQueue.fromJSON(object.playQueue) : undefined };
+  },
+
+  toJSON(message: CreatePlayQueueResponse): unknown {
+    const obj: any = {};
+    if (message.playQueue !== undefined) {
+      obj.playQueue = PlayQueue.toJSON(message.playQueue);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<CreatePlayQueueResponse>, I>>(base?: I): CreatePlayQueueResponse {
+    return CreatePlayQueueResponse.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<CreatePlayQueueResponse>, I>>(object: I): CreatePlayQueueResponse {
+    const message = createBaseCreatePlayQueueResponse();
+    message.playQueue = (object.playQueue !== undefined && object.playQueue !== null)
+      ? PlayQueue.fromPartial(object.playQueue)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseGetPlayQueueRequest(): GetPlayQueueRequest {
+  return {};
+}
+
+export const GetPlayQueueRequest = {
+  encode(_: GetPlayQueueRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): GetPlayQueueRequest {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGetPlayQueueRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(_: any): GetPlayQueueRequest {
+    return {};
+  },
+
+  toJSON(_: GetPlayQueueRequest): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<GetPlayQueueRequest>, I>>(base?: I): GetPlayQueueRequest {
+    return GetPlayQueueRequest.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<GetPlayQueueRequest>, I>>(_: I): GetPlayQueueRequest {
+    const message = createBaseGetPlayQueueRequest();
+    return message;
+  },
+};
+
 /** Musync service */
 export interface MusyncService {
   Login(request: DeepPartial<LoginRequest>, metadata?: grpc.Metadata): Promise<Token>;
@@ -3408,6 +3586,11 @@ export interface MusyncService {
     metadata?: grpc.Metadata,
   ): Promise<RemoveLocalFolderResponse>;
   QueryLocalFolders(request: DeepPartial<QueryLocalFoldersRequest>, metadata?: grpc.Metadata): Observable<LocalFolder>;
+  CreatePlayQueue(
+    request: DeepPartial<CreatePlayQueueRequest>,
+    metadata?: grpc.Metadata,
+  ): Promise<CreatePlayQueueResponse>;
+  GetPlayQueue(request: DeepPartial<GetPlayQueueRequest>, metadata?: grpc.Metadata): Promise<PlayQueue>;
   CreatePlaylist(
     request: DeepPartial<CreatePlaylistRequest>,
     metadata?: grpc.Metadata,
@@ -3439,6 +3622,8 @@ export class MusyncServiceClientImpl implements MusyncService {
     this.AddLocalFolder = this.AddLocalFolder.bind(this);
     this.RemoveLocalFolder = this.RemoveLocalFolder.bind(this);
     this.QueryLocalFolders = this.QueryLocalFolders.bind(this);
+    this.CreatePlayQueue = this.CreatePlayQueue.bind(this);
+    this.GetPlayQueue = this.GetPlayQueue.bind(this);
     this.CreatePlaylist = this.CreatePlaylist.bind(this);
     this.QueryPlaylists = this.QueryPlaylists.bind(this);
     this.UpdatePlaylist = this.UpdatePlaylist.bind(this);
@@ -3475,6 +3660,17 @@ export class MusyncServiceClientImpl implements MusyncService {
 
   QueryLocalFolders(request: DeepPartial<QueryLocalFoldersRequest>, metadata?: grpc.Metadata): Observable<LocalFolder> {
     return this.rpc.invoke(MusyncServiceQueryLocalFoldersDesc, QueryLocalFoldersRequest.fromPartial(request), metadata);
+  }
+
+  CreatePlayQueue(
+    request: DeepPartial<CreatePlayQueueRequest>,
+    metadata?: grpc.Metadata,
+  ): Promise<CreatePlayQueueResponse> {
+    return this.rpc.unary(MusyncServiceCreatePlayQueueDesc, CreatePlayQueueRequest.fromPartial(request), metadata);
+  }
+
+  GetPlayQueue(request: DeepPartial<GetPlayQueueRequest>, metadata?: grpc.Metadata): Promise<PlayQueue> {
+    return this.rpc.unary(MusyncServiceGetPlayQueueDesc, GetPlayQueueRequest.fromPartial(request), metadata);
   }
 
   CreatePlaylist(
@@ -3624,6 +3820,52 @@ export const MusyncServiceQueryLocalFoldersDesc: UnaryMethodDefinitionish = {
   responseType: {
     deserializeBinary(data: Uint8Array) {
       const value = LocalFolder.decode(data);
+      return {
+        ...value,
+        toObject() {
+          return value;
+        },
+      };
+    },
+  } as any,
+};
+
+export const MusyncServiceCreatePlayQueueDesc: UnaryMethodDefinitionish = {
+  methodName: "CreatePlayQueue",
+  service: MusyncServiceDesc,
+  requestStream: false,
+  responseStream: false,
+  requestType: {
+    serializeBinary() {
+      return CreatePlayQueueRequest.encode(this).finish();
+    },
+  } as any,
+  responseType: {
+    deserializeBinary(data: Uint8Array) {
+      const value = CreatePlayQueueResponse.decode(data);
+      return {
+        ...value,
+        toObject() {
+          return value;
+        },
+      };
+    },
+  } as any,
+};
+
+export const MusyncServiceGetPlayQueueDesc: UnaryMethodDefinitionish = {
+  methodName: "GetPlayQueue",
+  service: MusyncServiceDesc,
+  requestStream: false,
+  responseStream: false,
+  requestType: {
+    serializeBinary() {
+      return GetPlayQueueRequest.encode(this).finish();
+    },
+  } as any,
+  responseType: {
+    deserializeBinary(data: Uint8Array) {
+      const value = PlayQueue.decode(data);
       return {
         ...value,
         toObject() {

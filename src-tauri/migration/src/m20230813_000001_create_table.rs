@@ -128,12 +128,6 @@ impl MigrationTrait for Migration {
           )
           .col(ColumnDef::new(Playlist::CreatedAt).timestamp().not_null())
           .col(ColumnDef::new(Playlist::UpdatedAt).timestamp().not_null())
-          .col(
-            ColumnDef::new(Playlist::Temp)
-              .boolean()
-              .not_null()
-              .default(false),
-          )
           .foreign_key(
             ForeignKey::create()
               .name("fk-playlist-owner_id")
@@ -297,20 +291,70 @@ impl MigrationTrait for Migration {
               .auto_increment()
               .primary_key(),
           )
-          .col(ColumnDef::new(PlayQueue::PlaylistId).integer().not_null())
           .col(ColumnDef::new(PlayQueue::Position).integer().not_null())
           .col(ColumnDef::new(PlayQueue::Playing).boolean().not_null())
           .col(ColumnDef::new(PlayQueue::StartedAt).timestamp().not_null())
           .col(ColumnDef::new(PlayQueue::PausedAt).unsigned().not_null())
           .col(ColumnDef::new(PlayQueue::CreatedAt).timestamp().not_null())
           .col(ColumnDef::new(PlayQueue::UpdatedAt).timestamp().not_null())
+          .to_owned(),
+      )
+      .await?;
+
+    manager
+      .create_table(
+        Table::create()
+          .table(PlayQueueTrack::Table)
+          .if_not_exists()
+          .col(
+            ColumnDef::new(PlayQueueTrack::PlayQueueId)
+              .integer()
+              .not_null(),
+          )
+          .col(ColumnDef::new(PlayQueueTrack::TrackId).integer().not_null())
+          .col(
+            ColumnDef::new(PlayQueueTrack::Position)
+              .integer()
+              .not_null(),
+          )
           .foreign_key(
             ForeignKey::create()
-              .name("fk-play_queue-playlist_id")
-              .from(PlayQueue::Table, PlayQueue::PlaylistId)
-              .to(Playlist::Table, Playlist::Id)
+              .name("fk-play_queue_track-play_queue_id")
+              .from(PlayQueueTrack::Table, PlayQueueTrack::PlayQueueId)
+              .to(PlayQueue::Table, PlayQueue::Id)
               .on_delete(ForeignKeyAction::Cascade),
           )
+          .foreign_key(
+            ForeignKey::create()
+              .name("fk-play_queue_track-track_id")
+              .from(PlayQueueTrack::Table, PlayQueueTrack::TrackId)
+              .to(Track::Table, Track::Id)
+              .on_delete(ForeignKeyAction::Cascade),
+          )
+          .primary_key(
+            Index::create()
+              .col(PlayQueueTrack::PlayQueueId)
+              .col(PlayQueueTrack::TrackId)
+              .col(PlayQueueTrack::Position),
+          )
+          .to_owned(),
+      )
+      .await?;
+    manager
+      .create_index(
+        Index::create()
+          .name("idx-play_queue_track-play_queue_id")
+          .table(PlayQueueTrack::Table)
+          .col(PlayQueueTrack::PlayQueueId)
+          .to_owned(),
+      )
+      .await?;
+    manager
+      .create_index(
+        Index::create()
+          .name("idx-play_queue_track-track_id")
+          .table(PlayQueueTrack::Table)
+          .col(PlayQueueTrack::TrackId)
           .to_owned(),
       )
       .await?;
@@ -376,6 +420,14 @@ impl MigrationTrait for Migration {
         Table::drop()
           .if_exists()
           .table(LocalSrcFolder::Table)
+          .to_owned(),
+      )
+      .await?;
+    manager
+      .drop_table(
+        Table::drop()
+          .if_exists()
+          .table(PlayQueueTrack::Table)
           .to_owned(),
       )
       .await?;
@@ -446,7 +498,6 @@ enum Playlist {
   Description,
   CreatedAt,
   UpdatedAt,
-  Temp,
 }
 
 #[derive(DeriveIden)]
@@ -477,13 +528,20 @@ enum UserPlaylist {
 enum PlayQueue {
   Table,
   Id,
-  PlaylistId,
   Position,
   Playing,
   StartedAt,
   PausedAt,
   CreatedAt,
   UpdatedAt,
+}
+
+#[derive(DeriveIden)]
+enum PlayQueueTrack {
+  Table,
+  PlayQueueId,
+  TrackId,
+  Position,
 }
 
 #[derive(DeriveIden)]

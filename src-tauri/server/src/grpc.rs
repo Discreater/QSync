@@ -1,13 +1,14 @@
 use std::pin::Pin;
 
 use abi::{
-  AddLocalFolderRequest, AddLocalFolderResponse, CreatePlaylistRequest, CreatePlaylistResponse,
-  CreateTrackRequest, CreateTrackResponse, CreateUserRequest, CreateUserResponse,
-  DeletePlaylistsRequest, DeleteTracksRequest, DeleteUsersRequest, GetTrackCoverRequest,
-  GetTrackRequest, LocalFolder, LoginRequest, Picture, Playlist, QueryLocalFoldersRequest,
-  QueryPlaylistsRequest, QueryTracksRequest, QueryUsersRequest, RemoveLocalFolderRequest,
-  RemoveLocalFolderResponse, Token, Track, UpdatePlaylistRequest, UpdatePlaylistResponse,
-  UpdateTrackRequest, UpdateTrackResponse, UpdateUserRequest, UpdateUserResponse, User,
+  AddLocalFolderRequest, AddLocalFolderResponse, CreatePlayQueueRequest, CreatePlayQueueResponse,
+  CreatePlaylistRequest, CreatePlaylistResponse, CreateTrackRequest, CreateTrackResponse,
+  CreateUserRequest, CreateUserResponse, DeletePlaylistsRequest, DeleteTracksRequest,
+  DeleteUsersRequest, GetPlayQueueRequest, GetTrackCoverRequest, GetTrackRequest, LocalFolder,
+  LoginRequest, Picture, PlayQueue, Playlist, QueryLocalFoldersRequest, QueryPlaylistsRequest,
+  QueryTracksRequest, QueryUsersRequest, RemoveLocalFolderRequest, RemoveLocalFolderResponse,
+  Token, Track, UpdatePlaylistRequest, UpdatePlaylistResponse, UpdateTrackRequest,
+  UpdateTrackResponse, UpdateUserRequest, UpdateUserResponse, User,
 };
 use chrono::{Days, Utc};
 use dbm::UserId;
@@ -101,6 +102,18 @@ impl abi::musync_service_server::MusyncService for GrpcServer {
     let stream = futures::stream::iter(folders.into_iter().map(Ok));
     Ok(Response::new(Box::pin(stream)))
   }
+
+  async fn create_play_queue(
+    &self,
+    request: Request<CreatePlayQueueRequest>,
+  ) -> GrpcResult<CreatePlayQueueResponse> {
+    todo!()
+  }
+
+  async fn get_play_queue(&self, request: Request<GetPlayQueueRequest>) -> GrpcResult<PlayQueue> {
+    todo!()
+  }
+
   async fn create_playlist(
     &self,
     request: Request<CreatePlaylistRequest>,
