@@ -282,11 +282,33 @@ message CreatePlayQueueRequest {
 }
 
 message CreatePlayQueueResponse {
-  PlayQueue play_queue = 1;
+  int32 play_queue_id = 1;
 }
 
 // Currently, users can only get thier own play queue
 message GetPlayQueueRequest {}
+
+message UpdatePlayerRequest {
+  // is the update triggerred by user action.
+  // If this is false, it won't be broadcasted to other users.
+  // Otherwise, it will be broadcasted to other users.
+  bool manul = 1;
+  // index of the current playing track in the playlist
+  optional uint32 position = 2;
+  // is the playlist playing
+  optional bool playing = 3;
+  // Move the seek bar to the specified position.
+  optional uint32 progress = 4;
+}
+message UpdatePlayQueueEvent {
+  repeated int32 track_ids = 1;
+}
+
+message UpdatePlayerEvent {
+  uint32 position = 1;
+  bool playing = 2;
+  uint32 progress = 3;
+}
 
 // Musync service
 service MusyncService {

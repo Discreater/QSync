@@ -10,6 +10,7 @@ pub enum Error {
   Dbm(#[from] dbm::MusyncError),
 }
 
+#[derive(Debug)]
 pub enum HttpError {
   Auth,
   Internal,
@@ -23,6 +24,7 @@ impl From<dbm::MusyncError> for HttpError {
     match e {
       dbm::MusyncError::Unknown | dbm::MusyncError::SeaOrm(_) => HttpError::Internal,
       dbm::MusyncError::PlaylistNotFound(_)
+      | dbm::MusyncError::PlayQueueNotFound(_)
       | dbm::MusyncError::FolderNotFound(_)
       | dbm::MusyncError::TrackNotFound(_)
       | dbm::MusyncError::UserNotFound(_) => HttpError::NotFound,

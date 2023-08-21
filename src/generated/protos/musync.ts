@@ -361,11 +361,40 @@ export interface CreatePlayQueueRequest {
 }
 
 export interface CreatePlayQueueResponse {
-  playQueue: PlayQueue | undefined;
+  playQueueId: number;
 }
 
 /** Currently, users can only get thier own play queue */
 export interface GetPlayQueueRequest {
+}
+
+export interface UpdatePlayerRequest {
+  /**
+   * is the update triggerred by user action.
+   * If this is false, it won't be broadcasted to other users.
+   * Otherwise, it will be broadcasted to other users.
+   */
+  manul: boolean;
+  /** index of the current playing track in the playlist */
+  position?:
+    | number
+    | undefined;
+  /** is the playlist playing */
+  playing?:
+    | boolean
+    | undefined;
+  /** Move the seek bar to the specified position. */
+  progress?: number | undefined;
+}
+
+export interface UpdatePlayQueueEvent {
+  trackIds: number[];
+}
+
+export interface UpdatePlayerEvent {
+  position: number;
+  playing: boolean;
+  progress: number;
 }
 
 function createBasePlaylist(): Playlist {
@@ -3473,13 +3502,13 @@ export const CreatePlayQueueRequest = {
 };
 
 function createBaseCreatePlayQueueResponse(): CreatePlayQueueResponse {
-  return { playQueue: undefined };
+  return { playQueueId: 0 };
 }
 
 export const CreatePlayQueueResponse = {
   encode(message: CreatePlayQueueResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.playQueue !== undefined) {
-      PlayQueue.encode(message.playQueue, writer.uint32(10).fork()).ldelim();
+    if (message.playQueueId !== 0) {
+      writer.uint32(8).int32(message.playQueueId);
     }
     return writer;
   },
@@ -3492,11 +3521,11 @@ export const CreatePlayQueueResponse = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          if (tag !== 10) {
+          if (tag !== 8) {
             break;
           }
 
-          message.playQueue = PlayQueue.decode(reader, reader.uint32());
+          message.playQueueId = reader.int32();
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -3508,13 +3537,13 @@ export const CreatePlayQueueResponse = {
   },
 
   fromJSON(object: any): CreatePlayQueueResponse {
-    return { playQueue: isSet(object.playQueue) ? PlayQueue.fromJSON(object.playQueue) : undefined };
+    return { playQueueId: isSet(object.playQueueId) ? Number(object.playQueueId) : 0 };
   },
 
   toJSON(message: CreatePlayQueueResponse): unknown {
     const obj: any = {};
-    if (message.playQueue !== undefined) {
-      obj.playQueue = PlayQueue.toJSON(message.playQueue);
+    if (message.playQueueId !== 0) {
+      obj.playQueueId = Math.round(message.playQueueId);
     }
     return obj;
   },
@@ -3524,9 +3553,7 @@ export const CreatePlayQueueResponse = {
   },
   fromPartial<I extends Exact<DeepPartial<CreatePlayQueueResponse>, I>>(object: I): CreatePlayQueueResponse {
     const message = createBaseCreatePlayQueueResponse();
-    message.playQueue = (object.playQueue !== undefined && object.playQueue !== null)
-      ? PlayQueue.fromPartial(object.playQueue)
-      : undefined;
+    message.playQueueId = object.playQueueId ?? 0;
     return message;
   },
 };
@@ -3570,6 +3597,268 @@ export const GetPlayQueueRequest = {
   },
   fromPartial<I extends Exact<DeepPartial<GetPlayQueueRequest>, I>>(_: I): GetPlayQueueRequest {
     const message = createBaseGetPlayQueueRequest();
+    return message;
+  },
+};
+
+function createBaseUpdatePlayerRequest(): UpdatePlayerRequest {
+  return { manul: false, position: undefined, playing: undefined, progress: undefined };
+}
+
+export const UpdatePlayerRequest = {
+  encode(message: UpdatePlayerRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.manul === true) {
+      writer.uint32(8).bool(message.manul);
+    }
+    if (message.position !== undefined) {
+      writer.uint32(16).uint32(message.position);
+    }
+    if (message.playing !== undefined) {
+      writer.uint32(24).bool(message.playing);
+    }
+    if (message.progress !== undefined) {
+      writer.uint32(32).uint32(message.progress);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): UpdatePlayerRequest {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseUpdatePlayerRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 8) {
+            break;
+          }
+
+          message.manul = reader.bool();
+          continue;
+        case 2:
+          if (tag !== 16) {
+            break;
+          }
+
+          message.position = reader.uint32();
+          continue;
+        case 3:
+          if (tag !== 24) {
+            break;
+          }
+
+          message.playing = reader.bool();
+          continue;
+        case 4:
+          if (tag !== 32) {
+            break;
+          }
+
+          message.progress = reader.uint32();
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): UpdatePlayerRequest {
+    return {
+      manul: isSet(object.manul) ? Boolean(object.manul) : false,
+      position: isSet(object.position) ? Number(object.position) : undefined,
+      playing: isSet(object.playing) ? Boolean(object.playing) : undefined,
+      progress: isSet(object.progress) ? Number(object.progress) : undefined,
+    };
+  },
+
+  toJSON(message: UpdatePlayerRequest): unknown {
+    const obj: any = {};
+    if (message.manul === true) {
+      obj.manul = message.manul;
+    }
+    if (message.position !== undefined) {
+      obj.position = Math.round(message.position);
+    }
+    if (message.playing !== undefined) {
+      obj.playing = message.playing;
+    }
+    if (message.progress !== undefined) {
+      obj.progress = Math.round(message.progress);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<UpdatePlayerRequest>, I>>(base?: I): UpdatePlayerRequest {
+    return UpdatePlayerRequest.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<UpdatePlayerRequest>, I>>(object: I): UpdatePlayerRequest {
+    const message = createBaseUpdatePlayerRequest();
+    message.manul = object.manul ?? false;
+    message.position = object.position ?? undefined;
+    message.playing = object.playing ?? undefined;
+    message.progress = object.progress ?? undefined;
+    return message;
+  },
+};
+
+function createBaseUpdatePlayQueueEvent(): UpdatePlayQueueEvent {
+  return { trackIds: [] };
+}
+
+export const UpdatePlayQueueEvent = {
+  encode(message: UpdatePlayQueueEvent, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    writer.uint32(10).fork();
+    for (const v of message.trackIds) {
+      writer.int32(v);
+    }
+    writer.ldelim();
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): UpdatePlayQueueEvent {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseUpdatePlayQueueEvent();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag === 8) {
+            message.trackIds.push(reader.int32());
+
+            continue;
+          }
+
+          if (tag === 10) {
+            const end2 = reader.uint32() + reader.pos;
+            while (reader.pos < end2) {
+              message.trackIds.push(reader.int32());
+            }
+
+            continue;
+          }
+
+          break;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): UpdatePlayQueueEvent {
+    return { trackIds: Array.isArray(object?.trackIds) ? object.trackIds.map((e: any) => Number(e)) : [] };
+  },
+
+  toJSON(message: UpdatePlayQueueEvent): unknown {
+    const obj: any = {};
+    if (message.trackIds?.length) {
+      obj.trackIds = message.trackIds.map((e) => Math.round(e));
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<UpdatePlayQueueEvent>, I>>(base?: I): UpdatePlayQueueEvent {
+    return UpdatePlayQueueEvent.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<UpdatePlayQueueEvent>, I>>(object: I): UpdatePlayQueueEvent {
+    const message = createBaseUpdatePlayQueueEvent();
+    message.trackIds = object.trackIds?.map((e) => e) || [];
+    return message;
+  },
+};
+
+function createBaseUpdatePlayerEvent(): UpdatePlayerEvent {
+  return { position: 0, playing: false, progress: 0 };
+}
+
+export const UpdatePlayerEvent = {
+  encode(message: UpdatePlayerEvent, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.position !== 0) {
+      writer.uint32(8).uint32(message.position);
+    }
+    if (message.playing === true) {
+      writer.uint32(16).bool(message.playing);
+    }
+    if (message.progress !== 0) {
+      writer.uint32(24).uint32(message.progress);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): UpdatePlayerEvent {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseUpdatePlayerEvent();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 8) {
+            break;
+          }
+
+          message.position = reader.uint32();
+          continue;
+        case 2:
+          if (tag !== 16) {
+            break;
+          }
+
+          message.playing = reader.bool();
+          continue;
+        case 3:
+          if (tag !== 24) {
+            break;
+          }
+
+          message.progress = reader.uint32();
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): UpdatePlayerEvent {
+    return {
+      position: isSet(object.position) ? Number(object.position) : 0,
+      playing: isSet(object.playing) ? Boolean(object.playing) : false,
+      progress: isSet(object.progress) ? Number(object.progress) : 0,
+    };
+  },
+
+  toJSON(message: UpdatePlayerEvent): unknown {
+    const obj: any = {};
+    if (message.position !== 0) {
+      obj.position = Math.round(message.position);
+    }
+    if (message.playing === true) {
+      obj.playing = message.playing;
+    }
+    if (message.progress !== 0) {
+      obj.progress = Math.round(message.progress);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<UpdatePlayerEvent>, I>>(base?: I): UpdatePlayerEvent {
+    return UpdatePlayerEvent.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<UpdatePlayerEvent>, I>>(object: I): UpdatePlayerEvent {
+    const message = createBaseUpdatePlayerEvent();
+    message.position = object.position ?? 0;
+    message.playing = object.playing ?? false;
+    message.progress = object.progress ?? 0;
     return message;
   },
 };

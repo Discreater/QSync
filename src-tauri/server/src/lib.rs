@@ -1,7 +1,7 @@
-use std::{net::SocketAddr, time::Duration};
+use std::{net::SocketAddr, sync::Arc, time::Duration};
 
 use abi::musync_service_server::MusyncServiceServer;
-use axum::{routing::get, Router};
+use axum::{routing::get, Extension, Router};
 
 use axum_server::Handle;
 use error::Result;
@@ -13,7 +13,7 @@ use hyper::Body;
 use tokio::task::JoinHandle;
 use tonic_web::GrpcWebLayer;
 use tower::{make::Shared, steer::Steer, BoxError, ServiceExt};
-use tower_http::cors::{AllowHeaders, AllowMethods, AllowOrigin, CorsLayer};
+use tower_http::cors::{AllowMethods, AllowOrigin, CorsLayer};
 use tracing::info;
 
 use crate::grpc::GrpcServer;
@@ -45,12 +45,14 @@ impl Server {
       .allow_origin(AllowOrigin::any())
       .max_age(Duration::from_secs(60) * 10);
 
+    let ws_state = Arc::new(ws::WsState::default());
+
     let grpc_service = tonic::transport::Server::builder()
       .accept_http1(true)
       .layer(cors.clone())
       .layer(GrpcWebLayer::new())
       .add_service(MusyncServiceServer::with_interceptor(
-        GrpcServer::new(manager.clone()),
+        GrpcServer::new(manager.clone(), Arc::clone(&ws_state)),
         grpc::check_auth,
       ))
       .into_service()
@@ -65,7 +67,8 @@ impl Server {
           .route("/track/:id/cover", get(musync::get_cover))
           .with_state(manager.clone()),
       )
-      .route("/ws", get(ws::handler).with_state(manager.clone()))
+      .route("/ws", get(ws::handler).layer(Extension(ws_state)))
+      .with_state(manager.clone())
       .layer(cors);
 
     let http_service = http_app.map_err(BoxError::from).boxed_clone();

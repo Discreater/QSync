@@ -10,7 +10,7 @@ pub struct Model {
   #[sea_orm(primary_key, auto_increment = false)]
   pub track_id: i32,
   #[sea_orm(primary_key, auto_increment = false)]
-  pub position: i32,
+  pub position: u32,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]

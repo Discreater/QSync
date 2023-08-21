@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { invoke } from '@tauri-apps/api';
-import { computed, onMounted } from 'vue';
+import { computed, onMounted, onUnmounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import SmoothScrollbar from 'smooth-scrollbar';
 import { useRoute } from 'vue-router';
 import { getPlatform, inTauri } from './platforms';
-import { useQSyncStore } from './store';
+import { usePlayerStore, useQSyncStore } from './store';
 import QPlayer from './components/QPlayer.vue';
+import { WsClient } from './api/client';
 import TitleBar from '~/components/TitleBar.vue';
 import { defaultTheme } from '~/utils/theme';
 
@@ -22,6 +23,9 @@ class ShiftScrollPlugin extends SmoothScrollbar.ScrollbarPlugin {
 
 SmoothScrollbar.use(ShiftScrollPlugin);
 
+const playerStore = usePlayerStore();
+const qsyncStore = useQSyncStore();
+
 onMounted(async () => {
   inTauri(async () => {
     const _result = await invoke('greet', { name: 'World' });
@@ -32,8 +36,19 @@ onMounted(async () => {
 });
 const { locale: i18nLocale } = useI18n();
 
-const store = useQSyncStore();
-store.$subscribe((_mutation, state) => {
+const listen1 = WsClient.listenOnUpdatePlayer((update) => {
+  playerStore.updateFromRemote(update);
+});
+const listen2 = WsClient.listenOnUpdatePlayQueue((update) => {
+  qsyncStore.updatePlayQueueFromRemote(update.trackIds);
+});
+
+onUnmounted(() => {
+  WsClient.cancelOnUpdatePlayer(listen1);
+  WsClient.cancelOnUpdatePlayQueue(listen2);
+});
+
+qsyncStore.$subscribe((_mutation, state) => {
   i18nLocale.value = state.locale;
 });
 

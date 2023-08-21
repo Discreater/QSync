@@ -7,7 +7,7 @@ use sea_orm::entity::prelude::*;
 pub struct Model {
   #[sea_orm(primary_key)]
   pub id: i32,
-  pub position: i32,
+  pub position: u32,
   pub playing: bool,
   pub started_at: DateTimeUtc,
   pub paused_at: u32,

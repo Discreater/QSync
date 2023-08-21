@@ -466,14 +466,51 @@ pub struct CreatePlayQueueRequest {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct CreatePlayQueueResponse {
-  #[prost(message, optional, tag = "1")]
-  pub play_queue: ::core::option::Option<PlayQueue>,
+  #[prost(int32, tag = "1")]
+  pub play_queue_id: i32,
 }
 /// Currently, users can only get thier own play queue
 #[derive(serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct GetPlayQueueRequest {}
+#[derive(serde::Serialize, serde::Deserialize)]
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct UpdatePlayerRequest {
+  /// is the update triggerred by user action.
+  /// If this is false, it won't be broadcasted to other users.
+  /// Otherwise, it will be broadcasted to other users.
+  #[prost(bool, tag = "1")]
+  pub manul: bool,
+  /// index of the current playing track in the playlist
+  #[prost(uint32, optional, tag = "2")]
+  pub position: ::core::option::Option<u32>,
+  /// is the playlist playing
+  #[prost(bool, optional, tag = "3")]
+  pub playing: ::core::option::Option<bool>,
+  /// Move the seek bar to the specified position.
+  #[prost(uint32, optional, tag = "4")]
+  pub progress: ::core::option::Option<u32>,
+}
+#[derive(serde::Serialize, serde::Deserialize)]
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct UpdatePlayQueueEvent {
+  #[prost(int32, repeated, tag = "1")]
+  pub track_ids: ::prost::alloc::vec::Vec<i32>,
+}
+#[derive(serde::Serialize, serde::Deserialize)]
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct UpdatePlayerEvent {
+  #[prost(uint32, tag = "1")]
+  pub position: u32,
+  #[prost(bool, tag = "2")]
+  pub playing: bool,
+  #[prost(uint32, tag = "3")]
+  pub progress: u32,
+}
 /// Generated client implementations.
 pub mod musync_service_client {
   #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]

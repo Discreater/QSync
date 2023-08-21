@@ -177,8 +177,7 @@ impl MigrationTrait for Migration {
             ForeignKey::create()
               .name("fk-user-play_queue_id")
               .from(User::Table, User::PlayQueueId)
-              .to(PlayQueue::Table, PlayQueue::Id)
-              .on_delete(ForeignKeyAction::Cascade),
+              .to(PlayQueue::Table, PlayQueue::Id),
           )
           .to_owned(),
       )

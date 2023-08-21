@@ -25,6 +25,9 @@ pub enum MusyncError {
   #[error("User {0} not found")]
   UserNotFound(i32),
 
+  #[error("PlayQueue {0} not found")]
+  PlayQueueNotFound(i32),
+
   #[error("Folder {0} exists")]
   FolderExists(String),
 }
@@ -34,6 +37,7 @@ impl From<MusyncError> for tonic::Status {
     match value {
       MusyncError::Unknown | MusyncError::SeaOrm(_) => Status::internal("unknown"),
       MusyncError::PlaylistNotFound(_)
+      | MusyncError::PlayQueueNotFound(_)
       | MusyncError::FolderNotFound(_)
       | MusyncError::TrackNotFound(_)
       | MusyncError::UserNotFound(_) => Status::not_found("not found"),

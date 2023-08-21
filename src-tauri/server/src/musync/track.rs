@@ -20,10 +20,14 @@ pub(crate) fn get_track_info(path: &str) -> abi::Track {
         }
         song.artist = tag.artist().map(Cow::into_owned);
         song.album = tag.album().map(Cow::into_owned);
-        song.title = tag.title().map(Cow::into_owned).unwrap_or_else(|| {
-          let filename = std::path::Path::new(path).file_name().unwrap();
-          filename.to_str().unwrap().to_string()
-        });
+        song.title = tag
+          .title()
+          .map(Cow::into_owned)
+          .filter(|s| s.is_empty())
+          .unwrap_or_else(|| {
+            let filename = std::path::Path::new(path).file_name().unwrap();
+            filename.to_str().unwrap().to_string()
+          });
         song.genre = tag.genre().map(Cow::into_owned);
         song.year = tag.year();
       }

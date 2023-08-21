@@ -1,4 +1,4 @@
-use std::pin::Pin;
+use std::{pin::Pin, sync::Arc};
 
 use abi::{
   AddLocalFolderRequest, AddLocalFolderResponse, CreatePlayQueueRequest, CreatePlayQueueResponse,
@@ -7,34 +7,28 @@ use abi::{
   DeleteUsersRequest, GetPlayQueueRequest, GetTrackCoverRequest, GetTrackRequest, LocalFolder,
   LoginRequest, Picture, PlayQueue, Playlist, QueryLocalFoldersRequest, QueryPlaylistsRequest,
   QueryTracksRequest, QueryUsersRequest, RemoveLocalFolderRequest, RemoveLocalFolderResponse,
-  Token, Track, UpdatePlaylistRequest, UpdatePlaylistResponse, UpdateTrackRequest,
-  UpdateTrackResponse, UpdateUserRequest, UpdateUserResponse, User,
+  Token, Track, UpdatePlayQueueEvent, UpdatePlaylistRequest, UpdatePlaylistResponse,
+  UpdateTrackRequest, UpdateTrackResponse, UpdateUserRequest, UpdateUserResponse, User,
 };
 use chrono::{Days, Utc};
 use dbm::UserId;
 use futures::Stream;
-use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, Validation};
-use once_cell::sync::Lazy;
-use serde::{Deserialize, Serialize};
+
 use tonic::{Extensions, Request, Response, Status};
 use tracing::trace;
 
-use crate::musync;
+use crate::{musync, user::Claims, ws::WsState};
 
 pub struct GrpcServer {
   db: dbm::DbManager,
+  ws_state: Arc<WsState>,
 }
 
 impl GrpcServer {
-  pub fn new(db: dbm::DbManager) -> Self {
-    Self { db }
+  pub fn new(db: dbm::DbManager, ws_state: Arc<WsState>) -> Self {
+    Self { db, ws_state }
   }
 }
-
-static KEYS: Lazy<Keys> = Lazy::new(|| {
-  let secret = std::env::var("JWT_SECRET").expect("JWT_SECRET must be set");
-  Keys::new(secret.as_bytes())
-});
 
 pub type GrpcResult<T> = Result<Response<T>, Status>;
 pub type GrpcStream<T> = Pin<Box<dyn Stream<Item = Result<T, Status>> + Send>>;
@@ -55,7 +49,8 @@ impl abi::musync_service_server::MusyncService for GrpcServer {
         .unwrap()
         .timestamp() as usize,
     };
-    let token = encode(&Header::default(), &claims, &KEYS.encoding)
+    let token = claims
+      .encode()
       .map_err(|_| Status::internal("token creation"))?;
     let res = Token {
       data: token,
@@ -107,11 +102,34 @@ impl abi::musync_service_server::MusyncService for GrpcServer {
     &self,
     request: Request<CreatePlayQueueRequest>,
   ) -> GrpcResult<CreatePlayQueueResponse> {
-    todo!()
+    let owner_id = get_userid(request.extensions())?;
+    let req = request.into_inner();
+    let playqueue = self.db.create_play_queue(req, owner_id).await?;
+    if let Err(e) = self
+      .ws_state
+      .tx
+      .send(Arc::new(crate::ws::BroadcastMsg::UpdatePlayQueue {
+        user_id: owner_id,
+        update: UpdatePlayQueueEvent {
+          track_ids: playqueue.track_ids,
+        },
+      }))
+    {
+      tracing::error!("broadcast update play queue event failed: {}", e);
+    }
+    Ok(Response::new(CreatePlayQueueResponse {
+      play_queue_id: playqueue.id,
+    }))
   }
 
   async fn get_play_queue(&self, request: Request<GetPlayQueueRequest>) -> GrpcResult<PlayQueue> {
-    todo!()
+    let owner_id = get_userid(request.extensions())?;
+    let playqueue = self
+      .db
+      .get_user_play_queue(owner_id)
+      .await?
+      .ok_or(Status::not_found("not found play queue"))?;
+    Ok(Response::new(playqueue))
   }
 
   async fn create_playlist(
@@ -129,23 +147,23 @@ impl abi::musync_service_server::MusyncService for GrpcServer {
   type QueryPlaylistsStream = GrpcStream<Playlist>;
   async fn query_playlists(
     &self,
-    request: Request<QueryPlaylistsRequest>,
+    _request: Request<QueryPlaylistsRequest>,
   ) -> GrpcResult<Self::QueryPlaylistsStream> {
-    todo!()
+    unimplemented!()
   }
   async fn update_playlist(
     &self,
-    request: Request<UpdatePlaylistRequest>,
+    _request: Request<UpdatePlaylistRequest>,
   ) -> GrpcResult<UpdatePlaylistResponse> {
-    todo!()
+    unimplemented!()
   }
   /// Server streaming response type for the DeletePlaylists method.
   type DeletePlaylistsStream = GrpcStream<Playlist>;
   async fn delete_playlists(
     &self,
-    request: Request<DeletePlaylistsRequest>,
+    _request: Request<DeletePlaylistsRequest>,
   ) -> GrpcResult<Self::DeletePlaylistsStream> {
-    todo!()
+    unimplemented!()
   }
   async fn get_track(&self, request: Request<GetTrackRequest>) -> GrpcResult<Track> {
     let req = request.into_inner();
@@ -166,9 +184,9 @@ impl abi::musync_service_server::MusyncService for GrpcServer {
 
   async fn create_track(
     &self,
-    request: Request<CreateTrackRequest>,
+    _request: Request<CreateTrackRequest>,
   ) -> GrpcResult<CreateTrackResponse> {
-    todo!()
+    unimplemented!()
   }
   /// Server streaming response type for the QueryTracks method.
   type QueryTracksStream = GrpcStream<Track>;
@@ -183,65 +201,45 @@ impl abi::musync_service_server::MusyncService for GrpcServer {
   }
   async fn update_track(
     &self,
-    request: Request<UpdateTrackRequest>,
+    _request: Request<UpdateTrackRequest>,
   ) -> GrpcResult<UpdateTrackResponse> {
-    todo!()
+    unimplemented!()
   }
   /// Server streaming response type for the DeleteTracks method.
   type DeleteTracksStream = GrpcStream<Track>;
   async fn delete_tracks(
     &self,
-    request: Request<DeleteTracksRequest>,
+    _request: Request<DeleteTracksRequest>,
   ) -> GrpcResult<Self::DeleteTracksStream> {
-    todo!()
+    unimplemented!()
   }
   async fn create_user(
     &self,
-    request: Request<CreateUserRequest>,
+    _request: Request<CreateUserRequest>,
   ) -> GrpcResult<CreateUserResponse> {
-    todo!()
+    unimplemented!()
   }
   /// Server streaming response type for the QueryUsers method.
   type QueryUsersStream = GrpcStream<User>;
   async fn query_users(
     &self,
-    request: Request<QueryUsersRequest>,
+    _request: Request<QueryUsersRequest>,
   ) -> GrpcResult<Self::QueryUsersStream> {
-    todo!()
+    unimplemented!()
   }
   async fn update_user(
     &self,
-    request: Request<UpdateUserRequest>,
+    _request: Request<UpdateUserRequest>,
   ) -> GrpcResult<UpdateUserResponse> {
-    todo!()
+    unimplemented!()
   }
   /// Server streaming response type for the DeleteUsers method.
   type DeleteUsersStream = GrpcStream<User>;
   async fn delete_users(
     &self,
-    request: Request<DeleteUsersRequest>,
+    _request: Request<DeleteUsersRequest>,
   ) -> GrpcResult<Self::DeleteUsersStream> {
-    todo!()
-  }
-}
-
-#[derive(Default, Debug, Serialize, Deserialize)]
-struct Claims {
-  id: UserId,
-  exp: usize,
-}
-
-struct Keys {
-  encoding: EncodingKey,
-  decoding: DecodingKey,
-}
-
-impl Keys {
-  fn new(secret: &[u8]) -> Self {
-    Self {
-      encoding: EncodingKey::from_secret(secret),
-      decoding: DecodingKey::from_secret(secret),
-    }
+    unimplemented!()
   }
 }
 
@@ -250,18 +248,17 @@ pub fn check_auth(mut req: Request<()>) -> Result<Request<()>, Status> {
     let bearer = v
       .to_str()
       .map_err(|_| Status::new(tonic::Code::Unauthenticated, "Invalid token format"))?;
-    let token_data = decode::<Claims>(bearer, &KEYS.decoding, &Validation::default())
-      .map_err(|_| Status::unauthenticated("Invalid token format"))?;
-    trace!("auth {} success", token_data.claims.id);
-    req.extensions_mut().insert(token_data.claims);
+    let claims =
+      Claims::decode(bearer).map_err(|_| Status::unauthenticated("Invalid token format"))?;
+    trace!("auth {} success", claims.id);
+    req.extensions_mut().insert(claims);
   }
   Ok(req)
 }
 
 fn get_userid(ext: &Extensions) -> Result<UserId, Status> {
   let claims = ext
-    .get::<Option<Claims>>()
-    .and_then(|t| t.as_ref())
+    .get::<Claims>()
     .ok_or(Status::unauthenticated("No token"))?;
   Ok(claims.id)
 }

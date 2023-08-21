@@ -25,7 +25,7 @@ import { TrackExt } from '~/model_ext/track';
 const router = useRouter();
 const route = useRoute();
 
-const audio = new Audio();
+const audio = ref<HTMLAudioElement | null>(null);
 const qsyncStore = useQSyncStore();
 const playerStore = usePlayerStore();
 const configStore = useConfigStore();
@@ -40,7 +40,7 @@ function loadTrack(track: Track) {
   logger.trace(`load new track: ${track.title}`);
   const uri = ApiClient.get().track_uri(track.id);
   currentTrack.value = track;
-  audio.src = uri;
+  audio.value!.src = uri;
   if (track.duration)
     duration.value = TrackExt.durationInSecs(track.duration);
 
@@ -54,73 +54,102 @@ function loadTrack(track: Track) {
   }
 }
 
+const cannotPlay = ref(false);
+
 async function updatePlayer(pState: typeof playerStore) {
+  if (audio.value === null) {
+    logger.info('audio is null');
+    return;
+  }
+
   const playQueue = qsyncStore.playQueue;
   if (playQueue.length === 0)
     return;
 
   // ignore the same track
-  if (!currentTrack.value || !sameTrack(playQueue[pState.current], currentTrack.value))
-    loadTrack(playQueue[pState.current]);
-
-  audio.oncanplay = async () => {
-    const progress = pState.progress();
-    if (Math.abs(progress - audio.currentTime * 1000) > 1000) {
-      const progresInSec = progress / 1000;
-      logger.debug(`update time, from ${audio.currentTime} to ${progresInSec}`);
-      localProgress.value = progresInSec;
-      audio.currentTime = localProgress.value;
-    }
-    if (pState.playing && audio.paused) {
-      try {
-        await audio.play();
-      } catch (e) {
-        if (e instanceof DOMException) {
-          logger.info('mute play');
-          toggleMute(true);
-          await audio.play();
-        } else {
-          throw e;
+  if (!currentTrack.value || !sameTrack(playQueue[pState.position], currentTrack.value)) {
+    loadTrack(playQueue[pState.position]);
+    audio.value.oncanplay = updateState;
+  } else {
+    updateState();
+  }
+  async function updateState() {
+    if (pState.playing && audio.value!.paused) {
+      if (!cannotPlay.value) {
+        try {
+          await audio.value!.play();
+        } catch (e) {
+          if (e instanceof DOMException) {
+            logger.info('mute play');
+            toggleMute(true);
+            try {
+              await audio.value!.play();
+            } catch (e) {
+              logger.info('cannot play');
+              cannotPlay.value = true;
+              console.error(e);
+            }
+          } else {
+            console.error(e);
+          }
         }
       }
-    } else if (!pState.playing && !audio.paused) {
-      audio.pause();
+    } else if (!pState.playing && !audio.value!.paused) {
+      audio.value!.pause();
     }
-  };
+
+    // logger.trace('updating');
+    const progress = pState.progress();
+    if (Math.abs(progress - audio.value!.currentTime * 1000) > 1000) {
+      const progresInSec = progress / 1000;
+      // logger.debug(`update time, from ${audio.currentTime} to ${progresInSec}`);
+      localProgress.value = progresInSec;
+      audio.value!.currentTime = localProgress.value;
+    }
+  }
 }
 
 watch(playerStore, async (pState) => {
   await updatePlayer(pState);
 }, { deep: true });
 
+function onUserInteract() {
+  logger.debug('user interact');
+  cannotPlay.value = false;
+  updatePlayer(playerStore);
+}
+
 onMounted(async () => {
+  window.addEventListener('mousedown', onUserInteract);
+  audio.value!.onended = () => {
+    audio.value!.pause();
+    qsyncStore.nextTrack(false);
+  };
+  audio.value!.ontimeupdate = () => {
+    localProgress.value = audio.value!.currentTime;
+  };
+  audio.value!.onloadedmetadata = () => {
+    if (audio.value!.duration === Number.POSITIVE_INFINITY)
+      return;
+
+    duration.value = audio.value!.duration;
+  };
+  audio.value!.volume = configStore.volume / 100;
+
   await updatePlayer(playerStore);
 });
 onUnmounted(() => {
-  audio.pause();
+  window.removeEventListener('mousedown', onUserInteract);
+  audio.value?.pause();
 });
 
-audio.onended = () => {
-  audio.pause();
-  qsyncStore.nextTrack();
-};
 localProgress.value = playerStore.progress();
-audio.ontimeupdate = () => {
-  localProgress.value = audio.currentTime;
-};
-
-audio.onloadedmetadata = () => {
-  if (audio.duration === Number.POSITIVE_INFINITY)
-    return;
-
-  duration.value = audio.duration;
-};
 
 function handlePrevious() {
   qsyncStore.previousTrack();
 }
 function handleNext() {
-  qsyncStore.nextTrack();
+  qsyncStore.nextTrack(true);
 }
 function togglePlay() {
   playerStore.togglePlay();
@@ -132,9 +161,10 @@ function onSliderUpdate(v: number) {
 }
 
 watch(configStore, (config) => {
-  audio.volume = config.volume / 100;
+  if (audio.value === null)
+    return;
+  audio.value.volume = config.volume / 100;
 });
-audio.volume = configStore.volume / 100;
 function onVolumeUpdate(v: number) {
   v = Math.max(0, v);
   v = Math.min(100, v);
@@ -167,7 +197,7 @@ function toggleMute(mute?: boolean) {
   configStore.$patch((state) => {
     state.muted = muteState;
   });
-  audio.muted = muteState;
+  audio.value!.muted = muteState;
 }
 </script>
 
@@ -201,7 +231,7 @@ function toggleMute(mute?: boolean) {
         </HoverLayer>
       </div>
       <div class="flex-1 flex justify-center items-center gap-3">
-        <QHoverButton :icon="IconArrowShuffle" @click="qsyncStore.shufflePLayQueue()" />
+        <QHoverButton :icon="IconArrowShuffle" @click="qsyncStore.shufflePlayQueue()" />
         <QHoverButton :icon="IconPrevious" @click="handlePrevious" />
         <button
           class="rounded-full w-14 h-14 text-2xl flex justify-center items-center bg-gradient-to-br from-orange-500 to-purple-500"
@@ -232,6 +262,7 @@ function toggleMute(mute?: boolean) {
         <QHoverButton :icon="IconMore" :disabled="true" />
       </div>
     </div>
+    <audio ref="audio" class="hidden" />
   </div>
 </template>
 
