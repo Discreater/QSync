@@ -3,18 +3,12 @@
 ![playing](docs/img/playing.png)
 
 ## Roadmap
-### Common
-
-- [x] User Management
-   - token auth
-- [x] Websocket Message
-- [] Add client id (Each websocket connection has a unique client id)
 
 ### MuSync
 - [x] Music Player
 - [x] Local Music Library
+- [x] Sync play through websocket
 - [x] Unified Track ID
-- [x] Sync Player
 - [] [Media Session API](https://developer.mozilla.org/en-US/docs/Web/API/MediaSession)
 - [] Remote Music Library
    - Netease
@@ -24,6 +18,14 @@
    - Youtube
 - [] Lyric
 - [] Download metadata
+
+### Common
+
+- [x] User Management
+   - token auth
+- [x] Websocket Message
+- [] Add client id (Each websocket connection has a unique client id)
+
 
 ## FIXME
 - [] Need to consider loading time, pause local player when loading. (Preload?)
