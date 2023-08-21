@@ -9,26 +9,26 @@
 - [x] Local Music Library
 - [x] Sync play through websocket
 - [x] Unified Track ID
-- [] [Media Session API](https://developer.mozilla.org/en-US/docs/Web/API/MediaSession)
-- [] Remote Music Library
+- [ ] [Media Session API](https://developer.mozilla.org/en-US/docs/Web/API/MediaSession)
+- [ ] Remote Music Library
    - Netease
    - QQ Music
    - Bilibili
    - Migu
    - Youtube
-- [] Lyric
-- [] Download metadata
+- [ ] Lyric
+- [ ] Download metadata
 
 ### Common
 
 - [x] User Management
    - token auth
 - [x] Websocket Message
-- [] Add client id (Each websocket connection has a unique client id)
+- [ ] Add client id (Each websocket connection has a unique client id)
 
 
 ## FIXME
-- [] Need to consider loading time, pause local player when loading. (Preload?)
+- [ ] Need to consider loading time, pause local player when loading. (Preload?)
 
 ## Tech Stack
 
@@ -61,7 +61,9 @@
 
 ## Run
 
-Server will run on `localhost:8396`;
+Server will run on `localhost:8396`.
+
+Login with user `Kerse`.
 
 ### Server
 ```
