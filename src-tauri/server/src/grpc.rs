@@ -15,7 +15,8 @@ use dbm::UserId;
 use futures::Stream;
 
 use tonic::{Extensions, Request, Response, Status};
-use tracing::trace;
+use tracing::{error, trace};
+use utils::WithError;
 
 use crate::{musync, user::Claims, ws::WsState};
 
@@ -105,7 +106,7 @@ impl abi::musync_service_server::MusyncService for GrpcServer {
     let owner_id = get_userid(request.extensions())?;
     let req = request.into_inner();
     let playqueue = self.db.create_play_queue(req, owner_id).await?;
-    if let Err(e) = self
+    self
       .ws_state
       .tx
       .send(Arc::new(crate::ws::BroadcastMsg::UpdatePlayQueue {
@@ -114,9 +115,9 @@ impl abi::musync_service_server::MusyncService for GrpcServer {
           track_ids: playqueue.track_ids,
         },
       }))
-    {
-      tracing::error!("broadcast update play queue event failed: {}", e);
-    }
+      .with_err(|e| {
+        error!("broadcast update play queue event failed: {}", e);
+      });
     Ok(Response::new(CreatePlayQueueResponse {
       play_queue_id: playqueue.id,
     }))

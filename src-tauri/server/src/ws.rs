@@ -1,14 +1,19 @@
-use std::sync::Arc;
+use std::{
+  ops::{AddAssign, SubAssign},
+  sync::Arc,
+};
 
 use abi::{UpdatePlayQueueEvent, UpdatePlayerEvent, UpdatePlayerRequest};
 use axum::{extract::State, response::IntoResponse, Extension};
 use axum_typed_websockets::{Message, WebSocket, WebSocketUpgrade};
+use dashmap::DashMap;
 use dbm::{DbManager, UserId};
 use futures::{SinkExt, StreamExt};
 use http::StatusCode;
 use serde::{Deserialize, Serialize};
 use tokio::sync::{broadcast, Mutex};
-use tracing::{error, info, warn};
+use tracing::{error, info, trace, warn};
+use utils::WithError;
 
 use crate::{error::HttpError, user::Claims};
 
@@ -16,13 +21,17 @@ const CAPACITY: usize = 64;
 
 #[derive(Debug, Clone)]
 pub struct WsState {
+  clients: DashMap<UserId, usize>,
   pub tx: broadcast::Sender<Arc<BroadcastMsg>>,
 }
 
 impl Default for WsState {
   fn default() -> Self {
     let (tx, _) = broadcast::channel(CAPACITY);
-    Self { tx }
+    Self {
+      clients: DashMap::new(),
+      tx,
+    }
   }
 }
 
@@ -60,14 +69,29 @@ async fn handle_socket(
       user_id
     } else {
       info!("auto failed");
-      socket.close().await.ok();
+      socket
+        .close()
+        .await
+        .with_err(|e| error!("close socket failed: {}", e));
       return;
     }
   } else {
-    error!("not auth");
-    socket.close().await.ok();
+    error!("no auth");
+    socket
+      .close()
+      .await
+      .with_err(|e| error!("close socket failed: {}", e));
     return;
   };
+  socket
+    .send(Message::Item(ServerMsg::AuthSuccess))
+    .await
+    .with_err(|e| error!("send auth response failed: {e:?}"));
+
+  {
+    let mut client_num = state.clients.entry(user_id).or_insert(0);
+    client_num.add_assign(1);
+  }
 
   // send play queue and player
   if let Ok(play_queue) = db.get_user_play_queue(user_id).await {
@@ -76,7 +100,10 @@ async fn handle_socket(
       let msg = ServerMsg::UpdatePlayQueue(UpdatePlayQueueEvent {
         track_ids: play_queue.track_ids.clone(),
       });
-      socket.send(Message::Item(msg)).await.ok();
+      socket
+        .send(Message::Item(msg))
+        .await
+        .with_err(|e| error!("send message failed: {}", e));
 
       // send player
       let msg = ServerMsg::UpdatePlayer(UpdatePlayerEvent {
@@ -84,28 +111,45 @@ async fn handle_socket(
         playing: play_queue.playing,
         progress: play_queue.progress(),
       });
-      socket.send(Message::Item(msg)).await.ok();
+      socket
+        .send(Message::Item(msg))
+        .await
+        .with_err(|e| error!("send message failed: {}", e));
     }
   } else {
     error!("get user play queue failed");
-    socket.close().await.ok();
+    socket
+      .close()
+      .await
+      .with_err(|e| error!("close socket failed: {}", e));
     return;
   }
 
   let (sender, mut receiver) = socket.split();
 
   let sender = Arc::new(Mutex::new(sender));
-  let sender1 = Arc::clone(&sender);
+  let sender_in_recv = Arc::clone(&sender);
+  let state_in_recv = Arc::clone(&state);
+  let db_in_recv = db.clone();
   let mut recv_task = tokio::spawn(async move {
     while let Some(data) = receiver.next().await {
       match data {
         Ok(Message::Item(cm)) => {
-          if let Err(e) = handle_message(cm, Arc::clone(&state), db.clone(), user_id).await {
-            error!("error handling message: {:?}", e);
-          }
+          handle_message(cm, Arc::clone(&state_in_recv), db_in_recv.clone(), user_id)
+            .await
+            .with_err(|e| {
+              error!("error handling message: {:?}", e);
+            });
         }
         Ok(Message::Ping(i)) => {
-          sender1.lock().await.send(Message::Pong(i)).await.ok();
+          sender_in_recv
+            .lock()
+            .await
+            .send(Message::Pong(i))
+            .await
+            .with_err(|e| {
+              error!("error sending pong: {:?}", e);
+            });
         }
         Ok(Message::Pong(i)) => {
           let msg = String::from_utf8_lossy(&i);
@@ -146,7 +190,9 @@ async fn handle_socket(
         }
       };
       if let Some(msg) = send_msg {
-        sender.lock().await.send(msg).await.ok();
+        sender.lock().await.send(msg).await.with_err(|e| {
+          error!("error broadcast message: {:?}", e);
+        });
       }
     }
   });
@@ -155,6 +201,42 @@ async fn handle_socket(
   tokio::select! {
     _v1 = &mut recv_task => send_task.abort(),
     _v2 = &mut send_task => recv_task.abort(),
+  }
+
+  trace!("A client of user {user_id} disconnected");
+  // Remove client from state
+  {
+    if let Some(mut client_num) = state.clients.get_mut(&user_id) {
+      client_num.sub_assign(1);
+      let current_num = *client_num;
+      drop(client_num); // avoid deadlock
+      trace!("Client number of user {user_id} is {}", current_num);
+      if current_num == 0 {
+        state.clients.remove(&user_id);
+        trace!("All client of user {user_id} disconnected");
+        // All clients disconnected, pause player after 5 seconds
+        tokio::time::sleep(tokio::time::Duration::from_secs(5)).await;
+        match state.clients.get(&user_id) {
+          None => {
+            trace!("Pause player for user {user_id}");
+            db.update_player(
+              &UpdatePlayerRequest {
+                manul: true,
+                playing: Some(false),
+                position: None,
+                progress: None,
+              },
+              user_id,
+            )
+            .await
+            .with_err(|e| error!("error pause player: {:?}", e));
+          }
+          _ => {
+            trace!("Other client of user {user_id} connected, skip pause player");
+          }
+        }
+      }
+    }
   }
 }
 
@@ -169,12 +251,15 @@ async fn handle_message(
       let updated = db.update_player(&update, id).await?;
       if update.manul {
         if let Some(updated) = updated {
-          if let Err(e) = state.tx.send(Arc::new(BroadcastMsg::UpdatePlayer {
-            user_id: id,
-            update: updated,
-          })) {
-            warn!("error broadcast message: {e}");
-          }
+          state
+            .tx
+            .send(Arc::new(BroadcastMsg::UpdatePlayer {
+              user_id: id,
+              update: updated,
+            }))
+            .with_err(|e| {
+              warn!("error broadcast message: {e}");
+            });
         }
       }
     }
@@ -185,6 +270,7 @@ async fn handle_message(
 
 #[derive(Debug, Serialize)]
 pub enum ServerMsg {
+  AuthSuccess,
   UpdatePlayer(UpdatePlayerEvent),
   UpdatePlayQueue(UpdatePlayQueueEvent),
 }

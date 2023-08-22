@@ -4,7 +4,7 @@ import type { Token, UpdatePlayQueueEvent, UpdatePlayerEvent, UpdatePlayerReques
 import { useAccountStore } from '~/store/user';
 import { logger } from '~/utils/logger';
 
-type ServerMsg = 'Ping' | {
+type ServerMsg = 'AuthSuccess' | {
   UpdatePlayer: UpdatePlayerEvent
 } | {
   UpdatePlayQueue: UpdatePlayQueueEvent
@@ -19,6 +19,8 @@ export class WsClient {
   static updatePlayerListeners: Map<number, (update: UpdatePlayerEvent) => void> = new Map();
   static updatePlayQueueListeners: Map<number, (update: UpdatePlayQueueEvent) => void> = new Map();
 
+  authed: boolean = false;
+  msgQueue: ClientMsg[] = [];
   constructor(private wsClient: WebSocket, token: Token) {
     this.wsClient.onopen = () => {
       this.wsClient.send(JSON.stringify({
@@ -29,10 +31,12 @@ export class WsClient {
       (e.data as Blob).text().then((data) => {
         const msg = JSON.parse(data) as ServerMsg;
         logger.trace(`ws got message: ${data}`);
-        if (msg === 'Ping') {
-          this.wsClient.send(JSON.stringify(
-            'Pong',
-          ));
+        if (msg === 'AuthSuccess') {
+          this.authed = true;
+          this.msgQueue.forEach((msg) => {
+            logger.trace(`ws send message in message queue: ${JSON.stringify(msg)}`);
+            this.wsClient.send(JSON.stringify(msg));
+          });
         } else if ('UpdatePlayer' in msg) {
           WsClient.updatePlayerListeners.forEach((fn) => {
             fn(msg.UpdatePlayer);
@@ -47,6 +51,11 @@ export class WsClient {
   }
 
   sendMsg(msg: ClientMsg) {
+    if (!this.authed) {
+      logger.trace(`store in message queue: ${JSON.stringify(msg)}`);
+      this.msgQueue.push(msg);
+      return;
+    }
     logger.trace(`ws send message: ${JSON.stringify(msg)}`);
     this.wsClient.send(JSON.stringify(msg));
   }

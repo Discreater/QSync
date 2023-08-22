@@ -91,6 +91,7 @@ async function updatePlayer(pState: typeof playerStore) {
             } catch (e) {
               logger.info('cannot play');
               cannotPlay.value = true;
+              ifCannotPlay();
               console.error(e);
             }
           } else {
@@ -126,10 +127,13 @@ function onUserInteract() {
   logger.debug('user interact');
   cannotPlay.value = false;
   updatePlayer(playerStore);
+  window.removeEventListener('mousedown', onUserInteract);
+}
+function ifCannotPlay() {
+  window.addEventListener('mousedown', onUserInteract);
 }
 
 onMounted(async () => {
-  window.addEventListener('mousedown', onUserInteract);
   audio.value!.onended = () => {
     audio.value!.pause();
     qsyncStore.nextTrack(false);
@@ -148,7 +152,6 @@ onMounted(async () => {
   await updatePlayer(playerStore);
 });
 onUnmounted(() => {
-  window.removeEventListener('mousedown', onUserInteract);
   audio.value?.pause();
 });
 
