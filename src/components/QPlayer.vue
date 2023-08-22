@@ -150,6 +150,9 @@ onMounted(async () => {
   audio.value!.volume = configStore.volume / 100;
 
   await updatePlayer(playerStore);
+
+  setMediaSessionHandler();
+  updateMediaSession(currentTrack.value);
 });
 onUnmounted(() => {
   audio.value?.pause();
@@ -210,6 +213,54 @@ function toggleMute(mute?: boolean) {
     state.muted = muteState;
   });
   audio.value!.muted = muteState;
+}
+
+watch(currentTrack, (track) => {
+  updateMediaSession(track);
+});
+
+function updateMediaSession(track: Track | undefined) {
+  if (track) {
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: track.title,
+      artist: track.artist,
+      album: track.album,
+      artwork: [
+        {
+          src: ApiClient.get().cover_uri(track.id),
+        },
+      ],
+    });
+  } else {
+    navigator.mediaSession.metadata = null;
+  }
+}
+
+function setMediaSessionHandler() {
+  navigator.mediaSession.setActionHandler('play', () => {
+    playerStore.resumeTrack();
+  });
+  navigator.mediaSession.setActionHandler('pause', () => {
+    playerStore.pauseTrack();
+  });
+  navigator.mediaSession.setActionHandler('seekforward', (details) => {
+    if (details.seekOffset)
+      logger.trace(`seek forward: ${details.seekOffset}`);
+  });
+  navigator.mediaSession.setActionHandler('seekbackward', (details) => {
+    if (details.seekOffset)
+      logger.trace(`seek backward: ${details.seekOffset}`);
+  });
+  navigator.mediaSession.setActionHandler('seekto', (details) => {
+    if (details.seekTime)
+      logger.trace(`seek to: ${details.seekTime}`);
+  });
+  navigator.mediaSession.setActionHandler('previoustrack', () => {
+    qsyncStore.previousTrack();
+  });
+  navigator.mediaSession.setActionHandler('nexttrack', () => {
+    qsyncStore.nextTrack(true);
+  });
 }
 </script>
 

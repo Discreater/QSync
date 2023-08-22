@@ -9,7 +9,7 @@
 - [x] Local Music Library
 - [x] Sync play through websocket
 - [x] Unified Track ID
-- [ ] [Media Session API](https://developer.mozilla.org/en-US/docs/Web/API/MediaSession)
+- [x] [Media Session API](https://developer.mozilla.org/en-US/docs/Web/API/MediaSession)
 - [ ] Remote Music Library
    - Netease
    - QQ Music
