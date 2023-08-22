@@ -6,7 +6,7 @@ import { onMounted, onUnmounted, ref } from 'vue';
 import IconArrowShuffle from '~icons/fluent/arrow-shuffle-24-regular';
 import H1 from '~/components/typo/H1.vue';
 import Basic from '~/layouts/Basic.vue';
-import { usePlayerStore, useQSyncStore } from '~/store';
+import { useQSyncStore } from '~/store';
 import QButton from '~/components/QButton.vue';
 import { formatTime, shuffle } from '~/utils';
 import QHoverButton from '~/components/QHoverButton.vue';
@@ -16,6 +16,7 @@ import IconTop from '~icons/fluent/arrow-upload-24-regular';
 import QTable from '~/components/QTable.vue';
 import type { Column } from '~/components/QTable.vue';
 import type { Track } from '~/generated/protos/musync';
+import { usePlayerStore } from '~/store/player';
 
 const { t } = useI18n();
 const store = useQSyncStore();

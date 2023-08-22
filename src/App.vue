@@ -5,9 +5,10 @@ import { useI18n } from 'vue-i18n';
 import SmoothScrollbar from 'smooth-scrollbar';
 import { useRoute } from 'vue-router';
 import { getPlatform, inTauri } from './platforms';
-import { usePlayerStore, useQSyncStore } from './store';
+import { useQSyncStore } from './store';
 import QPlayer from './components/QPlayer.vue';
 import { WsClient } from './api/client';
+import { usePlayerStore } from './store/player';
 import TitleBar from '~/components/TitleBar.vue';
 import { defaultTheme } from '~/utils/theme';
 

@@ -28,7 +28,8 @@
 
 
 ## FIXME
-- [ ] Need to consider loading time, pause local player when loading. (Preload?)
+- [x] Need to consider loading time, pause local player when loading. (Preload?)
+   - Renew the progress after track loaded.
 
 ## Tech Stack
 

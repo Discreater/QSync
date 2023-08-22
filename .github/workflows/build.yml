@@ -25,6 +25,8 @@ jobs:
       - name: install nextest
         uses: taiki-e/install-action@nextest
       - uses: Swatinem/rust-cache@v1
+      - name: Install Protoc
+        uses: arduino/setup-protoc@v2
       - name: install dependencies (ubuntu only)
         if: matrix.platform == 'ubuntu-latest'
         run: |

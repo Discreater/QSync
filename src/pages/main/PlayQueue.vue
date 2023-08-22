@@ -4,12 +4,13 @@ import QScrollbar from '~/components/QScrollbar.vue';
 import type { Column } from '~/components/QTable.vue';
 import H1 from '~/components/typo/H1.vue';
 import Basic from '~/layouts/Basic.vue';
-import { usePlayerStore, useQSyncStore } from '~/store';
+import { useQSyncStore } from '~/store';
 import QTable from '~/components/QTable.vue';
 import QHoverButton from '~/components/QHoverButton.vue';
 import IconPlay from '~icons/fluent/play-24-regular';
 import { formatTime } from '~/utils';
 import { TrackExt } from '~/model_ext/track';
+import { usePlayerStore } from '~/store/player';
 
 const { t } = useI18n();
 const store = useQSyncStore();

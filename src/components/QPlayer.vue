@@ -6,7 +6,8 @@ import QSlider from './QSlider.vue';
 import QPopover from './QPopover.vue';
 import HoverLayer from './HoverLayer.vue';
 import H2 from './typo/H2.vue';
-import { sameTrack, useConfigStore, usePlayerStore, useQSyncStore } from '~/store';
+import { sameTrack, useConfigStore, useQSyncStore } from '~/store';
+import { usePlayerStore } from '~/store/player';
 import { logger } from '~/utils/logger';
 import IconArrowShuffle from '~icons/fluent/arrow-shuffle-24-regular';
 import IconPrevious from '~icons/fluent/previous-24-filled';
@@ -66,14 +67,17 @@ async function updatePlayer(pState: typeof playerStore) {
   if (playQueue.length === 0)
     return;
 
+  const loadingProgress = pState.progress();
   // ignore the same track
   if (!currentTrack.value || !sameTrack(playQueue[pState.position], currentTrack.value)) {
     loadTrack(playQueue[pState.position]);
-    audio.value.oncanplay = updateState;
+    audio.value.oncanplay = () => {
+      updateState(true);
+    };
   } else {
-    updateState();
+    updateState(false);
   }
-  async function updateState() {
+  async function updateState(delayUpdate: boolean) {
     if (pState.playing && audio.value!.paused) {
       if (!cannotPlay.value) {
         try {
@@ -91,6 +95,11 @@ async function updatePlayer(pState: typeof playerStore) {
             }
           } else {
             console.error(e);
+          }
+        } finally {
+          if (delayUpdate) {
+            logger.trace('delay update');
+            pState.updateProgress(loadingProgress, false);
           }
         }
       }
@@ -157,7 +166,7 @@ function togglePlay() {
 
 function onSliderUpdate(v: number) {
   localProgress.value = v;
-  playerStore.updateProgress(v * 1000);
+  playerStore.updateProgress(v * 1000, true);
 }
 
 watch(configStore, (config) => {
@@ -214,7 +223,7 @@ function toggleMute(mute?: boolean) {
       </template>
     </QSlider>
     <div class="grow flex justify-between items-center p-1">
-      <div class="flex-1 h-full flex">
+      <div class="flex-1 h-full flex overflow-hidden">
         <HoverLayer class="flex select-none cursor-default min-w-0" @click="onInfoCardClick()">
           <img
             v-if="showCardImg" :src="currentTrack ? ApiClient.get().cover_uri(currentTrack.id) : ''"
