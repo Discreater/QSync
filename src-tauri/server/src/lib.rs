@@ -1,4 +1,4 @@
-use std::{net::SocketAddr, sync::Arc, time::Duration};
+use std::{net::SocketAddr, path::PathBuf, sync::Arc, time::Duration};
 
 use abi::musync_service_server::MusyncServiceServer;
 use axum::{routing::get, Extension, Router};
@@ -31,8 +31,9 @@ pub struct Server {
 
 impl Server {
   /// spawn a new task, return the join handle of the server and the server handle
-  pub async fn serve(addr: &SocketAddr, db_url: &str) -> Result<Self> {
-    let manager = dbm::DbManager::from_url(db_url).await?;
+  pub async fn serve(addr: &SocketAddr, db_url: &str, data_folder: PathBuf) -> Result<Self> {
+    let manager = dbm::DbManager::from_url(db_url, data_folder).await?;
+    manager.re_index().await;
 
     let cors = CorsLayer::new()
       .allow_headers([
@@ -111,8 +112,29 @@ mod tests {
 
   fn init_tracing() {
     tracing_subscriber::fmt()
-      .with_env_filter("server=trace,hyper=warn")
+      .with_env_filter("server=trace,hyper=warn,dbm=trace")
       .init();
+  }
+
+  #[tokio::test]
+  async fn search_test() {
+    init_tracing();
+    let memory_sqlite_url = "sqlite::memory:";
+    let manager =
+      dbm::DbManager::from_url(memory_sqlite_url, PathBuf::from("../target/data/server/"))
+        .await
+        .unwrap();
+    let folder = "D:\\media\\music";
+    let tracks = crate::musync::track::get_tracks_in_folder(folder);
+    manager.re_index().await;
+    manager.create_tracks(tracks, folder).await.unwrap();
+    manager.re_index().await;
+    manager.re_index().await;
+
+    let search_res = manager.search_tracks("beyond 邓紫棋 one").await.unwrap();
+    println!("search res: {}", search_res.len());
+
+    tokio::time::sleep(Duration::from_secs(40)).await;
   }
 
   #[tokio::test]
@@ -121,7 +143,13 @@ mod tests {
     let server = {
       let addr = SocketAddr::from(([127, 0, 0, 1], 8396));
       let memory_sqlite_url = "sqlite::memory:";
-      Server::serve(&addr, memory_sqlite_url).await.unwrap()
+      Server::serve(
+        &addr,
+        memory_sqlite_url,
+        PathBuf::from("./target/data/server/"),
+      )
+      .await
+      .unwrap()
     };
     let client = tokio::spawn(async move {
       let client = hyper::Client::new();

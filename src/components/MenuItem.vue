@@ -1,7 +1,7 @@
 <script setup lang="ts">
 defineProps<{
   selected: boolean
-  name: string
+  name?: string
   responsible?: boolean
 }>();
 </script>
@@ -14,6 +14,6 @@ defineProps<{
     ${selected ? 'bg-gray-600/10' : ''} hover:bg-gray-500/10`"
   >
     <slot />
-    <span :class="`cursor-default ${responsible ? 'hidden sm:hidden md:block' : 'block'}`">{{ name }}</span>
+    <span v-if="name" :class="`cursor-default ${responsible ? 'hidden sm:hidden md:block' : 'block'}`">{{ name }}</span>
   </div>
 </template>

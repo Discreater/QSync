@@ -28,18 +28,18 @@ fn main() {
     .plugin(tauri_plugin_window_state::Builder::default().build())
     .invoke_handler(tauri::generate_handler![greet, get_server,])
     .setup(|app| {
-      let _data_dir = app
+      let data_dir = app
         .path_resolver()
         .app_data_dir()
         .expect("failed to resolve app data dir");
-      let db_file = _data_dir.join("db.sqlite");
+      let db_file = data_dir.join("db.sqlite");
       if !db_file.exists() {
         std::fs::File::create(&db_file)?;
       }
       let db_url = format!("sqlite://{}", db_file.to_string_lossy());
       info!("db_url: {}", db_url);
       let addr = SocketAddr::from(([127, 0, 0, 1], 8396));
-      let server = tauri::async_runtime::block_on(Server::serve(&addr, &db_url)).unwrap();
+      let server = tauri::async_runtime::block_on(Server::serve(&addr, &db_url, data_dir)).unwrap();
       app.manage(ServerState { server });
       Ok(())
     })

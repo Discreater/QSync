@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 use abi::{
   CreatePlayQueueRequest, CreatePlaylistRequest, LocalFolder, LoginRequest,
   QueryLocalFoldersRequest,
@@ -12,19 +14,27 @@ use sea_orm::{
 };
 use tracing::{info, trace, warn};
 
-use crate::{DbManager, MusyncError, PlaylistId, TrackId, UserId};
+use crate::{search::SearchActorHandle, DbManager, MusyncError, PlaylistId, TrackId, UserId};
 
 impl DbManager {
-  pub fn new(db: DatabaseConnection) -> Self {
-    Self { db }
+  pub fn new(db: DatabaseConnection, data_folder: PathBuf) -> Self {
+    Self {
+      search_actor_handle: SearchActorHandle::new(db.clone(), data_folder),
+      db,
+    }
   }
 
-  pub async fn from_url(db_url: &str) -> crate::error::Result<Self> {
+  pub async fn from_url(db_url: &str, data_folder: PathBuf) -> crate::error::Result<Self> {
     let db = Database::connect(db_url).await?;
     Migrator::up(&db, None).await?;
-    Ok(Self::new(db))
+    Ok(Self::new(db, data_folder))
+  }
+
+  pub async fn re_index(&self) {
+    self.search_actor_handle.index().await;
   }
 }
+/// Playlist
 impl DbManager {
   pub async fn create_playlist(
     &self,
@@ -168,6 +178,7 @@ impl DbManager {
     Ok(abi::Playlist::from_entity(queried, tracks))
   }
 }
+/// Track
 impl DbManager {
   pub async fn create_track(&self, track: abi::Track) -> Result<abi::Track, MusyncError> {
     let txn = self.db.begin().await?;
@@ -195,6 +206,7 @@ impl DbManager {
       .await?;
     }
     txn.commit().await?;
+    self.search_actor_handle.index().await;
     Ok(abi::Track::from_entity(inserted))
   }
 
@@ -246,6 +258,7 @@ impl DbManager {
     }
     LocalSrc::insert_many(local_srcs).exec(&txn).await?;
     txn.commit().await?;
+    self.search_actor_handle.index().await;
     Ok(inserted.last_insert_id)
   }
 
@@ -271,6 +284,7 @@ impl DbManager {
       .exec(&txn)
       .await?;
     txn.commit().await?;
+    self.search_actor_handle.index().await;
     trace!("deleted tracks: {:?}", deleted);
     Ok(deleted.rows_affected)
   }
@@ -331,6 +345,7 @@ impl DbManager {
         inserted.insert(&self.db).await?;
       }
     }
+    self.search_actor_handle.index().await;
 
     self.track(update.id).await
   }
@@ -344,6 +359,7 @@ impl DbManager {
       .filter(entity::track::Column::Id.is_in(ids.to_owned()))
       .exec(&self.db)
       .await?;
+    self.search_actor_handle.index().await;
     Ok(deleted.rows_affected)
   }
 
@@ -374,6 +390,15 @@ impl DbManager {
       .collect()
   }
 
+  pub async fn search_tracks(&self, query: &str) -> Result<Vec<abi::Track>, MusyncError> {
+    let tracks = self.search_actor_handle.search(query.to_owned()).await?;
+    let tracks = Track::find()
+      .filter(entity::track::Column::Id.is_in(tracks))
+      .all(&self.db)
+      .await?;
+    Ok(tracks.into_iter().map(abi::Track::from_entity).collect())
+  }
+
   pub async fn track(&self, id: TrackId) -> Result<abi::Track, MusyncError> {
     let row = Track::find_by_id(id)
       .one(&self.db)
@@ -390,6 +415,7 @@ impl DbManager {
   }
 }
 
+/// Player
 impl DbManager {
   pub async fn create_play_queue(
     &self,
@@ -524,6 +550,8 @@ impl DbManager {
     }
   }
 }
+
+/// User
 impl DbManager {
   pub async fn create_user(&self, user: abi::User) -> Result<abi::User, MusyncError> {
     let mut updating = user.clone();
@@ -622,6 +650,7 @@ impl DbManager {
 
 #[cfg(test)]
 mod tests {
+  use jieba_rs::Jieba;
   use migration::{Migrator, MigratorTrait};
 
   use sea_orm::Database;
@@ -638,7 +667,7 @@ mod tests {
   pub async fn init_manager() -> DbManager {
     let db = Database::connect("sqlite::memory:").await.unwrap();
     Migrator::refresh(&db).await.unwrap();
-    DbManager::new(db)
+    DbManager::new(db, PathBuf::from("./target/test_data"))
   }
 
   pub async fn create_test_user(manager: &DbManager) -> abi::User {
@@ -898,5 +927,20 @@ mod tests {
       .unwrap();
     assert_eq!(users.len(), 1);
     assert_eq!(users[0].id, user.id);
+  }
+
+  #[test]
+  fn jieba_test() {
+    let jieba = Jieba::new();
+    let words = jieba.cut("我们中出了一个叛徒this is a word sentence with", true);
+    println!("{:?}", words);
+    let words = jieba.cut("我们中出了一个叛徒this is a word sentence with", false);
+    println!("{:?}", words);
+    let words = jieba.cut_all("我们中出了一个叛徒this is a word sentence with");
+    println!("{:?}", words);
+    let words = jieba.cut_for_search("我们中出了一个叛徒this is a word sentence with", true);
+    println!("{:?}", words);
+    let words = jieba.cut_for_search("我们中出了一个叛徒this is a word sentence with", false);
+    println!("{:?}", words);
   }
 }

@@ -310,6 +310,14 @@ message UpdatePlayerEvent {
   uint32 progress = 3;
 }
 
+message SearchAllRequest {
+  string query = 1;
+}
+
+message SearchAllResponse {
+  repeated Track tracks = 1;
+}
+
 // Musync service
 service MusyncService {
   rpc Login(LoginRequest) returns (Token);
@@ -338,4 +346,6 @@ service MusyncService {
   rpc QueryUsers(QueryUsersRequest) returns (stream User);
   rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse);
   rpc DeleteUsers(DeleteUsersRequest) returns (stream User);
+  
+  rpc SearchAll(SearchAllRequest) returns (SearchAllResponse);
 }

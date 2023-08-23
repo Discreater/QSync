@@ -1,9 +1,11 @@
+import type { RouteRecordRaw } from 'vue-router';
 import Home from './Home.vue';
 import MusicLib from './MusicLib.vue';
 import Settings from './Settings.vue';
 import Source from './Source.vue';
 import PlayQueue from './PlayQueue.vue';
 import Account from './Account.vue';
+import SearchResult from './SearchResult.vue';
 
 export const routes = [
   {
@@ -24,4 +26,7 @@ export const routes = [
   {
     path: '/play-queue', component: PlayQueue, name: 'play-queue',
   },
-];
+  {
+    path: '/search-result', component: SearchResult, name: 'search-result', props: route => ({ query: route.query.q }),
+  },
+] as RouteRecordRaw[];

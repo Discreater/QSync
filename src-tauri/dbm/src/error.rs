@@ -30,12 +30,17 @@ pub enum MusyncError {
 
   #[error("Folder {0} exists")]
   FolderExists(String),
+
+  #[error("Search actor error")]
+  SearchActor,
 }
 impl From<MusyncError> for tonic::Status {
   fn from(value: MusyncError) -> Self {
     error!("{}", value.to_string());
     match value {
-      MusyncError::Unknown | MusyncError::SeaOrm(_) => Status::internal("unknown"),
+      MusyncError::Unknown | MusyncError::SeaOrm(_) | MusyncError::SearchActor => {
+        Status::internal("unknown")
+      }
       MusyncError::PlaylistNotFound(_)
       | MusyncError::PlayQueueNotFound(_)
       | MusyncError::FolderNotFound(_)

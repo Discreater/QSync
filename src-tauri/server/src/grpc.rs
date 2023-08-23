@@ -7,8 +7,9 @@ use abi::{
   DeleteUsersRequest, GetPlayQueueRequest, GetTrackCoverRequest, GetTrackRequest, LocalFolder,
   LoginRequest, Picture, PlayQueue, Playlist, QueryLocalFoldersRequest, QueryPlaylistsRequest,
   QueryTracksRequest, QueryUsersRequest, RemoveLocalFolderRequest, RemoveLocalFolderResponse,
-  Token, Track, UpdatePlayQueueEvent, UpdatePlaylistRequest, UpdatePlaylistResponse,
-  UpdateTrackRequest, UpdateTrackResponse, UpdateUserRequest, UpdateUserResponse, User,
+  SearchAllRequest, SearchAllResponse, Token, Track, UpdatePlayQueueEvent, UpdatePlaylistRequest,
+  UpdatePlaylistResponse, UpdateTrackRequest, UpdateTrackResponse, UpdateUserRequest,
+  UpdateUserResponse, User,
 };
 use chrono::{Days, Utc};
 use dbm::UserId;
@@ -241,6 +242,12 @@ impl abi::musync_service_server::MusyncService for GrpcServer {
     _request: Request<DeleteUsersRequest>,
   ) -> GrpcResult<Self::DeleteUsersStream> {
     unimplemented!()
+  }
+
+  async fn search_all(&self, request: Request<SearchAllRequest>) -> GrpcResult<SearchAllResponse> {
+    let req = request.into_inner();
+    let tracks = self.db.search_tracks(&req.query).await?;
+    Ok(Response::new(SearchAllResponse { tracks }))
   }
 }
 

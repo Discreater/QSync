@@ -22,7 +22,9 @@ impl From<dbm::MusyncError> for HttpError {
   fn from(e: dbm::MusyncError) -> Self {
     error!("MusyncError: {e}");
     match e {
-      dbm::MusyncError::Unknown | dbm::MusyncError::SeaOrm(_) => HttpError::Internal,
+      dbm::MusyncError::Unknown | dbm::MusyncError::SeaOrm(_) | dbm::MusyncError::SearchActor => {
+        HttpError::Internal
+      }
       dbm::MusyncError::PlaylistNotFound(_)
       | dbm::MusyncError::PlayQueueNotFound(_)
       | dbm::MusyncError::FolderNotFound(_)

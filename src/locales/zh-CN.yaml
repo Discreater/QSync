@@ -34,3 +34,8 @@ account:
   logout: 注销
   login: 登录
   username: 用户名
+nav:
+  search: 搜索
+search-result:
+  title: 搜索结果
+  track: 歌曲

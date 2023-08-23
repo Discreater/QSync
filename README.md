@@ -10,6 +10,9 @@
 - [x] Sync play through websocket
 - [x] Unified Track ID
 - [x] [Media Session API](https://developer.mozilla.org/en-US/docs/Web/API/MediaSession)
+- Search Music
+   - [x] Local
+   - [ ] Remote
 - [ ] Remote Music Library
    - Netease
    - QQ Music
@@ -30,6 +33,7 @@
 ## FIXME
 - [x] Need to consider loading time, pause local player when loading. (Preload?)
    - Renew the progress after track loaded.
+- [ ] Reduce the frequency of rebuilding the tantivy index.
 
 ## Tech Stack
 

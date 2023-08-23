@@ -11,7 +11,7 @@ import IconSpinner from '~icons/fluent/spinner-ios-20-regular';
 import IconFolder from '~icons/fluent/folder-24-regular';
 import IconDelete from '~icons/fluent/delete-24-regular';
 import { useQSyncStore } from '~/store';
-import QInput from '~/components/QInput.vue';
+import QInputRow from '~/components/QInputRow.vue';
 import { JellyfinClient } from '~/sources/jellyfin';
 import QSelect from '~/components/QSelect.vue';
 import LongButton from '~/components/LongButton.vue';
@@ -97,14 +97,14 @@ async function addAccount() {
         </LongButton>
         <div class="w-full border-white/20 border-b" />
         <div class="flex flex-col gap-2">
-          <QInput
+          <QInputRow
             v-if="sourceType === 'local'" id="directory" v-model:value="directory" :label="t('source.directory')"
             type="directory"
           />
           <template v-if="sourceType === 'jellyfin'">
-            <QInput id="server" v-model="server" :label="t('source.server')" type="url" placeholder="localhost:8096" />
-            <QInput id="username" v-model="username" :label="t('source.user')" type="text" />
-            <QInput id="password" v-model="password" :label="t('source.pwd')" type="password" />
+            <QInputRow id="server" v-model="server" :label="t('source.server')" type="url" placeholder="localhost:8096" />
+            <QInputRow id="username" v-model="username" :label="t('source.user')" type="text" />
+            <QInputRow id="password" v-model="password" :label="t('source.pwd')" type="password" />
           </template>
         </div>
         <div class="flex justify-end gap-2">

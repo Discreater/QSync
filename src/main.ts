@@ -5,7 +5,7 @@ import messages from '@intlify/unplugin-vue-i18n/messages';
 import { pinia, useQSyncStore } from './store';
 
 import App from './App.vue';
-import { router } from './router';
+import { router } from './pages/router';
 import { ApiClient } from './api/client';
 
 const app = createApp(App);

@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import { routes as mainRoutes } from './pages/main/router';
-import Main from './pages/Main.vue';
-import Lyric from './pages/Lyric.vue';
+import { routes as mainRoutes } from './main/router';
+import Main from './Main.vue';
+import Lyric from './Lyric.vue';
 
 export const router = createRouter({
   routes: [

@@ -397,6 +397,14 @@ export interface UpdatePlayerEvent {
   progress: number;
 }
 
+export interface SearchAllRequest {
+  query: string;
+}
+
+export interface SearchAllResponse {
+  tracks: Track[];
+}
+
 function createBasePlaylist(): Playlist {
   return { id: 0, ownerId: 0, trackIds: [], name: "", description: "", createdAt: undefined, updatedAt: undefined };
 }
@@ -3863,6 +3871,120 @@ export const UpdatePlayerEvent = {
   },
 };
 
+function createBaseSearchAllRequest(): SearchAllRequest {
+  return { query: "" };
+}
+
+export const SearchAllRequest = {
+  encode(message: SearchAllRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.query !== "") {
+      writer.uint32(10).string(message.query);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): SearchAllRequest {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseSearchAllRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.query = reader.string();
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): SearchAllRequest {
+    return { query: isSet(object.query) ? String(object.query) : "" };
+  },
+
+  toJSON(message: SearchAllRequest): unknown {
+    const obj: any = {};
+    if (message.query !== "") {
+      obj.query = message.query;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<SearchAllRequest>, I>>(base?: I): SearchAllRequest {
+    return SearchAllRequest.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<SearchAllRequest>, I>>(object: I): SearchAllRequest {
+    const message = createBaseSearchAllRequest();
+    message.query = object.query ?? "";
+    return message;
+  },
+};
+
+function createBaseSearchAllResponse(): SearchAllResponse {
+  return { tracks: [] };
+}
+
+export const SearchAllResponse = {
+  encode(message: SearchAllResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    for (const v of message.tracks) {
+      Track.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): SearchAllResponse {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseSearchAllResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.tracks.push(Track.decode(reader, reader.uint32()));
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): SearchAllResponse {
+    return { tracks: Array.isArray(object?.tracks) ? object.tracks.map((e: any) => Track.fromJSON(e)) : [] };
+  },
+
+  toJSON(message: SearchAllResponse): unknown {
+    const obj: any = {};
+    if (message.tracks?.length) {
+      obj.tracks = message.tracks.map((e) => Track.toJSON(e));
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<SearchAllResponse>, I>>(base?: I): SearchAllResponse {
+    return SearchAllResponse.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<SearchAllResponse>, I>>(object: I): SearchAllResponse {
+    const message = createBaseSearchAllResponse();
+    message.tracks = object.tracks?.map((e) => Track.fromPartial(e)) || [];
+    return message;
+  },
+};
+
 /** Musync service */
 export interface MusyncService {
   Login(request: DeepPartial<LoginRequest>, metadata?: grpc.Metadata): Promise<Token>;
@@ -3900,6 +4022,7 @@ export interface MusyncService {
   QueryUsers(request: DeepPartial<QueryUsersRequest>, metadata?: grpc.Metadata): Observable<User>;
   UpdateUser(request: DeepPartial<UpdateUserRequest>, metadata?: grpc.Metadata): Promise<UpdateUserResponse>;
   DeleteUsers(request: DeepPartial<DeleteUsersRequest>, metadata?: grpc.Metadata): Observable<User>;
+  SearchAll(request: DeepPartial<SearchAllRequest>, metadata?: grpc.Metadata): Promise<SearchAllResponse>;
 }
 
 export class MusyncServiceClientImpl implements MusyncService {
@@ -3927,6 +4050,7 @@ export class MusyncServiceClientImpl implements MusyncService {
     this.QueryUsers = this.QueryUsers.bind(this);
     this.UpdateUser = this.UpdateUser.bind(this);
     this.DeleteUsers = this.DeleteUsers.bind(this);
+    this.SearchAll = this.SearchAll.bind(this);
   }
 
   Login(request: DeepPartial<LoginRequest>, metadata?: grpc.Metadata): Promise<Token> {
@@ -4022,6 +4146,10 @@ export class MusyncServiceClientImpl implements MusyncService {
 
   DeleteUsers(request: DeepPartial<DeleteUsersRequest>, metadata?: grpc.Metadata): Observable<User> {
     return this.rpc.invoke(MusyncServiceDeleteUsersDesc, DeleteUsersRequest.fromPartial(request), metadata);
+  }
+
+  SearchAll(request: DeepPartial<SearchAllRequest>, metadata?: grpc.Metadata): Promise<SearchAllResponse> {
+    return this.rpc.unary(MusyncServiceSearchAllDesc, SearchAllRequest.fromPartial(request), metadata);
   }
 }
 
@@ -4477,6 +4605,29 @@ export const MusyncServiceDeleteUsersDesc: UnaryMethodDefinitionish = {
   responseType: {
     deserializeBinary(data: Uint8Array) {
       const value = User.decode(data);
+      return {
+        ...value,
+        toObject() {
+          return value;
+        },
+      };
+    },
+  } as any,
+};
+
+export const MusyncServiceSearchAllDesc: UnaryMethodDefinitionish = {
+  methodName: "SearchAll",
+  service: MusyncServiceDesc,
+  requestStream: false,
+  responseStream: false,
+  requestType: {
+    serializeBinary() {
+      return SearchAllRequest.encode(this).finish();
+    },
+  } as any,
+  responseType: {
+    deserializeBinary(data: Uint8Array) {
+      const value = SearchAllResponse.decode(data);
       return {
         ...value,
         toObject() {

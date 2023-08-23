@@ -16,7 +16,14 @@ migration = { path = "../migration" }
 entity = { path = "../entity" }
 chrono = "0.4.26"
 tonic = "0.9.2"
+jieba-rs = "0.6"
+tokio = { version = "1.25.0", features = ["full"] }
+tokio-stream = "0.1"
+tantivy = "0.20.2"
+utils = { path = "../utils" }
+debounced = { git = "https://github.com/Discreater/debounced" }
+futures-channel = { version = "0.3.25", features = ["sink"] }
+futures-util = { version = "0.3.25", default-features = false, features = ["sink"] }
 
 [dev-dependencies]
-tokio = { version = "1.25.0", features = ["full"] }
 tracing-subscriber = "0.3.16"

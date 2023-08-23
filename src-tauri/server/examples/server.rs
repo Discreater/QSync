@@ -1,4 +1,4 @@
-use std::net::SocketAddr;
+use std::{net::SocketAddr, path::PathBuf};
 
 fn init_tracing() {
   tracing_subscriber::fmt()
@@ -17,7 +17,9 @@ async fn main() {
     std::fs::File::create(sqlite_file).unwrap();
   }
   let sqlite_url: String = format!("sqlite://{}", sqlite_file);
-  let server = server::Server::serve(&addr, &sqlite_url).await.unwrap();
+  let server = server::Server::serve(&addr, &sqlite_url, PathBuf::from("../target/data/server"))
+    .await
+    .unwrap();
 
-  tokio::join!(server.join_handle).0.unwrap().unwrap();
+  server.join_handle.await.unwrap().unwrap();
 }
