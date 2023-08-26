@@ -12,9 +12,12 @@ const app = createApp(App);
 
 app.use(pinia);
 
-ApiClient.set('127.0.0.1:8396');
+const host = window.location.hostname.split(':')[0];
+
+ApiClient.set(`${host}:8396`);
 
 const store = useQSyncStore();
+store.updateFoldersFromRemote();
 
 const i18n = createI18n({
   legacy: false,

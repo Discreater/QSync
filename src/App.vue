@@ -4,6 +4,7 @@ import { computed, onMounted, onUnmounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import SmoothScrollbar from 'smooth-scrollbar';
 import { useRoute } from 'vue-router';
+import { breakpointsTailwind, useBreakpoints } from '@vueuse/core';
 import { getPlatform, inTauri } from './platforms';
 import { useQSyncStore } from './store';
 import QPlayer from './components/QPlayer.vue';
@@ -53,12 +54,16 @@ qsyncStore.$subscribe((_mutation, state) => {
   i18nLocale.value = state.locale;
 });
 
+const breakPoints = useBreakpoints(breakpointsTailwind);
+const inPhone = breakPoints.smaller('sm');
+
 const route = useRoute();
-const denseTitle = computed(() => route.name === 'lyric');
+const denseTitle = computed(() => route.name === 'lyric' || inPhone.value);
 </script>
 
 <template>
   <div
+    id="qsync"
     :class="`w-full h-full max-h-screen flex flex-col
      text-black dark:text-white bg-main_w_bg dark:bg-main_d_bg ${getPlatform() !== 'web' ? 'border-white/10 border' : ''} `"
   >

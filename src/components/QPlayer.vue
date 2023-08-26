@@ -270,7 +270,7 @@ function setMediaSessionHandler() {
 </script>
 
 <template>
-  <div class="h-[118px] flex flex-col border-solid border-t border-black/30 gap-1 p-1">
+  <div class="h-player flex flex-col border-solid border-t border-black/30 gap-1 p-1">
     <QSlider class="px-3" :value="localProgress" :min="0" :max="duration" @update:value="onSliderUpdate">
       <template #left="{ value }">
         <span class="text-xs w-14"> {{ formatTime(value, 'hh:mm:ss') }} </span>

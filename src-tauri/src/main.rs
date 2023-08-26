@@ -8,6 +8,7 @@ use std::net::SocketAddr;
 use server::Server;
 use tauri::{Manager, State};
 use tracing::{info, Level};
+use tracing_subscriber::EnvFilter;
 
 mod error;
 
@@ -18,7 +19,14 @@ fn greet(name: &str) -> String {
 
 fn init_tracing() {
   tracing_subscriber::fmt()
-    .with_max_level(Level::DEBUG)
+    .with_env_filter(
+      EnvFilter::from_default_env()
+        .add_directive(Level::WARN.into())
+        .add_directive("server=debug".parse().unwrap())
+        .add_directive("dbm=debug".parse().unwrap())
+        .add_directive("abi=debug".parse().unwrap())
+        .add_directive("entity=debug".parse().unwrap()),
+    )
     .init();
 }
 
@@ -31,7 +39,9 @@ fn main() {
     .invoke_handler(tauri::generate_handler![greet, get_server,])
     .setup(|app| {
       let path_resolver = app.path_resolver();
-      let resource_path = path_resolver.resolve_resource("../.env").expect("failed to resolve `.env`");
+      let resource_path = path_resolver
+        .resolve_resource("../.env")
+        .expect("failed to resolve `.env`");
       dotenvy::from_filename(resource_path).expect(".env file resolve failed");
       let data_dir = path_resolver
         .app_data_dir()
@@ -42,7 +52,7 @@ fn main() {
       }
       let db_url = format!("sqlite://{}", db_file.to_string_lossy());
       info!("db_url: {}", db_url);
-      let addr = SocketAddr::from(([127, 0, 0, 1], 8396));
+      let addr = SocketAddr::from(([0, 0, 0, 0], 8396));
       let server = tauri::async_runtime::block_on(Server::serve(&addr, &db_url, data_dir)).unwrap();
       app.manage(ServerState { server });
       Ok(())

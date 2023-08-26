@@ -5,10 +5,6 @@ module.exports = {
     './src/**/*.{vue,js,ts,jsx,tsx}',
   ],
   theme: {
-    screens: {
-      sm: '666px',
-      md: '864px',
-    },
     extend: {
       colors: {
         main_w_bg: '#f9f9f9',
@@ -21,6 +17,10 @@ module.exports = {
       },
       transitionProperty: {
         position: 'top, bottom',
+      },
+      spacing: {
+        title: '32px',
+        player: '118px',
       },
     },
   },

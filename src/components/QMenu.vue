@@ -9,13 +9,13 @@ const props = defineProps<{
   bottom?: Item[]
   defaultActivated?: ItemKey | null
   activated?: ItemKey | null
-  responsible?: boolean
+  onlyIcon?: boolean
 }>();
 const emit = defineEmits<{
   'itemClick': [item: Item]
 }>();
 
-const { top, bottom, activated: _activated, responsible } = toRefs(props);
+const { top, bottom, activated: _activated } = toRefs(props);
 
 const { t } = useI18n();
 
@@ -44,7 +44,7 @@ function handleItemClick(item: Item) {
 </script>
 
 <template>
-  <div :class="`h-full relative select-none ${responsible ? 'hidden sm:flex md:flex' : ''} flex-col justify-between`">
+  <div class="h-full relative select-none flex flex-col justify-between">
     <div
       class="transition-position duration-400 absolute w-[3px] h-5 my-2.5 rounded-md bg-passion" :style="{
         top: handlerTop,
@@ -52,7 +52,7 @@ function handleItemClick(item: Item) {
     />
     <div>
       <MenuItem
-        v-for="item in top" :key="item.key" :selected="item.key === activated" :name="t(item.name)" :responsible="responsible"
+        v-for="item in top" :key="item.key" :selected="item.key === activated" :name="t(item.name)" :only-icon="onlyIcon"
         @click="handleItemClick(item)"
       >
         <Component :is="item.icon" class="text-xl" />
@@ -60,7 +60,7 @@ function handleItemClick(item: Item) {
     </div>
     <div>
       <MenuItem
-        v-for="item in bottom" :key="item.key" :selected="item.key === activated" :name="t(item.name)" :responsible="responsible"
+        v-for="item in bottom" :key="item.key" :selected="item.key === activated" :name="t(item.name)" :only-icon="onlyIcon"
         @click="handleItemClick(item)"
       >
         <Component :is="item.icon" class="text-xl" />

@@ -41,7 +41,10 @@ impl abi::musync_service_server::MusyncService for GrpcServer {
     let req = req.into_inner();
     let res = self.db.login(req).await.map_err(|e| match e {
       dbm::MusyncError::LoginFailed(_) => Status::not_found("User not found"),
-      _ => Status::internal("Unknown error"),
+      e => {
+        error!("login failed: {}", e);
+        Status::internal("unknown error")
+      }
     })?;
 
     let claims = Claims {
