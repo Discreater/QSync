@@ -33,6 +33,8 @@ jobs:
           node-version: 16
       - name: Setup pnpm
         uses: pnpm/action-setup@v2.4.0
+        with:
+          version: latest
       - name: Get pnpm store directory
         shell: bash
         run: |

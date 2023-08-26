@@ -22,6 +22,7 @@ import { formatTime } from '~/utils';
 import { ApiClient } from '~/api/client';
 import type { Track } from '~/generated/protos/musync';
 import { TrackExt } from '~/model_ext/track';
+import { getPlatform } from '~/platforms';
 
 const router = useRouter();
 const route = useRoute();
@@ -220,47 +221,51 @@ watch(currentTrack, (track) => {
 });
 
 function updateMediaSession(track: Track | undefined) {
-  if (track) {
-    navigator.mediaSession.metadata = new MediaMetadata({
-      title: track.title,
-      artist: track.artist,
-      album: track.album,
-      artwork: [
-        {
-          src: ApiClient.get().cover_uri(track.id),
-        },
-      ],
-    });
-  } else {
-    navigator.mediaSession.metadata = null;
+  if (getPlatform() === 'web') {
+    if (track) {
+      navigator.mediaSession.metadata = new MediaMetadata({
+        title: track.title,
+        artist: track.artist,
+        album: track.album,
+        artwork: [
+          {
+            src: ApiClient.get().cover_uri(track.id),
+          },
+        ],
+      });
+    } else {
+      navigator.mediaSession.metadata = null;
+    }
   }
 }
 
 function setMediaSessionHandler() {
-  navigator.mediaSession.setActionHandler('play', () => {
-    playerStore.resumeTrack();
-  });
-  navigator.mediaSession.setActionHandler('pause', () => {
-    playerStore.pauseTrack();
-  });
-  navigator.mediaSession.setActionHandler('seekforward', (details) => {
-    if (details.seekOffset)
-      logger.trace(`seek forward: ${details.seekOffset}`);
-  });
-  navigator.mediaSession.setActionHandler('seekbackward', (details) => {
-    if (details.seekOffset)
-      logger.trace(`seek backward: ${details.seekOffset}`);
-  });
-  navigator.mediaSession.setActionHandler('seekto', (details) => {
-    if (details.seekTime)
-      logger.trace(`seek to: ${details.seekTime}`);
-  });
-  navigator.mediaSession.setActionHandler('previoustrack', () => {
-    qsyncStore.previousTrack();
-  });
-  navigator.mediaSession.setActionHandler('nexttrack', () => {
-    qsyncStore.nextTrack(true);
-  });
+  if (getPlatform() === 'web') {
+    navigator.mediaSession.setActionHandler('play', () => {
+      playerStore.resumeTrack();
+    });
+    navigator.mediaSession.setActionHandler('pause', () => {
+      playerStore.pauseTrack();
+    });
+    navigator.mediaSession.setActionHandler('seekforward', (details) => {
+      if (details.seekOffset)
+        logger.trace(`seek forward: ${details.seekOffset}`);
+    });
+    navigator.mediaSession.setActionHandler('seekbackward', (details) => {
+      if (details.seekOffset)
+        logger.trace(`seek backward: ${details.seekOffset}`);
+    });
+    navigator.mediaSession.setActionHandler('seekto', (details) => {
+      if (details.seekTime)
+        logger.trace(`seek to: ${details.seekTime}`);
+    });
+    navigator.mediaSession.setActionHandler('previoustrack', () => {
+      qsyncStore.previousTrack();
+    });
+    navigator.mediaSession.setActionHandler('nexttrack', () => {
+      qsyncStore.nextTrack(true);
+    });
+  }
 }
 </script>
 
@@ -278,7 +283,7 @@ function setMediaSessionHandler() {
     </QSlider>
     <div class="grow flex justify-between items-center p-1">
       <div class="flex-1 h-full flex overflow-hidden">
-        <HoverLayer class="flex select-none cursor-default min-w-0" @click="onInfoCardClick()">
+        <HoverLayer v-if="currentTrack" class="flex select-none cursor-default min-w-0" @click="onInfoCardClick()">
           <img
             v-if="showCardImg" :src="currentTrack ? ApiClient.get().cover_uri(currentTrack.id) : ''"
             class="object-scale-down w-20 border-white/10 bord er"

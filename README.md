@@ -50,7 +50,7 @@
 
 ## Build
 
-- Create `src-tauri/.env` file and add env variables
+- Create `.env` file and add env variables
    ```env
    DATABASE_URL=sqlite://./target/db.sqlite3
    JWT_SECRET=JJJWWW
@@ -64,7 +64,7 @@
    protoc --plugin=./node_modules/.bin/protoc-gen-ts_proto --ts_proto_out=./src/generated --ts_proto_opt=esModuleInterop=true --ts_proto_opt=outputClientImpl=grpc-web ./protos/musync.proto
    ```
 
-## Run
+## Run in Web
 
 Server will run on `localhost:8396`.
 
@@ -79,4 +79,9 @@ cargo run --example server
 ### Web
 ```
 pnpm dev
+```
+
+## Run in Tauri client
+```
+pnpm tauri dev
 ```

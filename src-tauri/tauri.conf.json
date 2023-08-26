@@ -31,7 +31,7 @@
         "removeDir": false,
         "removeFile": false,
         "renameFile": true,
-        "scope": [],
+        "scope": ["$RESOURCE/*"],
         "writeFile": false
       },
       "window": {
@@ -51,6 +51,9 @@
     },
     "bundle": {
       "active": true,
+      "appimage": {
+        "bundleMediaFramework": false
+      },
       "category": "DeveloperTool",
       "copyright": "",
       "deb": {
@@ -73,7 +76,9 @@
         "providerShortName": null,
         "signingIdentity": null
       },
-      "resources": [],
+      "resources": [
+        "../.env"
+      ],
       "shortDescription": "",
       "targets": "all",
       "windows": {
@@ -83,7 +88,7 @@
       }
     },
     "security": {
-      "csp": "default-src 'self'; img-src 'self' asset: https://asset.localhost"
+      "csp": "null"
     },
     "updater": {
       "active": false
@@ -98,7 +103,7 @@
         "resizable": true,
         "title": "QSync",
         "decorations": false,
-        "transparent": true
+        "transparent": false
       }
     ]
   }

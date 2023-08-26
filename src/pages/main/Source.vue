@@ -56,12 +56,14 @@ async function addAccount() {
     // });
   } else if (sourceType.value === 'local') {
     let path;
-    if (getPlatform() === 'web')
-      path = 'D:\\media\\music';
-    else if (directory.value)
+    if (getPlatform() === 'web') {
+      // path = 'D:\\media\\music';
+      path = '/mnt/wd/音乐/';
+    } else if (directory.value) {
       path = directory.value;
-    else
+    } else {
       return;
+    }
 
     store.addMusicFolder(path);
     showAddModel.value = false;

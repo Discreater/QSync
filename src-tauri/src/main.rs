@@ -24,15 +24,19 @@ fn init_tracing() {
 
 fn main() {
   init_tracing();
+  // load envrionment
+  // dotenvy::dotenv().expect(".env file not found");
   tauri::Builder::default()
     .plugin(tauri_plugin_window_state::Builder::default().build())
     .invoke_handler(tauri::generate_handler![greet, get_server,])
     .setup(|app| {
-      let data_dir = app
-        .path_resolver()
+      let path_resolver = app.path_resolver();
+      let resource_path = path_resolver.resolve_resource("../.env").expect("failed to resolve `.env`");
+      dotenvy::from_filename(resource_path).expect(".env file resolve failed");
+      let data_dir = path_resolver
         .app_data_dir()
         .expect("failed to resolve app data dir");
-      let db_file = data_dir.join("db.sqlite");
+      let db_file: std::path::PathBuf = data_dir.join("db.sqlite");
       if !db_file.exists() {
         std::fs::File::create(&db_file)?;
       }
