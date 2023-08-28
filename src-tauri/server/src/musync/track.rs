@@ -9,6 +9,10 @@ pub(crate) fn get_track_info(path: &str) -> abi::Track {
     }),
     ..Default::default()
   };
+  let filename = {
+    let filename = std::path::Path::new(path).file_name().unwrap();
+    filename.to_str().unwrap().to_string()
+  };
   if let Ok(probe) = lofty::Probe::open(path) {
     if let Ok(tagged_file) = probe.read() {
       let properties = tagged_file.properties();
@@ -20,18 +24,14 @@ pub(crate) fn get_track_info(path: &str) -> abi::Track {
         }
         song.artist = tag.artist().map(Cow::into_owned);
         song.album = tag.album().map(Cow::into_owned);
-        song.title = tag
-          .title()
-          .map(Cow::into_owned)
-          .filter(|s| s.is_empty())
-          .unwrap_or_else(|| {
-            let filename = std::path::Path::new(path).file_name().unwrap();
-            filename.to_str().unwrap().to_string()
-          });
+        song.title = tag.title().map(Cow::into_owned).unwrap_or_default();
         song.genre = tag.genre().map(Cow::into_owned);
         song.year = tag.year();
       }
     }
+  }
+  if song.title.is_empty() {
+    song.title = filename;
   }
   song
 }

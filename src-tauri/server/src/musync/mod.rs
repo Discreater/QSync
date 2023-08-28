@@ -31,7 +31,7 @@ pub async fn get_track(
         mime_guess::from_path(src.path)
           .first()
           .map(|e| e.to_string())
-          .ok_or(HttpError::Internal)?,
+          .ok_or(HttpError::NotFound)?,
       ),
       (CACHE_CONTROL, "max-age=3600".to_owned()),
     ]);
