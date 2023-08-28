@@ -1,8 +1,9 @@
 use std::{borrow::Cow, fs};
 
 use lofty::{Accessor, AudioFile, ItemKey, TaggedFileExt};
+use tracing::warn;
 
-pub(crate) fn get_track_info(path: &str) -> abi::Track {
+pub(crate) fn get_track_info(path: &str) -> Option<abi::Track> {
   let mut song = abi::Track {
     local_src: Some(abi::LocalSource {
       path: path.to_string(),
@@ -28,12 +29,18 @@ pub(crate) fn get_track_info(path: &str) -> abi::Track {
         song.genre = tag.genre().map(Cow::into_owned);
         song.year = tag.year();
       }
+    } else {
+      warn!("unsupported media: {}", path);
+      return None;
     }
+  } else {
+    warn!("path not exists: {}", path);
+    return None;
   }
   if song.title.is_empty() {
     song.title = filename;
   }
-  song
+  Some(song)
 }
 
 pub(crate) fn get_track_pictures_internal(track: &abi::Track) -> Vec<lofty::Picture> {
@@ -75,7 +82,9 @@ fn add_track_from_folder(dir: &str, tracks: &mut Vec<abi::Track>) -> Option<()> 
     let path = entry.path();
     let path_str = path.to_str().unwrap();
     if path.is_file() {
-      tracks.push(get_track_info(path_str));
+      if let Some(track) = get_track_info(path_str) {
+        tracks.push(track);
+      }
     } else if path.is_dir() {
       add_track_from_folder(path_str, tracks);
     }
