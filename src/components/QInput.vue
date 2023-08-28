@@ -3,7 +3,7 @@ import { computed, ref } from 'vue';
 import QHoverButton from './QHoverButton.vue';
 import IconDismiss from '~icons/fluent/dismiss-12-regular';
 
-const props = defineProps<{ id: string; type: 'url' | 'text' | 'password'; placeholder?: string; value?: string; label?: string }>();
+const props = defineProps<{ id: string; type: 'url' | 'text' | 'password'; placeholder?: string; value?: string }>();
 const emit = defineEmits<{
   (e: 'update:value', value: string): void
 }>();

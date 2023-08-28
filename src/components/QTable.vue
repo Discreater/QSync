@@ -3,7 +3,6 @@ export interface Column {
   key: string
   title?: string
 };
-
 defineProps<{ columns: Column[]; data: Row[]; showHead?: boolean; rowClassName?: (row: Row) => string }>();
 </script>
 
@@ -19,8 +18,10 @@ defineProps<{ columns: Column[]; data: Row[]; showHead?: boolean; rowClassName?:
       </tr>
     </thead>
     <tbody>
-      <tr v-for="(row, rowIndex) in data" :key="rowIndex" :class="`${rowClassName?.(row)} group`">
-        <td v-for="col in columns" :key="col.key" :data-col-key="col.key" :class="`${rowIndex % 2 === 1 ? 'bg-highlight' : 'group-hover:bg-highlight'} border-x-2 border-transparent`">
+      <tr v-for="(row, rowIndex) in data" :key="rowIndex" :class="`${rowClassName?.(row)} ${rowIndex % 2 === 1 ? 'bg-highlight' : 'hover:bg-highlight'}`">
+        <td
+          v-for="col in columns" :key="col.key" :data-col-key="col.key" class="border-x-2 border-transparent"
+        >
           <slot name="bodyCell" :column="col" :row="row" :row-idx="rowIndex" />
         </td>
       </tr>

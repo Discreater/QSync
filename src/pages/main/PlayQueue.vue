@@ -26,24 +26,16 @@ const columns: Column[] = [
     key: 'actions',
   },
   {
-    title: 'Title',
     key: 'title',
+    title: 'Title',
   },
   {
-    title: 'Artist',
     key: 'artist',
+    title: 'Artist',
   },
   {
-    title: 'Album',
     key: 'album',
-  },
-  {
-    title: 'Year',
-    key: 'year',
-  },
-  {
-    title: 'Genre',
-    key: 'genre',
+    title: 'Album',
   },
   {
     key: 'duration',
@@ -71,12 +63,6 @@ const columns: Column[] = [
           </template>
           <template v-else-if="column.key === 'album'">
             {{ row.album }}
-          </template>
-          <template v-else-if="column.key === 'year'">
-            {{ row.year }}
-          </template>
-          <template v-else-if="column.key === 'genre'">
-            {{ row.genre }}
           </template>
           <template v-else-if="column.key === 'duration'">
             {{ row.duration != null ? formatTime(TrackExt.durationInSecs(row.duration)) : '' }}

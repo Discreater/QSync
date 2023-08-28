@@ -3,6 +3,7 @@ import Scrollbar from 'smooth-scrollbar';
 
 import { useI18n } from 'vue-i18n';
 import { onMounted, onUnmounted, ref } from 'vue';
+import { useRouter } from 'vue-router';
 import IconArrowShuffle from '~icons/fluent/arrow-shuffle-24-regular';
 import H1 from '~/components/typo/H1.vue';
 import Basic from '~/layouts/Basic.vue';
@@ -13,10 +14,10 @@ import QHoverButton from '~/components/QHoverButton.vue';
 import IconPlay from '~icons/fluent/play-24-regular';
 import IconLocation from '~icons/fluent/my-location-24-regular';
 import IconTop from '~icons/fluent/arrow-upload-24-regular';
-import QTable from '~/components/QTable.vue';
 import type { Column } from '~/components/QTable.vue';
 import type { Track } from '~/generated/protos/musync';
 import { usePlayerStore } from '~/store/player';
+import QTable from '~/components/QTable.vue';
 
 const { t } = useI18n();
 const store = useQSyncStore();
@@ -29,9 +30,6 @@ onMounted(() => {
     scrollbar.value = Scrollbar.init(container.value, {
       alwaysShowTracks: true,
     });
-    setTimeout(() => {
-      locateToPlaying();
-    }, 50);
   }
 });
 const views = ref(store.musicFolders.flatMap(folder => folder.tracks));
@@ -78,30 +76,28 @@ const columns: Column[] = [
     key: 'actions',
   },
   {
-    title: 'Title',
     key: 'title',
+    title: 'Title',
   },
   {
-    title: 'Artist',
     key: 'artist',
+    title: 'Artist',
   },
   {
-    title: 'Album',
     key: 'album',
-  },
-  {
-    title: 'Year',
-    key: 'year',
-  },
-  {
-    title: 'Genre',
-    key: 'genre',
+    title: 'Album',
   },
   {
     key: 'duration',
     title: 'Duration',
   },
 ];
+
+const router = useRouter();
+
+function handleTitleClick(track: Track) {
+  router.push({ name: 'track', query: { id: track.id } });
+}
 </script>
 
 <template>
@@ -118,14 +114,12 @@ const columns: Column[] = [
       <QTable :columns="columns" :data="views" :row-class-name="rowClassName">
         <template #bodyCell="{ column, row, rowIdx }">
           <template v-if="column.key === 'actions'">
-            <div>
-              <QHoverButton :icon="IconPlay" @click="playByIdx(rowIdx)" />
+            <div class="flex">
+              <QHoverButton :icon="IconPlay" class="text-passion" @click="playByIdx(rowIdx)" />
             </div>
           </template>
           <template v-else-if="column.key === 'title'">
-            <div>
-              {{ row.title }}
-            </div>
+            <QHoverButton :text="row.title" class="hover:text-passion text-left" @click="handleTitleClick(row)" />
           </template>
           <template v-else-if="column.key === 'artist'">
             <div>

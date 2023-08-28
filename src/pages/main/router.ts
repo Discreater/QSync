@@ -6,6 +6,7 @@ import Source from './Source.vue';
 import PlayQueue from './PlayQueue.vue';
 import Account from './Account.vue';
 import SearchResult from './SearchResult.vue';
+import Track from './Track.vue';
 
 export const routes = [
   {
@@ -28,5 +29,8 @@ export const routes = [
   },
   {
     path: '/search-result', component: SearchResult, name: 'search-result', props: route => ({ query: route.query.q }),
+  },
+  {
+    path: '/track', component: Track, name: 'track', props: route => ({ id: route.query.id }),
   },
 ] as RouteRecordRaw[];

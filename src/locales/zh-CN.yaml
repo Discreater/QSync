@@ -41,3 +41,12 @@ search-result:
   track: 歌曲
 player:
   unknown-artist: 未知歌手
+track:
+  track-info: 歌曲信息
+  title: 标题
+  artist: 歌手
+  album: 专辑
+  genre: 流派
+  year: 发行年份
+  local-src: 本地源
+  netease-src: 网易云源
