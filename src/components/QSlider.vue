@@ -94,11 +94,21 @@ input[type="range"]::-moz-range-thumb {
 
 /* Thumb: webkit */
 input[type="range"]::-webkit-slider-thumb:hover {
-  border: 0.3rem solid #454545;
+  border-width: 0.3rem;
+}
+
+/* Thumb: webkit */
+input[type="range"]::-webkit-slider-thumb:active {
+  border-width: 0.45rem;
 }
 
 /* Thumb: Firefox */
 input[type="range"]::-moz-range-thumb:hover {
-  border: 0.3rem solid #454545;
+  border-width: 0.3rem;
+}
+
+/* Thumb: Firefox */
+input[type="range"]::-moz-range-thumb:active {
+  border-width: 0.45rem;
 }
 </style>
