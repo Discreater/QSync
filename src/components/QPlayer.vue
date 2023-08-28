@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import { useI18n } from 'vue-i18n';
 import QHoverButton from './QHoverButton.vue';
 import QSlider from './QSlider.vue';
 import QPopover from './QPopover.vue';
 import HoverLayer from './HoverLayer.vue';
 import H2 from './typo/H2.vue';
+import QImage from './QImage.vue';
 import { sameTrack, useConfigStore, useQSyncStore } from '~/store';
 import { usePlayerStore } from '~/store/player';
 import { logger } from '~/utils/logger';
@@ -18,6 +20,7 @@ import IconRepeat from '~icons/fluent/arrow-repeat-all-24-regular';
 import IconVolume from '~icons/fluent/speaker-2-24-regular';
 import IconVolumeMute from '~icons/fluent/speaker-mute-24-regular';
 import IconMore from '~icons/fluent/more-horizontal-24-regular';
+import IconMusic from '~icons/fluent/music-note-2-24-regular';
 import { formatTime } from '~/utils';
 import { ApiClient } from '~/api/client';
 import type { Track } from '~/generated/protos/musync';
@@ -33,6 +36,7 @@ const playerStore = usePlayerStore();
 const configStore = useConfigStore();
 
 const currentTrack = ref<Track>();
+const unsupported = ref(false);
 
 // in seconds (float point)
 const localProgress = ref(0);
@@ -43,6 +47,7 @@ function loadTrack(track: Track) {
   const uri = ApiClient.get().track_uri(track.id);
   currentTrack.value = track;
   audio.value!.src = uri;
+  unsupported.value = false;
   if (track.duration)
     duration.value = TrackExt.durationInSecs(track.duration);
 
@@ -80,11 +85,17 @@ async function updatePlayer(pState: typeof playerStore) {
   }
   async function updateState(delayUpdate: boolean) {
     if (pState.playing && audio.value!.paused) {
-      if (!cannotPlay.value) {
+      if (!cannotPlay.value && !unsupported.value) {
         try {
           await audio.value!.play();
         } catch (e) {
           if (e instanceof DOMException) {
+            // No supported media type
+            if (e.message.match('no supported')) {
+              unsupported.value = true;
+              return;
+            }
+
             logger.info('mute play');
             toggleMute(true);
             try {
@@ -201,9 +212,17 @@ function onInfoCardClick() {
 }
 const showCardImg = computed(() => route.name !== 'lyric');
 
+const { t } = useI18n();
+
 function artistAlbum(view: Track | undefined) {
-  if (view)
-    return `${view.artist} • ${view.album}`;
+  if (view) {
+    if (view.artist && view.album)
+      return `${view.artist} • ${view.album}`;
+    else if (view.artist)
+      return view.artist;
+    else if (view.album)
+      return `${t('player.unknown-artist')} • view.album`;
+  }
 }
 
 function toggleMute(mute?: boolean) {
@@ -271,6 +290,7 @@ function setMediaSessionHandler() {
 
 <template>
   <div class="h-player flex flex-col border-solid border-t border-black/30 gap-1 p-1">
+    <!-- Progress slider -->
     <QSlider class="px-3" :value="localProgress" :min="0" :max="duration" @update:value="onSliderUpdate">
       <template #left="{ value }">
         <span class="text-xs w-14"> {{ formatTime(value, 'hh:mm:ss') }} </span>
@@ -283,12 +303,19 @@ function setMediaSessionHandler() {
     </QSlider>
     <div class="grow flex justify-between items-center p-1">
       <div class="flex-1 h-full flex overflow-hidden">
+        <!-- Track info (cover/title/artist...) -->
         <HoverLayer v-if="currentTrack" class="flex select-none cursor-default min-w-0" @click="onInfoCardClick()">
-          <img
+          <QImage
             v-if="showCardImg" :src="currentTrack ? ApiClient.get().cover_uri(currentTrack.id) : ''"
-            class="object-scale-down w-20 border-white/10 bord er"
+            class="object-scale-down w-20 h-20 border-white/10 border"
           >
-          <div :class="`flex flex-col min-w-0 transition-all duration-300 ${showCardImg ? 'ml-5' : 'ml-2 mr-3'}`">
+            <template #failed>
+              <div class="flex items-center justify-center h-full ">
+                <IconMusic class="text-3xl" />
+              </div>
+            </template>
+          </QImage>
+          <div class="flex flex-col min-w-0 transition-all duration-300" :class="showCardImg ? 'ml-5' : 'ml-2 mr-3'">
             <H2 class="truncate" :title="currentTrack?.title">
               {{ currentTrack?.title }}
             </H2>

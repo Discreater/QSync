@@ -16,6 +16,7 @@ const langOptions = [
 ];
 
 const breakPoints = useBreakpoints(breakpointsTailwind);
+const current = breakPoints.current();
 </script>
 
 <template>
@@ -25,7 +26,7 @@ const breakPoints = useBreakpoints(breakpointsTailwind);
       toggle dark
     </button>
     <p>
-      {{ breakPoints.current() }}
+      {{ current }}
     </p>
     <QSelect v-model:value="store.locale" :options="langOptions" />
   </Basic>

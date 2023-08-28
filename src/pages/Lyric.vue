@@ -2,8 +2,10 @@
 import { computed, ref } from 'vue';
 import { onBeforeRouteUpdate } from 'vue-router';
 import { ApiClient } from '~/api/client';
+import QImage from '~/components/QImage.vue';
 import type { TrackId } from '~/model_ext/track';
 import { getPlatform } from '~/platforms';
+import IconMusic from '~icons/fluent/music-note-2-24-regular';
 
 const props = defineProps<{ id?: string | number }>();
 const trackId = ref<TrackId>();
@@ -36,7 +38,13 @@ const picture_url = computed(() => {
     }"
   >
     <div class="flex items-end bg-gray-800/60 backdrop-blur-2xl w-full h-full">
-      <img :src="picture_url" :class="`ml-5 mb-5 w-72 rounded-lg ${picture_url ? '' : 'invisible'} ring-1 ring-white/10`">
+      <QImage :src="picture_url" class="ml-5 mb-5 w-72 h-72 rounded-lg ring-1 ring-white/10" :class="picture_url ? '' : 'invisible'">
+        <template #failed>
+          <div class="flex items-center justify-center h-full">
+            <IconMusic class="text-6xl" />
+          </div>
+        </template>
+      </QImage>
       <div class="grow">
         lyric
       </div>
