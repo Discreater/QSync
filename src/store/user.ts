@@ -24,6 +24,7 @@ export const useAccountStore = defineStore('account', {
           token,
           username: name,
         });
+        ApiClient.reset();
       }).catch((err) => {
         console.error(err);
       });

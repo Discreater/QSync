@@ -136,6 +136,11 @@ export class ApiClient {
     ApiClient.apiClient = new ApiClient(addr, accountStore.token);
   }
 
+  static reset() {
+    const addr = ApiClient.get().addr;
+    ApiClient.apiClient = new ApiClient(addr);
+  }
+
   track_uri(id: number): string {
     return `${this.http_addr}/assets/track/${id}`;
   }
