@@ -15,6 +15,7 @@ use chrono::{Days, Utc};
 use dbm::UserId;
 use futures::Stream;
 
+use ncmapi::NcmApi;
 use tonic::{Extensions, Request, Response, Status};
 use tracing::{error, trace};
 use utils::WithError;
@@ -24,11 +25,16 @@ use crate::{musync, user::Claims, ws::WsState};
 pub struct GrpcServer {
   db: dbm::DbManager,
   ws_state: Arc<WsState>,
+  ncm_api: Arc<NcmApi>,
 }
 
 impl GrpcServer {
   pub fn new(db: dbm::DbManager, ws_state: Arc<WsState>) -> Self {
-    Self { db, ws_state }
+    Self {
+      db,
+      ws_state,
+      ncm_api: Arc::new(NcmApi::default()),
+    }
   }
 }
 
@@ -56,7 +62,7 @@ impl abi::musync_service_server::MusyncService for GrpcServer {
     };
     let token = claims
       .encode()
-      .map_err(|_| Status::internal("token creation"))?;
+      .map_err(|_| Status::internal("token creation failed"))?;
     let res = Token {
       data: token,
       r#type: "Bearer".to_string(),
@@ -249,8 +255,18 @@ impl abi::musync_service_server::MusyncService for GrpcServer {
 
   async fn search_all(&self, request: Request<SearchAllRequest>) -> GrpcResult<SearchAllResponse> {
     let req = request.into_inner();
-    let tracks = self.db.search_tracks(&req.query).await?;
-    Ok(Response::new(SearchAllResponse { tracks }))
+    let db_search = self.db.search_tracks(&req.query);
+    let ncm_search = self.ncm_api.search(&req.query, None);
+    let (db_tracks, ncm_res) = tokio::join!(db_search, ncm_search);
+    let db_tracks = db_tracks?;
+    let ncm_res = match ncm_res {
+      Ok(res) => String::from_utf8_lossy(res.data()).into_owned(),
+      Err(e) => e.to_string(),
+    };
+    Ok(Response::new(SearchAllResponse {
+      db_tracks,
+      ncm_res,
+    }))
   }
 }
 

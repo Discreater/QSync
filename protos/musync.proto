@@ -315,7 +315,9 @@ message SearchAllRequest {
 }
 
 message SearchAllResponse {
-  repeated Track tracks = 1;
+  repeated Track db_tracks = 1;
+  // netease music search result
+  string ncm_res = 2;
 }
 
 // Musync service

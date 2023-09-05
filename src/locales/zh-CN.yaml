@@ -39,6 +39,8 @@ nav:
 search-result:
   title: 搜索结果
   track: 歌曲
+  local-track: 本地歌曲
+  netease-result: 网易云
 player:
   unknown-artist: 未知歌手
 track:

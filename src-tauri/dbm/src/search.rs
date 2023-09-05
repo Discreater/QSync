@@ -58,7 +58,7 @@ impl SearchActor {
     }
     Index::open_or_create(
       MmapDirectory::open(cache_data_folder).expect("open cache data folder failed"),
-      schema.clone(),
+      schema,
     )
     .expect("create index failed")
   }

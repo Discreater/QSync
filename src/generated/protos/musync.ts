@@ -402,7 +402,9 @@ export interface SearchAllRequest {
 }
 
 export interface SearchAllResponse {
-  tracks: Track[];
+  dbTracks: Track[];
+  /** netease music search result */
+  ncmRes: string;
 }
 
 function createBasePlaylist(): Playlist {
@@ -3929,13 +3931,16 @@ export const SearchAllRequest = {
 };
 
 function createBaseSearchAllResponse(): SearchAllResponse {
-  return { tracks: [] };
+  return { dbTracks: [], ncmRes: "" };
 }
 
 export const SearchAllResponse = {
   encode(message: SearchAllResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    for (const v of message.tracks) {
+    for (const v of message.dbTracks) {
       Track.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.ncmRes !== "") {
+      writer.uint32(18).string(message.ncmRes);
     }
     return writer;
   },
@@ -3952,7 +3957,14 @@ export const SearchAllResponse = {
             break;
           }
 
-          message.tracks.push(Track.decode(reader, reader.uint32()));
+          message.dbTracks.push(Track.decode(reader, reader.uint32()));
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.ncmRes = reader.string();
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -3964,13 +3976,19 @@ export const SearchAllResponse = {
   },
 
   fromJSON(object: any): SearchAllResponse {
-    return { tracks: Array.isArray(object?.tracks) ? object.tracks.map((e: any) => Track.fromJSON(e)) : [] };
+    return {
+      dbTracks: Array.isArray(object?.dbTracks) ? object.dbTracks.map((e: any) => Track.fromJSON(e)) : [],
+      ncmRes: isSet(object.ncmRes) ? String(object.ncmRes) : "",
+    };
   },
 
   toJSON(message: SearchAllResponse): unknown {
     const obj: any = {};
-    if (message.tracks?.length) {
-      obj.tracks = message.tracks.map((e) => Track.toJSON(e));
+    if (message.dbTracks?.length) {
+      obj.dbTracks = message.dbTracks.map((e) => Track.toJSON(e));
+    }
+    if (message.ncmRes !== "") {
+      obj.ncmRes = message.ncmRes;
     }
     return obj;
   },
@@ -3980,7 +3998,8 @@ export const SearchAllResponse = {
   },
   fromPartial<I extends Exact<DeepPartial<SearchAllResponse>, I>>(object: I): SearchAllResponse {
     const message = createBaseSearchAllResponse();
-    message.tracks = object.tracks?.map((e) => Track.fromPartial(e)) || [];
+    message.dbTracks = object.dbTracks?.map((e) => Track.fromPartial(e)) || [];
+    message.ncmRes = object.ncmRes ?? "";
     return message;
   },
 };

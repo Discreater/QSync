@@ -523,7 +523,10 @@ pub struct SearchAllRequest {
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct SearchAllResponse {
   #[prost(message, repeated, tag = "1")]
-  pub tracks: ::prost::alloc::vec::Vec<Track>,
+  pub db_tracks: ::prost::alloc::vec::Vec<Track>,
+  /// netease music search result
+  #[prost(string, tag = "2")]
+  pub ncm_res: ::prost::alloc::string::String,
 }
 /// Generated client implementations.
 pub mod musync_service_client {

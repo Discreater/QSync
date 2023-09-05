@@ -10,5 +10,5 @@ pub fn convert_to_timestamp(dt: &DateTime<Utc>) -> Timestamp {
 
 pub fn convert_from_timestamp(t: &Timestamp) -> Option<DateTime<Utc>> {
   let naive_dt = NaiveDateTime::from_timestamp_opt(t.seconds, t.nanos as u32);
-  naive_dt.map(|t| DateTime::<Utc>::from_utc(t, Utc))
+  naive_dt.map(|t| DateTime::<Utc>::from_naive_utc_and_offset(t, Utc))
 }

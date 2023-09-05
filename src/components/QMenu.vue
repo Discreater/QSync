@@ -22,6 +22,10 @@ const { t } = useI18n();
 const localActivated = ref(props.defaultActivated);
 const activated = computed(() => _activated?.value ?? localActivated.value);
 
+const noActivated = computed(() => (props.top.findIndex(i => i.key === activated.value) === -1
+                            && (props.bottom?.findIndex(i => i.key === activated.value) === -1))
+                            ?? false);
+
 const handlerTop = computed(() => {
   if (!activated.value)
     return 0;
@@ -46,6 +50,7 @@ function handleItemClick(item: Item) {
 <template>
   <div class="h-full relative select-none flex flex-col justify-between">
     <div
+      v-show="!noActivated"
       class="transition-position duration-400 absolute w-[3px] h-5 my-2.5 rounded-md bg-passion" :style="{
         top: handlerTop,
       }"

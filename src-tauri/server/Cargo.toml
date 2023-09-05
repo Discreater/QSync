@@ -22,9 +22,11 @@ hyper = "0.14.27"
 
 chrono = { version = "0.4.26", features = ["serde"] }
 serde = "1.0.183"
+serde_json = "1.0"
+
 thiserror = "1.0.46"
 lofty = "0.15.0"
-base64 = "0.21.2"
+base64 = "0.21"
 abi = { path = "../abi" }
 dbm = { path = "../dbm" }
 tracing = "0.1.37"
@@ -34,7 +36,8 @@ futures = "0.3.28"
 mime_guess = "2.0.4"
 dashmap = "5.5.1"
 utils = { path = "../utils" }
-# ncmapi = "0.1"
+# ncmapi = { path="../../../ncmapi-rs" }
+ncmapi = { git="https://github.com/Discreater/ncmapi-rs" }
 
 [dev-dependencies]
 tracing-subscriber = "0.3.16"
