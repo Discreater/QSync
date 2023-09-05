@@ -12,26 +12,46 @@ rust-version = "1.59"
 [workspace]
 members = [".", "abi", "dbm", "migration", "entity", "server", "utils"]
 
+[workspace.dependencies]
+tokio = "1.31.0"
+tokio-util = "0.7.8"
+tokio-stream = "0.1"
+prost = "0.12"
+prost-types = "0.12"
+tonic = "0.10"
+tonic-build = "0.10"
+tonic-web = "0.10"
+tracing = "0.1.37"
+tracing-subscriber = "0.3.16"
+sea-orm = "0.12"
+sea-orm-migration = "0.12"
+thiserror = "1"
+anyhow = "1"
+chrono = "0.4.28"
+serde = "1"
+serde_json = "1"
+futures = "0.3.28"
+futures-channel = "0.3.25"
+futures-util = "0.3.25"
+dotenvy = "0.15.7"
+
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [build-dependencies]
 tauri-build = { version = "1.2.1", features = [] }
 
 [dependencies]
-serde_json = "1.0"
-serde = { version = "1.0", features = ["derive"] }
+serde_json = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
 tauri = { version = "1.2.4", features = [ "protocol-asset", "fs-read-dir", "fs-rename-file", "fs-exists", "fs-read-file", "dialog-open", "window-close", "window-maximize", "window-minimize", "window-start-dragging", "window-unmaximize", "window-unminimize", "devtools"] }
 dbm = { path = "dbm" }
-lofty = "0.15.0"
-id3 = "1.7.0"
-thiserror = "1.0.44"
+thiserror = { workspace = true }
 tauri-plugin-window-state = { git = "https://github.com/tauri-apps/plugins-workspace", branch = "v1" }
-abi = { version = "0.1.0", path = "abi" }
-base64 = "0.21.2"
-tracing = "0.1.37"
-tracing-subscriber = "0.3.16"
+abi = { path = "abi" }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
 server = { path = "server" }
-dotenvy = "0.15.7"
+dotenvy = { workspace = true }
 
 [features]
 # by default Tauri runs in production mode

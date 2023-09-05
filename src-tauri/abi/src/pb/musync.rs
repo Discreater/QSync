@@ -1022,8 +1022,9 @@ pub mod musync_service_server {
       request: tonic::Request<super::RemoveLocalFolderRequest>,
     ) -> std::result::Result<tonic::Response<super::RemoveLocalFolderResponse>, tonic::Status>;
     /// Server streaming response type for the QueryLocalFolders method.
-    type QueryLocalFoldersStream: futures_core::Stream<Item = std::result::Result<super::LocalFolder, tonic::Status>>
-      + Send
+    type QueryLocalFoldersStream: tonic::codegen::tokio_stream::Stream<
+        Item = std::result::Result<super::LocalFolder, tonic::Status>,
+      > + Send
       + 'static;
     async fn query_local_folders(
       &self,
@@ -1042,8 +1043,9 @@ pub mod musync_service_server {
       request: tonic::Request<super::CreatePlaylistRequest>,
     ) -> std::result::Result<tonic::Response<super::CreatePlaylistResponse>, tonic::Status>;
     /// Server streaming response type for the QueryPlaylists method.
-    type QueryPlaylistsStream: futures_core::Stream<Item = std::result::Result<super::Playlist, tonic::Status>>
-      + Send
+    type QueryPlaylistsStream: tonic::codegen::tokio_stream::Stream<
+        Item = std::result::Result<super::Playlist, tonic::Status>,
+      > + Send
       + 'static;
     async fn query_playlists(
       &self,
@@ -1054,8 +1056,9 @@ pub mod musync_service_server {
       request: tonic::Request<super::UpdatePlaylistRequest>,
     ) -> std::result::Result<tonic::Response<super::UpdatePlaylistResponse>, tonic::Status>;
     /// Server streaming response type for the DeletePlaylists method.
-    type DeletePlaylistsStream: futures_core::Stream<Item = std::result::Result<super::Playlist, tonic::Status>>
-      + Send
+    type DeletePlaylistsStream: tonic::codegen::tokio_stream::Stream<
+        Item = std::result::Result<super::Playlist, tonic::Status>,
+      > + Send
       + 'static;
     async fn delete_playlists(
       &self,
@@ -1074,7 +1077,7 @@ pub mod musync_service_server {
       request: tonic::Request<super::CreateTrackRequest>,
     ) -> std::result::Result<tonic::Response<super::CreateTrackResponse>, tonic::Status>;
     /// Server streaming response type for the QueryTracks method.
-    type QueryTracksStream: futures_core::Stream<Item = std::result::Result<super::Track, tonic::Status>>
+    type QueryTracksStream: tonic::codegen::tokio_stream::Stream<Item = std::result::Result<super::Track, tonic::Status>>
       + Send
       + 'static;
     async fn query_tracks(
@@ -1086,7 +1089,7 @@ pub mod musync_service_server {
       request: tonic::Request<super::UpdateTrackRequest>,
     ) -> std::result::Result<tonic::Response<super::UpdateTrackResponse>, tonic::Status>;
     /// Server streaming response type for the DeleteTracks method.
-    type DeleteTracksStream: futures_core::Stream<Item = std::result::Result<super::Track, tonic::Status>>
+    type DeleteTracksStream: tonic::codegen::tokio_stream::Stream<Item = std::result::Result<super::Track, tonic::Status>>
       + Send
       + 'static;
     async fn delete_tracks(
@@ -1098,7 +1101,7 @@ pub mod musync_service_server {
       request: tonic::Request<super::CreateUserRequest>,
     ) -> std::result::Result<tonic::Response<super::CreateUserResponse>, tonic::Status>;
     /// Server streaming response type for the QueryUsers method.
-    type QueryUsersStream: futures_core::Stream<Item = std::result::Result<super::User, tonic::Status>>
+    type QueryUsersStream: tonic::codegen::tokio_stream::Stream<Item = std::result::Result<super::User, tonic::Status>>
       + Send
       + 'static;
     async fn query_users(
@@ -1110,7 +1113,7 @@ pub mod musync_service_server {
       request: tonic::Request<super::UpdateUserRequest>,
     ) -> std::result::Result<tonic::Response<super::UpdateUserResponse>, tonic::Status>;
     /// Server streaming response type for the DeleteUsers method.
-    type DeleteUsersStream: futures_core::Stream<Item = std::result::Result<super::User, tonic::Status>>
+    type DeleteUsersStream: tonic::codegen::tokio_stream::Stream<Item = std::result::Result<super::User, tonic::Status>>
       + Send
       + 'static;
     async fn delete_users(
@@ -1204,7 +1207,7 @@ pub mod musync_service_server {
             type Future = BoxFuture<tonic::Response<Self::Response>, tonic::Status>;
             fn call(&mut self, request: tonic::Request<super::LoginRequest>) -> Self::Future {
               let inner = Arc::clone(&self.0);
-              let fut = async move { (*inner).login(request).await };
+              let fut = async move { <T as MusyncService>::login(&inner, request).await };
               Box::pin(fut)
             }
           }
@@ -1238,7 +1241,8 @@ pub mod musync_service_server {
               request: tonic::Request<super::AddLocalFolderRequest>,
             ) -> Self::Future {
               let inner = Arc::clone(&self.0);
-              let fut = async move { (*inner).add_local_folder(request).await };
+              let fut =
+                async move { <T as MusyncService>::add_local_folder(&inner, request).await };
               Box::pin(fut)
             }
           }
@@ -1272,7 +1276,8 @@ pub mod musync_service_server {
               request: tonic::Request<super::RemoveLocalFolderRequest>,
             ) -> Self::Future {
               let inner = Arc::clone(&self.0);
-              let fut = async move { (*inner).remove_local_folder(request).await };
+              let fut =
+                async move { <T as MusyncService>::remove_local_folder(&inner, request).await };
               Box::pin(fut)
             }
           }
@@ -1308,7 +1313,8 @@ pub mod musync_service_server {
               request: tonic::Request<super::QueryLocalFoldersRequest>,
             ) -> Self::Future {
               let inner = Arc::clone(&self.0);
-              let fut = async move { (*inner).query_local_folders(request).await };
+              let fut =
+                async move { <T as MusyncService>::query_local_folders(&inner, request).await };
               Box::pin(fut)
             }
           }
@@ -1342,7 +1348,8 @@ pub mod musync_service_server {
               request: tonic::Request<super::CreatePlayQueueRequest>,
             ) -> Self::Future {
               let inner = Arc::clone(&self.0);
-              let fut = async move { (*inner).create_play_queue(request).await };
+              let fut =
+                async move { <T as MusyncService>::create_play_queue(&inner, request).await };
               Box::pin(fut)
             }
           }
@@ -1376,7 +1383,7 @@ pub mod musync_service_server {
               request: tonic::Request<super::GetPlayQueueRequest>,
             ) -> Self::Future {
               let inner = Arc::clone(&self.0);
-              let fut = async move { (*inner).get_play_queue(request).await };
+              let fut = async move { <T as MusyncService>::get_play_queue(&inner, request).await };
               Box::pin(fut)
             }
           }
@@ -1410,7 +1417,7 @@ pub mod musync_service_server {
               request: tonic::Request<super::CreatePlaylistRequest>,
             ) -> Self::Future {
               let inner = Arc::clone(&self.0);
-              let fut = async move { (*inner).create_playlist(request).await };
+              let fut = async move { <T as MusyncService>::create_playlist(&inner, request).await };
               Box::pin(fut)
             }
           }
@@ -1445,7 +1452,7 @@ pub mod musync_service_server {
               request: tonic::Request<super::QueryPlaylistsRequest>,
             ) -> Self::Future {
               let inner = Arc::clone(&self.0);
-              let fut = async move { (*inner).query_playlists(request).await };
+              let fut = async move { <T as MusyncService>::query_playlists(&inner, request).await };
               Box::pin(fut)
             }
           }
@@ -1479,7 +1486,7 @@ pub mod musync_service_server {
               request: tonic::Request<super::UpdatePlaylistRequest>,
             ) -> Self::Future {
               let inner = Arc::clone(&self.0);
-              let fut = async move { (*inner).update_playlist(request).await };
+              let fut = async move { <T as MusyncService>::update_playlist(&inner, request).await };
               Box::pin(fut)
             }
           }
@@ -1515,7 +1522,8 @@ pub mod musync_service_server {
               request: tonic::Request<super::DeletePlaylistsRequest>,
             ) -> Self::Future {
               let inner = Arc::clone(&self.0);
-              let fut = async move { (*inner).delete_playlists(request).await };
+              let fut =
+                async move { <T as MusyncService>::delete_playlists(&inner, request).await };
               Box::pin(fut)
             }
           }
@@ -1544,7 +1552,7 @@ pub mod musync_service_server {
             type Future = BoxFuture<tonic::Response<Self::Response>, tonic::Status>;
             fn call(&mut self, request: tonic::Request<super::GetTrackRequest>) -> Self::Future {
               let inner = Arc::clone(&self.0);
-              let fut = async move { (*inner).get_track(request).await };
+              let fut = async move { <T as MusyncService>::get_track(&inner, request).await };
               Box::pin(fut)
             }
           }
@@ -1578,7 +1586,7 @@ pub mod musync_service_server {
               request: tonic::Request<super::GetTrackCoverRequest>,
             ) -> Self::Future {
               let inner = Arc::clone(&self.0);
-              let fut = async move { (*inner).get_track_cover(request).await };
+              let fut = async move { <T as MusyncService>::get_track_cover(&inner, request).await };
               Box::pin(fut)
             }
           }
@@ -1609,7 +1617,7 @@ pub mod musync_service_server {
             type Future = BoxFuture<tonic::Response<Self::Response>, tonic::Status>;
             fn call(&mut self, request: tonic::Request<super::CreateTrackRequest>) -> Self::Future {
               let inner = Arc::clone(&self.0);
-              let fut = async move { (*inner).create_track(request).await };
+              let fut = async move { <T as MusyncService>::create_track(&inner, request).await };
               Box::pin(fut)
             }
           }
@@ -1641,7 +1649,7 @@ pub mod musync_service_server {
             type Future = BoxFuture<tonic::Response<Self::ResponseStream>, tonic::Status>;
             fn call(&mut self, request: tonic::Request<super::QueryTracksRequest>) -> Self::Future {
               let inner = Arc::clone(&self.0);
-              let fut = async move { (*inner).query_tracks(request).await };
+              let fut = async move { <T as MusyncService>::query_tracks(&inner, request).await };
               Box::pin(fut)
             }
           }
@@ -1672,7 +1680,7 @@ pub mod musync_service_server {
             type Future = BoxFuture<tonic::Response<Self::Response>, tonic::Status>;
             fn call(&mut self, request: tonic::Request<super::UpdateTrackRequest>) -> Self::Future {
               let inner = Arc::clone(&self.0);
-              let fut = async move { (*inner).update_track(request).await };
+              let fut = async move { <T as MusyncService>::update_track(&inner, request).await };
               Box::pin(fut)
             }
           }
@@ -1707,7 +1715,7 @@ pub mod musync_service_server {
               request: tonic::Request<super::DeleteTracksRequest>,
             ) -> Self::Future {
               let inner = Arc::clone(&self.0);
-              let fut = async move { (*inner).delete_tracks(request).await };
+              let fut = async move { <T as MusyncService>::delete_tracks(&inner, request).await };
               Box::pin(fut)
             }
           }
@@ -1736,7 +1744,7 @@ pub mod musync_service_server {
             type Future = BoxFuture<tonic::Response<Self::Response>, tonic::Status>;
             fn call(&mut self, request: tonic::Request<super::CreateUserRequest>) -> Self::Future {
               let inner = Arc::clone(&self.0);
-              let fut = async move { (*inner).create_user(request).await };
+              let fut = async move { <T as MusyncService>::create_user(&inner, request).await };
               Box::pin(fut)
             }
           }
@@ -1768,7 +1776,7 @@ pub mod musync_service_server {
             type Future = BoxFuture<tonic::Response<Self::ResponseStream>, tonic::Status>;
             fn call(&mut self, request: tonic::Request<super::QueryUsersRequest>) -> Self::Future {
               let inner = Arc::clone(&self.0);
-              let fut = async move { (*inner).query_users(request).await };
+              let fut = async move { <T as MusyncService>::query_users(&inner, request).await };
               Box::pin(fut)
             }
           }
@@ -1797,7 +1805,7 @@ pub mod musync_service_server {
             type Future = BoxFuture<tonic::Response<Self::Response>, tonic::Status>;
             fn call(&mut self, request: tonic::Request<super::UpdateUserRequest>) -> Self::Future {
               let inner = Arc::clone(&self.0);
-              let fut = async move { (*inner).update_user(request).await };
+              let fut = async move { <T as MusyncService>::update_user(&inner, request).await };
               Box::pin(fut)
             }
           }
@@ -1829,7 +1837,7 @@ pub mod musync_service_server {
             type Future = BoxFuture<tonic::Response<Self::ResponseStream>, tonic::Status>;
             fn call(&mut self, request: tonic::Request<super::DeleteUsersRequest>) -> Self::Future {
               let inner = Arc::clone(&self.0);
-              let fut = async move { (*inner).delete_users(request).await };
+              let fut = async move { <T as MusyncService>::delete_users(&inner, request).await };
               Box::pin(fut)
             }
           }
@@ -1858,7 +1866,7 @@ pub mod musync_service_server {
             type Future = BoxFuture<tonic::Response<Self::Response>, tonic::Status>;
             fn call(&mut self, request: tonic::Request<super::SearchAllRequest>) -> Self::Future {
               let inner = Arc::clone(&self.0);
-              let fut = async move { (*inner).search_all(request).await };
+              let fut = async move { <T as MusyncService>::search_all(&inner, request).await };
               Box::pin(fut)
             }
           }

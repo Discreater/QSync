@@ -263,10 +263,7 @@ impl abi::musync_service_server::MusyncService for GrpcServer {
       Ok(res) => String::from_utf8_lossy(res.data()).into_owned(),
       Err(e) => e.to_string(),
     };
-    Ok(Response::new(SearchAllResponse {
-      db_tracks,
-      ncm_res,
-    }))
+    Ok(Response::new(SearchAllResponse { db_tracks, ncm_res }))
   }
 }
 

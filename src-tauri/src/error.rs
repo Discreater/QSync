@@ -8,8 +8,6 @@ pub enum Error {
   #[error(transparent)]
   Io(#[from] std::io::Error),
   #[error(transparent)]
-  Lofty(#[from] lofty::LoftyError),
-  #[error(transparent)]
   Parse(#[from] ParseIntError),
   #[error(transparent)]
   Musyncer(#[from] dbm::MusyncError),
