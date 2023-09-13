@@ -51,7 +51,7 @@ function handleItemClick(item: Item) {
   <div class="h-full relative select-none flex flex-col justify-between">
     <div
       v-show="!noActivated"
-      class="transition-position duration-400 absolute w-[3px] h-5 my-2.5 rounded-md bg-passion" :style="{
+      class="transition-position duration-400 absolute w-[3px] h-5 my-2.5 rounded bg-passion" :style="{
         top: handlerTop,
       }"
     />

@@ -17,7 +17,7 @@ const toggleDropped = useToggle(dropped);
   <div>
     <div
       class="group flex justify-between items-center min-w-[20rem]
-         bg-[#323232] rounded-md select-none cursor-default hover:bg-[#3e3e3e]
+         bg-[#323232] rounded select-none cursor-default hover:bg-[#3e3e3e]
           h-[4.25rem] px-[17px] ring-1 ring-black/10" @click="toggleDropped()"
     >
       <div class="flex space-x-4 items-center">
@@ -30,7 +30,7 @@ const toggleDropped = useToggle(dropped);
         <button
           v-if="droppable" class=" disabled:opacity-25
           cursor-default
-          rounded-md  h-8 ml-3"
+          rounded  h-8 ml-3"
         >
           <IconUp v-if="dropped" />
           <IconDown v-else />

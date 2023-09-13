@@ -90,7 +90,7 @@ async function addAccount() {
       </LongButton>
     </div>
     <div v-show="showAddModel" class="absolute inset-0 bg-[#4b4b4b80] flex justify-center items-center">
-      <div class="flex flex-col bg-[#1c1c1c] px-4 pb-4 pt-2 rounded-md gap-2">
+      <div class="flex flex-col bg-[#1c1c1c] px-4 pb-4 pt-2 rounded gap-2">
         <H2>{{ t('source.add') }}</H2>
         <LongButton :text="t('source.type')">
           <template #extra>

@@ -5,6 +5,12 @@ module.exports = {
     './src/**/*.{vue,js,ts,jsx,tsx}',
   ],
   theme: {
+    borderRadius: {
+      none: '0',
+      DEFAULT: '4px',
+      WINDOW: '8px',
+      full: '9999px',
+    },
     extend: {
       colors: {
         main_w_bg: '#f9f9f9',

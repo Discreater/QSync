@@ -32,9 +32,9 @@ defineProps<{ columns: Column[]; data: Row[]; showHead?: boolean; rowClassName?:
 
 <style lang="postcss" scoped>
 td:first-child {
-  @apply rounded-l-lg;
+  @apply rounded-l;
 }
 td:last-child {
-  @apply rounded-r-lg;
+  @apply rounded-r;
 }
 </style>
