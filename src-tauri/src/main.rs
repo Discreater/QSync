@@ -22,10 +22,11 @@ fn init_tracing() {
     .with_env_filter(
       EnvFilter::from_default_env()
         .add_directive(Level::WARN.into())
-        .add_directive("server=debug".parse().unwrap())
-        .add_directive("dbm=debug".parse().unwrap())
-        .add_directive("abi=debug".parse().unwrap())
-        .add_directive("entity=debug".parse().unwrap()),
+        .add_directive("qsync=trace".parse().unwrap())
+        .add_directive("server=trace".parse().unwrap())
+        .add_directive("dbm=trace".parse().unwrap())
+        .add_directive("abi=trace".parse().unwrap())
+        .add_directive("entity=trace".parse().unwrap()),
     )
     .init();
 }

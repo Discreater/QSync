@@ -240,7 +240,7 @@ watch(currentTrack, (track) => {
 });
 
 function updateMediaSession(track: Track | undefined) {
-  if (getPlatform() === 'web') {
+  if (navigator.mediaSession != null) {
     if (track) {
       navigator.mediaSession.metadata = new MediaMetadata({
         title: track.title,
@@ -259,7 +259,7 @@ function updateMediaSession(track: Track | undefined) {
 }
 
 function setMediaSessionHandler() {
-  if (getPlatform() === 'web') {
+  if (navigator.mediaSession != null) {
     navigator.mediaSession.setActionHandler('play', () => {
       playerStore.resumeTrack();
     });

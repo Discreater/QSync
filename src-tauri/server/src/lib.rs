@@ -33,7 +33,6 @@ impl Server {
   /// spawn a new task, return the join handle of the server and the server handle
   pub async fn serve(addr: &SocketAddr, db_url: &str, data_folder: PathBuf) -> Result<Self> {
     let manager = dbm::DbManager::from_url(db_url, data_folder).await?;
-    manager.re_index().await;
 
     let cors = CorsLayer::new()
       .allow_headers([

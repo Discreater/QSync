@@ -12,12 +12,15 @@ export default defineConfig({
     watch: {
       ignored: [string => string.includes('src-tauri')],
     },
+    strictPort: true,
   },
   resolve: {
     alias: {
       '~/': `${path.resolve(__dirname, 'src')}/`,
     },
   },
+  clearScreen: false,
+  envPrefix: ['VITE_', 'TAURI_'],
   plugins: [
     vue({}),
     vueJsx({}),
