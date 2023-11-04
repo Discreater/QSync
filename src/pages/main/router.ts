@@ -10,27 +10,45 @@ import Track from './Track.vue';
 
 export const routes = [
   {
-    path: '/', component: Home, name: 'home',
+    path: '/',
+    component: Home,
+    name: 'home',
   },
   {
-    path: '/music-lib', component: MusicLib, name: 'music-lib',
+    path: '/music-lib',
+    component: MusicLib,
+    name: 'music-lib',
   },
   {
-    path: '/settings', component: Settings, name: 'settings',
+    path: '/settings',
+    component: Settings,
+    name: 'settings',
   },
   {
-    path: '/account', component: Account, name: 'account',
+    path: '/account',
+    component: Account,
+    name: 'account',
   },
   {
-    path: '/source', component: Source, name: 'source',
+    path: '/source',
+    component: Source,
+    name: 'source',
   },
   {
-    path: '/play-queue', component: PlayQueue, name: 'play-queue',
+    path: '/play-queue',
+    component: PlayQueue,
+    name: 'play-queue',
   },
   {
-    path: '/search-result', component: SearchResult, name: 'search-result', props: route => ({ query: route.query.q }),
+    path: '/search-result',
+    component: SearchResult,
+    name: 'search-result',
+    props: route => ({ query: route.query.q }),
   },
   {
-    path: '/track', component: Track, name: 'track', props: route => ({ id: route.query.id }),
+    path: '/track',
+    component: Track,
+    name: 'track',
+    props: route => ({ id: route.query.id }),
   },
 ] as RouteRecordRaw[];

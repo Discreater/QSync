@@ -13,7 +13,9 @@ export function shuffle<T>(array: T[]): T[] {
 
     // And swap it with the current element.
     [array[currentIndex], array[randomIndex]] = [
-      array[randomIndex], array[currentIndex]];
+      array[randomIndex],
+      array[currentIndex],
+    ];
   }
 
   return array;
@@ -46,8 +48,8 @@ export function formatTime(time: number, formatter: 'mm:ss' | 'hh:mm:ss' = 'mm:s
 /**
  * May not work
  */
-/* eslint-disable @typescript-eslint/no-this-alias  */
-/* eslint-disable @typescript-eslint/no-invalid-this  */
+/* eslint-disable ts/no-this-alias  */
+/* eslint-disable ts/no-invalid-this  */
 function debounce<T extends (...args: any) => any>(fn: T, wait: number, options?: {
   leading?: boolean
   maxWait?: number

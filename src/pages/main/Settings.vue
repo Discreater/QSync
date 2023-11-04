@@ -17,7 +17,7 @@ const { t } = useI18n();
 const store = useQSyncStore();
 
 async function handleAddMusicFolder() {
-  const selected = await open({
+  const _selected = await open({
     directory: true,
   }) as string;
   // store.addMusicFolder(selected);

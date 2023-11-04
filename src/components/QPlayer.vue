@@ -25,7 +25,6 @@ import { formatTime } from '~/utils';
 import { ApiClient } from '~/api/client';
 import type { Track } from '~/generated/protos/musync';
 import { TrackExt } from '~/model_ext/track';
-import { getPlatform } from '~/platforms';
 
 const router = useRouter();
 const route = useRoute();

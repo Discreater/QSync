@@ -6,10 +6,14 @@ import Lyric from './Lyric.vue';
 export const router = createRouter({
   routes: [
     {
-      path: '/main', component: Main, name: 'main', children: mainRoutes,
+      path: '/main',
+      component: Main,
+      name: 'main',
+      children: mainRoutes,
     },
     {
-      path: '/', redirect: '/main',
+      path: '/',
+      redirect: '/main',
     },
     {
       path: '/lyric',
