@@ -367,22 +367,33 @@ impl DbManager {
     &self,
     query: abi::QueryTracksRequest,
   ) -> Result<Vec<abi::Track>, MusyncError> {
-    let rows = Track::find()
-      .apply_if(query.title, |b, title| {
-        b.filter(entity::track::Column::Title.like(format!("%{}%", title)))
-      })
-      .apply_if(query.playlist_id, |b, playlist_id| {
-        b.inner_join(PlaylistTrack)
-          .filter(entity::playlist_track::Column::PlaylistId.eq(playlist_id))
-      })
-      .apply_if(query.artist, |b, artist| {
-        b.filter(entity::track::Column::Artist.like(format!("%{}%", artist)))
-      })
-      .apply_if(query.album, |b, album| {
-        b.filter(entity::track::Column::Album.like(format!("%{}%", album)))
-      })
-      .all(&self.db)
-      .await?;
+    trace!("query tracks: {:?}", query);
+
+    let rows = if query.title.is_none() && query.artist.is_none() && query.album.is_none() {
+      Track::find().all(&self.db).await?
+    } else {
+      Track::find()
+        .filter(
+          Condition::any()
+            .add_option(
+              query
+                .title
+                .map(|title| entity::track::Column::Title.like(format!("%{}%", title))),
+            )
+            .add_option(
+              query
+                .artist
+                .map(|artist| entity::track::Column::Artist.like(format!("%{}%", artist))),
+            )
+            .add_option(
+              query
+                .album
+                .map(|album| entity::track::Column::Album.like(format!("%{}%", album))),
+            ),
+        )
+        .all(&self.db)
+        .await?
+    };
 
     rows
       .into_iter()
@@ -417,6 +428,17 @@ impl DbManager {
 
 /// Player
 impl DbManager {
+  pub async fn stop_all(&self) -> Result<(), MusyncError> {
+    trace!("stoping all");
+    let updater = entity::play_queue::ActiveModel {
+      playing: Set(false),
+      paused_at: Set(0),
+      ..Default::default()
+    };
+    PlayQueue::update_many().set(updater).exec(&self.db).await?;
+    Ok(())
+  }
+
   pub async fn create_play_queue(
     &self,
     create: CreatePlayQueueRequest,
@@ -650,7 +672,6 @@ impl DbManager {
 
 #[cfg(test)]
 mod tests {
-  use jieba_rs::Jieba;
   use migration::{Migrator, MigratorTrait};
 
   use sea_orm::Database;
@@ -927,20 +948,5 @@ mod tests {
       .unwrap();
     assert_eq!(users.len(), 1);
     assert_eq!(users[0].id, user.id);
-  }
-
-  #[test]
-  fn jieba_test() {
-    let jieba = Jieba::new();
-    let words = jieba.cut("我们中出了一个叛徒this is a word sentence with", true);
-    println!("{:?}", words);
-    let words = jieba.cut("我们中出了一个叛徒this is a word sentence with", false);
-    println!("{:?}", words);
-    let words = jieba.cut_all("我们中出了一个叛徒this is a word sentence with");
-    println!("{:?}", words);
-    let words = jieba.cut_for_search("我们中出了一个叛徒this is a word sentence with", true);
-    println!("{:?}", words);
-    let words = jieba.cut_for_search("我们中出了一个叛徒this is a word sentence with", false);
-    println!("{:?}", words);
   }
 }

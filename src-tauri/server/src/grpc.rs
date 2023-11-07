@@ -6,10 +6,10 @@ use abi::{
   CreateUserRequest, CreateUserResponse, DeletePlaylistsRequest, DeleteTracksRequest,
   DeleteUsersRequest, GetPlayQueueRequest, GetTrackCoverRequest, GetTrackRequest, LocalFolder,
   LoginRequest, Picture, PlayQueue, Playlist, QueryLocalFoldersRequest, QueryPlaylistsRequest,
-  QueryTracksRequest, QueryUsersRequest, RemoveLocalFolderRequest, RemoveLocalFolderResponse,
-  SearchAllRequest, SearchAllResponse, Token, Track, UpdatePlayQueueEvent, UpdatePlaylistRequest,
-  UpdatePlaylistResponse, UpdateTrackRequest, UpdateTrackResponse, UpdateUserRequest,
-  UpdateUserResponse, User,
+  QueryTracksRequest, QueryUsersRequest, RebuildIndexRequest, RebuildIndexResponse,
+  RemoveLocalFolderRequest, RemoveLocalFolderResponse, SearchAllRequest, SearchAllResponse, Token,
+  Track, UpdatePlayQueueEvent, UpdatePlaylistRequest, UpdatePlaylistResponse, UpdateTrackRequest,
+  UpdateTrackResponse, UpdateUserRequest, UpdateUserResponse, User,
 };
 use chrono::{Days, Utc};
 use dbm::UserId;
@@ -254,9 +254,16 @@ impl abi::musync_service_server::MusyncService for GrpcServer {
   }
 
   async fn search_all(&self, request: Request<SearchAllRequest>) -> GrpcResult<SearchAllResponse> {
-    let req = request.into_inner();
-    let db_search = self.db.search_tracks(&req.query);
-    let ncm_search = self.ncm_api.search(&req.query, None);
+    let query = request.into_inner().query;
+    trace!("search all: {query}");
+    let db_search = self.db.query_tracks(QueryTracksRequest {
+      title: Some(query.clone()),
+      artist: Some(query.clone()),
+      album: Some(query.clone()),
+      genre: Some(query.clone()),
+      ..Default::default()
+    });
+    let ncm_search = self.ncm_api.search(&query, None);
     let (db_tracks, ncm_res) = tokio::join!(db_search, ncm_search);
     let db_tracks = db_tracks?;
     let ncm_res = match ncm_res {
@@ -264,6 +271,14 @@ impl abi::musync_service_server::MusyncService for GrpcServer {
       Err(e) => e.to_string(),
     };
     Ok(Response::new(SearchAllResponse { db_tracks, ncm_res }))
+  }
+
+  async fn rebuild_index(
+    &self,
+    _req: Request<RebuildIndexRequest>,
+  ) -> GrpcResult<RebuildIndexResponse> {
+    self.db.re_index().await;
+    Ok(Response::new(RebuildIndexResponse { success: true }))
   }
 }
 

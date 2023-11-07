@@ -33,6 +33,7 @@ export const usePlayerStore = defineStore('playQueueStatus', {
       return evilProgress(this.playing, this.startAt);
     },
     updateFromRemote(event: UpdatePlayerEvent) {
+      logger.trace(`update player from remote: ${JSON.stringify(event)}`);
       const startAt = fromEvilProgress(event.playing, event.progress);
 
       this.$patch({
@@ -99,5 +100,13 @@ export const usePlayerStore = defineStore('playQueueStatus', {
       });
     },
   },
+  persist: true,
+});
+
+export const usePlayerConfigStore = defineStore('config', {
+  state: () => ({
+    volume: 100,
+    muted: false,
+  }),
   persist: true,
 });

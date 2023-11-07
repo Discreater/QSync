@@ -33,7 +33,8 @@
 ## FIXME
 - [x] Need to consider loading time, pause local player when loading. (Preload?)
    - Renew the progress after track loaded.
-- [ ] Reduce the frequency of rebuilding the tantivy index.
+- [x] Reduce the frequency of rebuilding the tantivy index.
+- [ ] Refactor client player (init status, error handle, etc.)
 
 ## Tech Stack
 

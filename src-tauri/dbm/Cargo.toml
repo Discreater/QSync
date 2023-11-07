@@ -23,12 +23,13 @@ chrono = { workspace = true }
 tonic = { workspace = true }
 tokio = { workspace = true, features = ["full"] }
 tokio-stream = { workspace = true }
-jieba-rs = "0.6"
 tantivy = "0.21"
+tantivy-jieba = "0.10.0"
 utils = { path = "../utils" }
 debounced = { git = "https://github.com/Discreater/debounced" }
 futures-channel = { workspace = true, features = ["sink"] }
 futures-util = { workspace = true, features = ["sink"] }
+
 
 [dev-dependencies]
 tracing-subscriber = { workspace = true }

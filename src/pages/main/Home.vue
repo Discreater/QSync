@@ -4,11 +4,11 @@ import { breakpointsTailwind, useBreakpoints } from '@vueuse/core';
 import Basic from '~/layouts/Basic.vue';
 import { toggleDark } from '~/utils';
 import H1 from '~/components/typo/H1.vue';
-import { useQSyncStore } from '~/store';
+import { useMusyncStore } from '~/store';
 import QSelect from '~/components/QSelect.vue';
 
 const { t } = useI18n();
-const store = useQSyncStore();
+const store = useMusyncStore();
 
 const langOptions = [
   { name: 'English', key: 'en' },

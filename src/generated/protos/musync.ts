@@ -204,7 +204,11 @@ export interface CreateTrackResponse {
 
 /** Query track */
 export interface QueryTracksRequest {
-  /** Query by which playlist contains the track */
+  /**
+   * Query by which playlist contains the track
+   *
+   * @deprecated
+   */
   playlistId?:
     | number
     | undefined;
@@ -407,6 +411,13 @@ export interface SearchAllResponse {
   ncmRes: string;
 }
 
+export interface RebuildIndexRequest {
+}
+
+export interface RebuildIndexResponse {
+  success: boolean;
+}
+
 function createBasePlaylist(): Playlist {
   return { id: 0, ownerId: 0, trackIds: [], name: "", description: "", createdAt: undefined, updatedAt: undefined };
 }
@@ -516,11 +527,11 @@ export const Playlist = {
 
   fromJSON(object: any): Playlist {
     return {
-      id: isSet(object.id) ? Number(object.id) : 0,
-      ownerId: isSet(object.ownerId) ? Number(object.ownerId) : 0,
-      trackIds: Array.isArray(object?.trackIds) ? object.trackIds.map((e: any) => Number(e)) : [],
-      name: isSet(object.name) ? String(object.name) : "",
-      description: isSet(object.description) ? String(object.description) : "",
+      id: isSet(object.id) ? globalThis.Number(object.id) : 0,
+      ownerId: isSet(object.ownerId) ? globalThis.Number(object.ownerId) : 0,
+      trackIds: globalThis.Array.isArray(object?.trackIds) ? object.trackIds.map((e: any) => globalThis.Number(e)) : [],
+      name: isSet(object.name) ? globalThis.String(object.name) : "",
+      description: isSet(object.description) ? globalThis.String(object.description) : "",
       createdAt: isSet(object.createdAt) ? fromJsonTimestamp(object.createdAt) : undefined,
       updatedAt: isSet(object.updatedAt) ? fromJsonTimestamp(object.updatedAt) : undefined,
     };
@@ -667,12 +678,12 @@ export const PlayQueue = {
 
   fromJSON(object: any): PlayQueue {
     return {
-      id: isSet(object.id) ? Number(object.id) : 0,
-      trackIds: Array.isArray(object?.trackIds) ? object.trackIds.map((e: any) => Number(e)) : [],
-      position: isSet(object.position) ? Number(object.position) : 0,
-      playing: isSet(object.playing) ? Boolean(object.playing) : false,
+      id: isSet(object.id) ? globalThis.Number(object.id) : 0,
+      trackIds: globalThis.Array.isArray(object?.trackIds) ? object.trackIds.map((e: any) => globalThis.Number(e)) : [],
+      position: isSet(object.position) ? globalThis.Number(object.position) : 0,
+      playing: isSet(object.playing) ? globalThis.Boolean(object.playing) : false,
       startedAt: isSet(object.startedAt) ? fromJsonTimestamp(object.startedAt) : undefined,
-      pausedAt: isSet(object.pausedAt) ? Number(object.pausedAt) : 0,
+      pausedAt: isSet(object.pausedAt) ? globalThis.Number(object.pausedAt) : 0,
     };
   },
 
@@ -863,13 +874,13 @@ export const Track = {
 
   fromJSON(object: any): Track {
     return {
-      id: isSet(object.id) ? Number(object.id) : 0,
-      title: isSet(object.title) ? String(object.title) : "",
-      artist: isSet(object.artist) ? String(object.artist) : undefined,
-      album: isSet(object.album) ? String(object.album) : undefined,
-      duration: isSet(object.duration) ? Number(object.duration) : undefined,
-      genre: isSet(object.genre) ? String(object.genre) : undefined,
-      year: isSet(object.year) ? Number(object.year) : undefined,
+      id: isSet(object.id) ? globalThis.Number(object.id) : 0,
+      title: isSet(object.title) ? globalThis.String(object.title) : "",
+      artist: isSet(object.artist) ? globalThis.String(object.artist) : undefined,
+      album: isSet(object.album) ? globalThis.String(object.album) : undefined,
+      duration: isSet(object.duration) ? globalThis.Number(object.duration) : undefined,
+      genre: isSet(object.genre) ? globalThis.String(object.genre) : undefined,
+      year: isSet(object.year) ? globalThis.Number(object.year) : undefined,
       createdAt: isSet(object.createdAt) ? fromJsonTimestamp(object.createdAt) : undefined,
       updatedAt: isSet(object.updatedAt) ? fromJsonTimestamp(object.updatedAt) : undefined,
       localSrc: isSet(object.localSrc) ? LocalSource.fromJSON(object.localSrc) : undefined,
@@ -975,7 +986,7 @@ export const NeteaseSource = {
   },
 
   fromJSON(object: any): NeteaseSource {
-    return { id: isSet(object.id) ? String(object.id) : "" };
+    return { id: isSet(object.id) ? globalThis.String(object.id) : "" };
   },
 
   toJSON(message: NeteaseSource): unknown {
@@ -1032,7 +1043,7 @@ export const LocalSource = {
   },
 
   fromJSON(object: any): LocalSource {
-    return { path: isSet(object.path) ? String(object.path) : "" };
+    return { path: isSet(object.path) ? globalThis.String(object.path) : "" };
   },
 
   toJSON(message: LocalSource): unknown {
@@ -1120,8 +1131,8 @@ export const User = {
 
   fromJSON(object: any): User {
     return {
-      id: isSet(object.id) ? Number(object.id) : 0,
-      name: isSet(object.name) ? String(object.name) : "",
+      id: isSet(object.id) ? globalThis.Number(object.id) : 0,
+      name: isSet(object.name) ? globalThis.String(object.name) : "",
       createdAt: isSet(object.createdAt) ? fromJsonTimestamp(object.createdAt) : undefined,
       updatedAt: isSet(object.updatedAt) ? fromJsonTimestamp(object.updatedAt) : undefined,
     };
@@ -1203,7 +1214,10 @@ export const Token = {
   },
 
   fromJSON(object: any): Token {
-    return { data: isSet(object.data) ? String(object.data) : "", type: isSet(object.type) ? String(object.type) : "" };
+    return {
+      data: isSet(object.data) ? globalThis.String(object.data) : "",
+      type: isSet(object.type) ? globalThis.String(object.type) : "",
+    };
   },
 
   toJSON(message: Token): unknown {
@@ -1295,10 +1309,10 @@ export const Picture = {
 
   fromJSON(object: any): Picture {
     return {
-      picType: isSet(object.picType) ? String(object.picType) : undefined,
-      mimeType: isSet(object.mimeType) ? String(object.mimeType) : "",
-      description: isSet(object.description) ? String(object.description) : undefined,
-      data: isSet(object.data) ? String(object.data) : "",
+      picType: isSet(object.picType) ? globalThis.String(object.picType) : undefined,
+      mimeType: isSet(object.mimeType) ? globalThis.String(object.mimeType) : "",
+      description: isSet(object.description) ? globalThis.String(object.description) : undefined,
+      data: isSet(object.data) ? globalThis.String(object.data) : "",
     };
   },
 
@@ -1401,9 +1415,9 @@ export const CreatePlaylistRequest = {
 
   fromJSON(object: any): CreatePlaylistRequest {
     return {
-      trackIds: Array.isArray(object?.trackIds) ? object.trackIds.map((e: any) => Number(e)) : [],
-      name: isSet(object.name) ? String(object.name) : "",
-      description: isSet(object.description) ? String(object.description) : "",
+      trackIds: globalThis.Array.isArray(object?.trackIds) ? object.trackIds.map((e: any) => globalThis.Number(e)) : [],
+      name: isSet(object.name) ? globalThis.String(object.name) : "",
+      description: isSet(object.description) ? globalThis.String(object.description) : "",
     };
   },
 
@@ -1540,7 +1554,7 @@ export const DeletePlaylistsRequest = {
   },
 
   fromJSON(object: any): DeletePlaylistsRequest {
-    return { ids: Array.isArray(object?.ids) ? object.ids.map((e: any) => Number(e)) : [] };
+    return { ids: globalThis.Array.isArray(object?.ids) ? object.ids.map((e: any) => globalThis.Number(e)) : [] };
   },
 
   toJSON(message: DeletePlaylistsRequest): unknown {
@@ -1618,9 +1632,9 @@ export const QueryPlaylistsRequest = {
 
   fromJSON(object: any): QueryPlaylistsRequest {
     return {
-      userId: isSet(object.userId) ? Number(object.userId) : undefined,
-      trackId: isSet(object.trackId) ? Number(object.trackId) : undefined,
-      name: isSet(object.name) ? String(object.name) : undefined,
+      userId: isSet(object.userId) ? globalThis.Number(object.userId) : undefined,
+      trackId: isSet(object.trackId) ? globalThis.Number(object.trackId) : undefined,
+      name: isSet(object.name) ? globalThis.String(object.name) : undefined,
     };
   },
 
@@ -1751,11 +1765,15 @@ export const UpdatePlaylistRequest = {
 
   fromJSON(object: any): UpdatePlaylistRequest {
     return {
-      id: isSet(object.id) ? Number(object.id) : 0,
-      addedTrackIds: Array.isArray(object?.addedTrackIds) ? object.addedTrackIds.map((e: any) => Number(e)) : [],
-      removedTrackIds: Array.isArray(object?.removedTrackIds) ? object.removedTrackIds.map((e: any) => Number(e)) : [],
-      name: isSet(object.name) ? String(object.name) : undefined,
-      description: isSet(object.description) ? String(object.description) : undefined,
+      id: isSet(object.id) ? globalThis.Number(object.id) : 0,
+      addedTrackIds: globalThis.Array.isArray(object?.addedTrackIds)
+        ? object.addedTrackIds.map((e: any) => globalThis.Number(e))
+        : [],
+      removedTrackIds: globalThis.Array.isArray(object?.removedTrackIds)
+        ? object.removedTrackIds.map((e: any) => globalThis.Number(e))
+        : [],
+      name: isSet(object.name) ? globalThis.String(object.name) : undefined,
+      description: isSet(object.description) ? globalThis.String(object.description) : undefined,
     };
   },
 
@@ -2060,12 +2078,12 @@ export const QueryTracksRequest = {
 
   fromJSON(object: any): QueryTracksRequest {
     return {
-      playlistId: isSet(object.playlistId) ? Number(object.playlistId) : undefined,
-      title: isSet(object.title) ? String(object.title) : undefined,
-      artist: isSet(object.artist) ? String(object.artist) : undefined,
-      album: isSet(object.album) ? String(object.album) : undefined,
-      genre: isSet(object.genre) ? String(object.genre) : undefined,
-      year: isSet(object.year) ? Number(object.year) : undefined,
+      playlistId: isSet(object.playlistId) ? globalThis.Number(object.playlistId) : undefined,
+      title: isSet(object.title) ? globalThis.String(object.title) : undefined,
+      artist: isSet(object.artist) ? globalThis.String(object.artist) : undefined,
+      album: isSet(object.album) ? globalThis.String(object.album) : undefined,
+      genre: isSet(object.genre) ? globalThis.String(object.genre) : undefined,
+      year: isSet(object.year) ? globalThis.Number(object.year) : undefined,
     };
   },
 
@@ -2234,13 +2252,13 @@ export const TrackUpdate = {
 
   fromJSON(object: any): TrackUpdate {
     return {
-      id: isSet(object.id) ? Number(object.id) : 0,
-      title: isSet(object.title) ? String(object.title) : undefined,
-      artist: isSet(object.artist) ? String(object.artist) : undefined,
-      album: isSet(object.album) ? String(object.album) : undefined,
-      duration: isSet(object.duration) ? Number(object.duration) : undefined,
-      genre: isSet(object.genre) ? String(object.genre) : undefined,
-      year: isSet(object.year) ? Number(object.year) : undefined,
+      id: isSet(object.id) ? globalThis.Number(object.id) : 0,
+      title: isSet(object.title) ? globalThis.String(object.title) : undefined,
+      artist: isSet(object.artist) ? globalThis.String(object.artist) : undefined,
+      album: isSet(object.album) ? globalThis.String(object.album) : undefined,
+      duration: isSet(object.duration) ? globalThis.Number(object.duration) : undefined,
+      genre: isSet(object.genre) ? globalThis.String(object.genre) : undefined,
+      year: isSet(object.year) ? globalThis.Number(object.year) : undefined,
       localSrc: isSet(object.localSrc) ? LocalSource.fromJSON(object.localSrc) : undefined,
       neteaseSrc: isSet(object.neteaseSrc) ? NeteaseSource.fromJSON(object.neteaseSrc) : undefined,
     };
@@ -2464,7 +2482,9 @@ export const DeleteTracksRequest = {
   },
 
   fromJSON(object: any): DeleteTracksRequest {
-    return { trackIds: Array.isArray(object?.trackIds) ? object.trackIds.map((e: any) => Number(e)) : [] };
+    return {
+      trackIds: globalThis.Array.isArray(object?.trackIds) ? object.trackIds.map((e: any) => globalThis.Number(e)) : [],
+    };
   },
 
   toJSON(message: DeleteTracksRequest): unknown {
@@ -2635,7 +2655,7 @@ export const QueryUsersRequest = {
   },
 
   fromJSON(object: any): QueryUsersRequest {
-    return { name: isSet(object.name) ? String(object.name) : undefined };
+    return { name: isSet(object.name) ? globalThis.String(object.name) : undefined };
   },
 
   toJSON(message: QueryUsersRequest): unknown {
@@ -2702,7 +2722,10 @@ export const UserUpdate = {
   },
 
   fromJSON(object: any): UserUpdate {
-    return { id: isSet(object.id) ? Number(object.id) : 0, name: isSet(object.name) ? String(object.name) : "" };
+    return {
+      id: isSet(object.id) ? globalThis.Number(object.id) : 0,
+      name: isSet(object.name) ? globalThis.String(object.name) : "",
+    };
   },
 
   toJSON(message: UserUpdate): unknown {
@@ -2891,7 +2914,7 @@ export const DeleteUsersRequest = {
   },
 
   fromJSON(object: any): DeleteUsersRequest {
-    return { ids: Array.isArray(object?.ids) ? object.ids.map((e: any) => Number(e)) : [] };
+    return { ids: globalThis.Array.isArray(object?.ids) ? object.ids.map((e: any) => globalThis.Number(e)) : [] };
   },
 
   toJSON(message: DeleteUsersRequest): unknown {
@@ -2958,7 +2981,10 @@ export const LoginRequest = {
   },
 
   fromJSON(object: any): LoginRequest {
-    return { name: isSet(object.name) ? String(object.name) : "", type: isSet(object.type) ? String(object.type) : "" };
+    return {
+      name: isSet(object.name) ? globalThis.String(object.name) : "",
+      type: isSet(object.type) ? globalThis.String(object.type) : "",
+    };
   },
 
   toJSON(message: LoginRequest): unknown {
@@ -3019,7 +3045,7 @@ export const AddLocalFolderRequest = {
   },
 
   fromJSON(object: any): AddLocalFolderRequest {
-    return { path: isSet(object.path) ? String(object.path) : "" };
+    return { path: isSet(object.path) ? globalThis.String(object.path) : "" };
   },
 
   toJSON(message: AddLocalFolderRequest): unknown {
@@ -3076,7 +3102,7 @@ export const RemoveLocalFolderRequest = {
   },
 
   fromJSON(object: any): RemoveLocalFolderRequest {
-    return { path: isSet(object.path) ? String(object.path) : "" };
+    return { path: isSet(object.path) ? globalThis.String(object.path) : "" };
   },
 
   toJSON(message: RemoveLocalFolderRequest): unknown {
@@ -3133,7 +3159,7 @@ export const AddLocalFolderResponse = {
   },
 
   fromJSON(object: any): AddLocalFolderResponse {
-    return { addedTracks: isSet(object.addedTracks) ? Number(object.addedTracks) : 0 };
+    return { addedTracks: isSet(object.addedTracks) ? globalThis.Number(object.addedTracks) : 0 };
   },
 
   toJSON(message: AddLocalFolderResponse): unknown {
@@ -3190,7 +3216,7 @@ export const RemoveLocalFolderResponse = {
   },
 
   fromJSON(object: any): RemoveLocalFolderResponse {
-    return { removedTracks: isSet(object.removedTracks) ? Number(object.removedTracks) : 0 };
+    return { removedTracks: isSet(object.removedTracks) ? globalThis.Number(object.removedTracks) : 0 };
   },
 
   toJSON(message: RemoveLocalFolderResponse): unknown {
@@ -3247,7 +3273,7 @@ export const GetTrackRequest = {
   },
 
   fromJSON(object: any): GetTrackRequest {
-    return { id: isSet(object.id) ? Number(object.id) : 0 };
+    return { id: isSet(object.id) ? globalThis.Number(object.id) : 0 };
   },
 
   toJSON(message: GetTrackRequest): unknown {
@@ -3315,8 +3341,8 @@ export const GetTrackCoverRequest = {
 
   fromJSON(object: any): GetTrackCoverRequest {
     return {
-      trackId: isSet(object.trackId) ? Number(object.trackId) : 0,
-      coverIdx: isSet(object.coverIdx) ? Number(object.coverIdx) : undefined,
+      trackId: isSet(object.trackId) ? globalThis.Number(object.trackId) : 0,
+      coverIdx: isSet(object.coverIdx) ? globalThis.Number(object.coverIdx) : undefined,
     };
   },
 
@@ -3421,7 +3447,7 @@ export const LocalFolder = {
   },
 
   fromJSON(object: any): LocalFolder {
-    return { path: isSet(object.path) ? String(object.path) : "" };
+    return { path: isSet(object.path) ? globalThis.String(object.path) : "" };
   },
 
   toJSON(message: LocalFolder): unknown {
@@ -3490,7 +3516,9 @@ export const CreatePlayQueueRequest = {
   },
 
   fromJSON(object: any): CreatePlayQueueRequest {
-    return { trackIds: Array.isArray(object?.trackIds) ? object.trackIds.map((e: any) => Number(e)) : [] };
+    return {
+      trackIds: globalThis.Array.isArray(object?.trackIds) ? object.trackIds.map((e: any) => globalThis.Number(e)) : [],
+    };
   },
 
   toJSON(message: CreatePlayQueueRequest): unknown {
@@ -3547,7 +3575,7 @@ export const CreatePlayQueueResponse = {
   },
 
   fromJSON(object: any): CreatePlayQueueResponse {
-    return { playQueueId: isSet(object.playQueueId) ? Number(object.playQueueId) : 0 };
+    return { playQueueId: isSet(object.playQueueId) ? globalThis.Number(object.playQueueId) : 0 };
   },
 
   toJSON(message: CreatePlayQueueResponse): unknown {
@@ -3678,10 +3706,10 @@ export const UpdatePlayerRequest = {
 
   fromJSON(object: any): UpdatePlayerRequest {
     return {
-      manul: isSet(object.manul) ? Boolean(object.manul) : false,
-      position: isSet(object.position) ? Number(object.position) : undefined,
-      playing: isSet(object.playing) ? Boolean(object.playing) : undefined,
-      progress: isSet(object.progress) ? Number(object.progress) : undefined,
+      manul: isSet(object.manul) ? globalThis.Boolean(object.manul) : false,
+      position: isSet(object.position) ? globalThis.Number(object.position) : undefined,
+      playing: isSet(object.playing) ? globalThis.Boolean(object.playing) : undefined,
+      progress: isSet(object.progress) ? globalThis.Number(object.progress) : undefined,
     };
   },
 
@@ -3763,7 +3791,9 @@ export const UpdatePlayQueueEvent = {
   },
 
   fromJSON(object: any): UpdatePlayQueueEvent {
-    return { trackIds: Array.isArray(object?.trackIds) ? object.trackIds.map((e: any) => Number(e)) : [] };
+    return {
+      trackIds: globalThis.Array.isArray(object?.trackIds) ? object.trackIds.map((e: any) => globalThis.Number(e)) : [],
+    };
   },
 
   toJSON(message: UpdatePlayQueueEvent): unknown {
@@ -3841,9 +3871,9 @@ export const UpdatePlayerEvent = {
 
   fromJSON(object: any): UpdatePlayerEvent {
     return {
-      position: isSet(object.position) ? Number(object.position) : 0,
-      playing: isSet(object.playing) ? Boolean(object.playing) : false,
-      progress: isSet(object.progress) ? Number(object.progress) : 0,
+      position: isSet(object.position) ? globalThis.Number(object.position) : 0,
+      playing: isSet(object.playing) ? globalThis.Boolean(object.playing) : false,
+      progress: isSet(object.progress) ? globalThis.Number(object.progress) : 0,
     };
   },
 
@@ -3909,7 +3939,7 @@ export const SearchAllRequest = {
   },
 
   fromJSON(object: any): SearchAllRequest {
-    return { query: isSet(object.query) ? String(object.query) : "" };
+    return { query: isSet(object.query) ? globalThis.String(object.query) : "" };
   },
 
   toJSON(message: SearchAllRequest): unknown {
@@ -3977,8 +4007,8 @@ export const SearchAllResponse = {
 
   fromJSON(object: any): SearchAllResponse {
     return {
-      dbTracks: Array.isArray(object?.dbTracks) ? object.dbTracks.map((e: any) => Track.fromJSON(e)) : [],
-      ncmRes: isSet(object.ncmRes) ? String(object.ncmRes) : "",
+      dbTracks: globalThis.Array.isArray(object?.dbTracks) ? object.dbTracks.map((e: any) => Track.fromJSON(e)) : [],
+      ncmRes: isSet(object.ncmRes) ? globalThis.String(object.ncmRes) : "",
     };
   },
 
@@ -4000,6 +4030,106 @@ export const SearchAllResponse = {
     const message = createBaseSearchAllResponse();
     message.dbTracks = object.dbTracks?.map((e) => Track.fromPartial(e)) || [];
     message.ncmRes = object.ncmRes ?? "";
+    return message;
+  },
+};
+
+function createBaseRebuildIndexRequest(): RebuildIndexRequest {
+  return {};
+}
+
+export const RebuildIndexRequest = {
+  encode(_: RebuildIndexRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): RebuildIndexRequest {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseRebuildIndexRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(_: any): RebuildIndexRequest {
+    return {};
+  },
+
+  toJSON(_: RebuildIndexRequest): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<RebuildIndexRequest>, I>>(base?: I): RebuildIndexRequest {
+    return RebuildIndexRequest.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<RebuildIndexRequest>, I>>(_: I): RebuildIndexRequest {
+    const message = createBaseRebuildIndexRequest();
+    return message;
+  },
+};
+
+function createBaseRebuildIndexResponse(): RebuildIndexResponse {
+  return { success: false };
+}
+
+export const RebuildIndexResponse = {
+  encode(message: RebuildIndexResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.success === true) {
+      writer.uint32(8).bool(message.success);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): RebuildIndexResponse {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseRebuildIndexResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 8) {
+            break;
+          }
+
+          message.success = reader.bool();
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): RebuildIndexResponse {
+    return { success: isSet(object.success) ? globalThis.Boolean(object.success) : false };
+  },
+
+  toJSON(message: RebuildIndexResponse): unknown {
+    const obj: any = {};
+    if (message.success === true) {
+      obj.success = message.success;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<RebuildIndexResponse>, I>>(base?: I): RebuildIndexResponse {
+    return RebuildIndexResponse.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<RebuildIndexResponse>, I>>(object: I): RebuildIndexResponse {
+    const message = createBaseRebuildIndexResponse();
+    message.success = object.success ?? false;
     return message;
   },
 };
@@ -4042,6 +4172,7 @@ export interface MusyncService {
   UpdateUser(request: DeepPartial<UpdateUserRequest>, metadata?: grpc.Metadata): Promise<UpdateUserResponse>;
   DeleteUsers(request: DeepPartial<DeleteUsersRequest>, metadata?: grpc.Metadata): Observable<User>;
   SearchAll(request: DeepPartial<SearchAllRequest>, metadata?: grpc.Metadata): Promise<SearchAllResponse>;
+  RebuildIndex(request: DeepPartial<RebuildIndexRequest>, metadata?: grpc.Metadata): Promise<RebuildIndexResponse>;
 }
 
 export class MusyncServiceClientImpl implements MusyncService {
@@ -4070,6 +4201,7 @@ export class MusyncServiceClientImpl implements MusyncService {
     this.UpdateUser = this.UpdateUser.bind(this);
     this.DeleteUsers = this.DeleteUsers.bind(this);
     this.SearchAll = this.SearchAll.bind(this);
+    this.RebuildIndex = this.RebuildIndex.bind(this);
   }
 
   Login(request: DeepPartial<LoginRequest>, metadata?: grpc.Metadata): Promise<Token> {
@@ -4169,6 +4301,10 @@ export class MusyncServiceClientImpl implements MusyncService {
 
   SearchAll(request: DeepPartial<SearchAllRequest>, metadata?: grpc.Metadata): Promise<SearchAllResponse> {
     return this.rpc.unary(MusyncServiceSearchAllDesc, SearchAllRequest.fromPartial(request), metadata);
+  }
+
+  RebuildIndex(request: DeepPartial<RebuildIndexRequest>, metadata?: grpc.Metadata): Promise<RebuildIndexResponse> {
+    return this.rpc.unary(MusyncServiceRebuildIndexDesc, RebuildIndexRequest.fromPartial(request), metadata);
   }
 }
 
@@ -4657,6 +4793,29 @@ export const MusyncServiceSearchAllDesc: UnaryMethodDefinitionish = {
   } as any,
 };
 
+export const MusyncServiceRebuildIndexDesc: UnaryMethodDefinitionish = {
+  methodName: "RebuildIndex",
+  service: MusyncServiceDesc,
+  requestStream: false,
+  responseStream: false,
+  requestType: {
+    serializeBinary() {
+      return RebuildIndexRequest.encode(this).finish();
+    },
+  } as any,
+  responseType: {
+    deserializeBinary(data: Uint8Array) {
+      const value = RebuildIndexResponse.decode(data);
+      return {
+        ...value,
+        toObject() {
+          return value;
+        },
+      };
+    },
+  } as any,
+};
+
 interface UnaryMethodDefinitionishR extends grpc.UnaryMethodDefinition<any, any> {
   requestStream: any;
   responseStream: any;
@@ -4742,7 +4901,7 @@ export class GrpcWebImpl {
       ? new BrowserHeaders({ ...this.options?.metadata.headersMap, ...metadata?.headersMap })
       : metadata ?? this.options.metadata;
     return new Observable((observer) => {
-      const upStream = (() => {
+      const upStream = () => {
         const client = grpc.invoke(methodDesc, {
           host: this.host,
           request,
@@ -4766,35 +4925,17 @@ export class GrpcWebImpl {
         observer.add(() => {
           return client.close();
         });
-      });
+      };
       upStream();
     }).pipe(share());
   }
 }
 
-declare const self: any | undefined;
-declare const window: any | undefined;
-declare const global: any | undefined;
-const tsProtoGlobalThis: any = (() => {
-  if (typeof globalThis !== "undefined") {
-    return globalThis;
-  }
-  if (typeof self !== "undefined") {
-    return self;
-  }
-  if (typeof window !== "undefined") {
-    return window;
-  }
-  if (typeof global !== "undefined") {
-    return global;
-  }
-  throw "Unable to locate global object";
-})();
-
 type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
 
 export type DeepPartial<T> = T extends Builtin ? T
-  : T extends Array<infer U> ? Array<DeepPartial<U>> : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
+  : T extends globalThis.Array<infer U> ? globalThis.Array<DeepPartial<U>>
+  : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
   : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
 
@@ -4811,14 +4952,14 @@ function toTimestamp(date: Date): Timestamp {
 function fromTimestamp(t: Timestamp): Date {
   let millis = (t.seconds || 0) * 1_000;
   millis += (t.nanos || 0) / 1_000_000;
-  return new Date(millis);
+  return new globalThis.Date(millis);
 }
 
 function fromJsonTimestamp(o: any): Date {
-  if (o instanceof Date) {
+  if (o instanceof globalThis.Date) {
     return o;
   } else if (typeof o === "string") {
-    return new Date(o);
+    return new globalThis.Date(o);
   } else {
     return fromTimestamp(Timestamp.fromJSON(o));
   }
@@ -4828,7 +4969,7 @@ function isSet(value: any): boolean {
   return value !== null && value !== undefined;
 }
 
-export class GrpcWebError extends tsProtoGlobalThis.Error {
+export class GrpcWebError extends globalThis.Error {
   constructor(message: string, public code: grpc.Code, public metadata: grpc.Metadata) {
     super(message);
   }

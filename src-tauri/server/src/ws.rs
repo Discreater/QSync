@@ -93,18 +93,9 @@ async fn handle_socket(
     client_num.add_assign(1);
   }
 
-  // send play queue and player
+  // send player status
   if let Ok(play_queue) = db.get_user_play_queue(user_id).await {
     if let Some(play_queue) = play_queue {
-      // play queue
-      let msg = ServerMsg::UpdatePlayQueue(UpdatePlayQueueEvent {
-        track_ids: play_queue.track_ids.clone(),
-      });
-      socket
-        .send(Message::Item(msg))
-        .await
-        .with_err(|e| error!("send message failed: {}", e));
-
       // send player
       let msg = ServerMsg::UpdatePlayer(UpdatePlayerEvent {
         position: play_queue.position,

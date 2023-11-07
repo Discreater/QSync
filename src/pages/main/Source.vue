@@ -10,9 +10,8 @@ import IconAdd from '~icons/fluent/add-circle-24-regular';
 import IconSpinner from '~icons/fluent/spinner-ios-20-regular';
 import IconFolder from '~icons/fluent/folder-24-regular';
 import IconDelete from '~icons/fluent/delete-24-regular';
-import { useQSyncStore } from '~/store';
+import { useMusyncStore } from '~/store';
 import QInputRow from '~/components/QInputRow.vue';
-import { JellyfinClient } from '~/sources/jellyfin';
 import QSelect from '~/components/QSelect.vue';
 import LongButton from '~/components/LongButton.vue';
 import type { Item } from '~/components/types';
@@ -20,7 +19,7 @@ import { logger } from '~/utils/logger';
 import { getPlatform } from '~/platforms';
 
 const { t } = useI18n();
-const store = useQSyncStore();
+const store = useMusyncStore();
 
 type SourceType = 'jellyfin' | 'local';
 
@@ -38,12 +37,12 @@ const showAddModel = ref(false);
 async function addAccount() {
   if (sourceType.value === 'jellyfin') {
     if (server.value !== undefined && username.value !== undefined && password.value !== undefined) {
-      const opt = {
+      const _opt = {
         server: server.value,
         user: username.value,
         pwd: password.value,
       };
-      const _client = new JellyfinClient(opt, store.jellyfinSource.deviceName, store.jellyfinSource.deviceId);
+      // const _client = new JellyfinClient(opt, store.jellyfinSource.deviceName, store.jellyfinSource.deviceId);
       logger.warn('jellyfin not support yet');
     }
     // const client = new JellyfinClient({

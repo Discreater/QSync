@@ -1,17 +1,17 @@
 <script setup lang="ts">
 import { invoke } from '@tauri-apps/api';
-import { computed, onMounted, onUnmounted } from 'vue';
+import { computed, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import SmoothScrollbar from 'smooth-scrollbar';
 import { useRoute } from 'vue-router';
 import { breakpointsTailwind, useBreakpoints } from '@vueuse/core';
 import { getPlatform, inTauri } from './platforms';
-import { useQSyncStore } from './store';
+import { useMusyncStore } from './store';
 import QPlayer from './components/QPlayer.vue';
-import { WsClient } from './api/client';
-import { usePlayerStore } from './store/player';
 import TitleBar from '~/components/TitleBar.vue';
 import { defaultTheme } from '~/utils/theme';
+
+import { useLoading } from '~/logic';
 
 // originally created by @DjSt3rios
 // see: https://github.com/idiotWu/smooth-scrollbar/discussions/367
@@ -25,8 +25,11 @@ class ShiftScrollPlugin extends SmoothScrollbar.ScrollbarPlugin {
 
 SmoothScrollbar.use(ShiftScrollPlugin);
 
-const playerStore = usePlayerStore();
-const qsyncStore = useQSyncStore();
+const { t } = useI18n();
+
+const qsyncStore = useMusyncStore();
+
+const loading = useLoading();
 
 onMounted(async () => {
   inTauri(async () => {
@@ -37,18 +40,6 @@ onMounted(async () => {
   root.style.setProperty('--main', theme.main);
 });
 const { locale: i18nLocale } = useI18n();
-
-const listen1 = WsClient.listenOnUpdatePlayer((update) => {
-  playerStore.updateFromRemote(update);
-});
-const listen2 = WsClient.listenOnUpdatePlayQueue((update) => {
-  qsyncStore.updatePlayQueueFromRemote(update.trackIds);
-});
-
-onUnmounted(() => {
-  WsClient.cancelOnUpdatePlayer(listen1);
-  WsClient.cancelOnUpdatePlayQueue(listen2);
-});
 
 qsyncStore.$subscribe((_mutation, state) => {
   i18nLocale.value = state.locale;
@@ -64,11 +55,19 @@ const denseTitle = computed(() => route.name === 'lyric' || inPhone.value);
 <template>
   <div
     id="qsync"
-    :class="`w-full h-full max-h-screen flex flex-col
-     text-black dark:text-white bg-main_w_bg dark:bg-main_d_bg ${getPlatform() !== 'web' ? 'border-white/10 border' : ''} `"
+    class="w-full h-full max-h-screen flex flex-col
+     text-black dark:text-white bg-main_w_bg dark:bg-main_d_bg"
+    :class="getPlatform() !== 'web' ? 'border-white/10 border' : ''"
   >
-    <RouterView />
-    <TitleBar v-if="getPlatform() !== 'web'" :dense="denseTitle" />
-    <QPlayer class="shrink-0" />
+    <div v-if="loading" class="w-full h-full flex justify-center items-center">
+      <p>
+        {{ t('loading') }}
+      </p>
+    </div>
+    <template v-else>
+      <RouterView />
+      <TitleBar v-if="getPlatform() !== 'web'" :dense="denseTitle" />
+      <QPlayer class="shrink-0" />
+    </template>
   </div>
 </template>

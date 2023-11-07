@@ -8,8 +8,8 @@ import QPopover from './QPopover.vue';
 import HoverLayer from './HoverLayer.vue';
 import H2 from './typo/H2.vue';
 import QImage from './QImage.vue';
-import { sameTrack, useConfigStore, useQSyncStore } from '~/store';
-import { usePlayerStore } from '~/store/player';
+import { sameTrack, useMusyncStore } from '~/store';
+import { usePlayerConfigStore, usePlayerStore } from '~/store/player';
 import { logger } from '~/utils/logger';
 import IconArrowShuffle from '~icons/fluent/arrow-shuffle-24-regular';
 import IconPrevious from '~icons/fluent/previous-24-filled';
@@ -30,9 +30,9 @@ const router = useRouter();
 const route = useRoute();
 
 const audio = ref<HTMLAudioElement | null>(null);
-const qsyncStore = useQSyncStore();
+const qsyncStore = useMusyncStore();
 const playerStore = usePlayerStore();
-const configStore = useConfigStore();
+const configStore = usePlayerConfigStore();
 
 const currentTrack = ref<Track>();
 const unsupported = ref(false);
@@ -69,8 +69,10 @@ async function updatePlayer(pState: typeof playerStore) {
   }
 
   const playQueue = qsyncStore.playQueue;
-  if (playQueue.length === 0)
+  if (playQueue.length <= pState.position) {
+    logger.warn(`update player error: play queue length is ${playQueue.length}, position is ${pState.position}`);
     return;
+  }
 
   const loadingProgress = pState.progress();
   // ignore the same track
@@ -168,8 +170,6 @@ onMounted(async () => {
 onUnmounted(() => {
   audio.value?.pause();
 });
-
-localProgress.value = playerStore.progress();
 
 function handlePrevious() {
   qsyncStore.previousTrack();

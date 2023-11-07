@@ -11,6 +11,7 @@ settings:
   add-folder: 添加文件夹
   lib-no-folder: 此库中不包含任何文件夹
   user: 用户
+  reindex: 重建索引
 source:
   add: 添加源
   user: 用户
@@ -52,3 +53,4 @@ track:
   year: 发行年份
   local-src: 本地源
   netease-src: 网易云源
+loading: 加载中

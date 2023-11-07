@@ -10,17 +10,22 @@ import IconFolder from '~icons/fluent/folder-24-regular';
 import IconFolderAdd from '~icons/fluent/folder-add-24-regular';
 
 import { open } from '~/platforms/dialog';
-import { useQSyncStore } from '~/store';
+import { useMusyncStore } from '~/store';
 import QList from '~/components/QList.vue';
+import { ApiClient } from '~/api/client';
 
 const { t } = useI18n();
-const store = useQSyncStore();
+const store = useMusyncStore();
 
 async function handleAddMusicFolder() {
   const _selected = await open({
     directory: true,
   }) as string;
   // store.addMusicFolder(selected);
+}
+
+async function rebuildIndex() {
+  ApiClient.get().grpcClient.RebuildIndex({});
 }
 </script>
 
@@ -33,7 +38,7 @@ async function handleAddMusicFolder() {
         <QButton :icon="IconFolderAdd" :text="t('settings.add-folder')" @click.stop="handleAddMusicFolder()" />
       </template>
       <template #drop>
-        <QList :items="store.musicFolders" :key-map="(t) => t.path">
+        <QList :items="store.musicFolders" :key-map="({ path }) => path">
           <template #item="{ item }">
             <div>{{ item.path }}</div>
           </template>
@@ -43,5 +48,6 @@ async function handleAddMusicFolder() {
         </QList>
       </template>
     </LongButton>
+    <QButton :text="t('settings.reindex')" @click="rebuildIndex" />
   </Basic>
 </template>

@@ -1,6 +1,6 @@
 use std::{net::SocketAddr, path::PathBuf, sync::Arc, time::Duration};
 
-use abi::musync_service_server::MusyncServiceServer;
+use abi::{musync_service_server::MusyncServiceServer, UpdatePlayerEvent};
 use axum::{routing::get, Extension, Router};
 
 use axum_server::Handle;
@@ -33,6 +33,7 @@ impl Server {
   /// spawn a new task, return the join handle of the server and the server handle
   pub async fn serve(addr: &SocketAddr, db_url: &str, data_folder: PathBuf) -> Result<Self> {
     let manager = dbm::DbManager::from_url(db_url, data_folder).await?;
+    manager.stop_all().await?;
 
     let cors = CorsLayer::new()
       .allow_headers([

@@ -15,7 +15,6 @@ use tantivy::{
 use tokio::sync::oneshot;
 use tokio_stream::StreamExt;
 use tracing::{error, trace};
-use utils::WithError;
 
 use crate::{MusyncError, TrackId};
 
@@ -56,11 +55,14 @@ impl SearchActor {
     if !cache_data_folder.exists() {
       std::fs::create_dir_all(&cache_data_folder).expect("create cache data folder failed");
     }
-    Index::open_or_create(
+    let index = Index::open_or_create(
       MmapDirectory::open(cache_data_folder).expect("open cache data folder failed"),
       schema,
     )
-    .expect("create index failed")
+    .expect("create index failed");
+    let tokenizer = tantivy_jieba::JiebaTokenizer {};
+    index.tokenizers().register("jieba", tokenizer);
+    index
   }
 
   async fn rebuild_index(&mut self) {
@@ -175,12 +177,12 @@ impl SearchActorHandle {
   }
 
   pub async fn index(&self) {
-    let msg = ActorMessage::Index;
-    let mut sender = self.sender.clone();
-    sender.send(msg).await.with_err(|e| {
-      error!("error sending message to search actor: {:?}", e);
-    });
-    trace!("index message sent")
+    let _msg = ActorMessage::Index;
+    // let mut sender = self.sender.clone();
+    // sender.send(msg).await.with_err(|e| {
+    //   error!("error sending message to search actor: {:?}", e);
+    // });
+    // trace!("index message sent")
   }
 
   pub async fn search(&self, query: String) -> Result<SearchResult, MusyncError> {

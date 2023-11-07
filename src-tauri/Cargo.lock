@@ -1238,10 +1238,10 @@ dependencies = [
  "entity",
  "futures-channel",
  "futures-util",
- "jieba-rs",
  "migration",
  "sea-orm",
  "tantivy",
+ "tantivy-jieba",
  "thiserror",
  "tokio",
  "tokio-stream",
@@ -5386,6 +5386,17 @@ dependencies = [
  "byteorder",
  "regex-syntax 0.6.29",
  "utf8-ranges",
+]
+
+[[package]]
+name = "tantivy-jieba"
+version = "0.10.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "44022293c12a8f878e03439b2f11806d3d394130fe33d4e7781cba91abbac0a4"
+dependencies = [
+ "jieba-rs",
+ "lazy_static",
+ "tantivy-tokenizer-api",
 ]
 
 [[package]]

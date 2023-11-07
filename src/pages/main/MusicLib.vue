@@ -7,7 +7,7 @@ import { useRouter } from 'vue-router';
 import IconArrowShuffle from '~icons/fluent/arrow-shuffle-24-regular';
 import H1 from '~/components/typo/H1.vue';
 import Basic from '~/layouts/Basic.vue';
-import { useQSyncStore } from '~/store';
+import { useMusyncStore } from '~/store';
 import QButton from '~/components/QButton.vue';
 import { formatTime, shuffle } from '~/utils';
 import QHoverButton from '~/components/QHoverButton.vue';
@@ -20,7 +20,7 @@ import { usePlayerStore } from '~/store/player';
 import QTable from '~/components/QTable.vue';
 
 const { t } = useI18n();
-const store = useQSyncStore();
+const store = useMusyncStore();
 const playerStore = usePlayerStore();
 const container = ref<HTMLDivElement | null>(null);
 const scrollbar = ref<Scrollbar | null>(null);

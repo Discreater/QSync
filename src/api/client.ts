@@ -21,7 +21,7 @@ export class WsClient {
 
   authed: boolean = false;
   msgQueue: ClientMsg[] = [];
-  constructor(private wsClient: WebSocket, token: Token) {
+  constructor(private wsClient: WebSocket, token: Token, onConnected?: () => void) {
     this.wsClient.onopen = () => {
       this.wsClient.send(JSON.stringify({
         Auth: token?.data,
@@ -37,6 +37,7 @@ export class WsClient {
             logger.trace(`ws send message in message queue: ${JSON.stringify(msg)}`);
             this.wsClient.send(JSON.stringify(msg));
           });
+          onConnected?.();
         } else if ('UpdatePlayer' in msg) {
           WsClient.updatePlayerListeners.forEach((fn) => {
             fn(msg.UpdatePlayer);
@@ -90,14 +91,19 @@ export class WsClient {
 export class ApiClient {
   grpcClient: MusyncServiceClientImpl;
   wsClient: WsClient | undefined;
-  private constructor(private addr: string, token?: Token) {
+  private constructor(private addr: string, token?: Token, onConnected?: () => void) {
     logger.trace(addr);
     const rpc = new GrpcWebImpl(this.http_addr, {
       metadata: token !== undefined ? new grpc.Metadata({ authorization: `${token?.data}` }) : undefined,
     });
     this.grpcClient = new MusyncServiceClientImpl(rpc);
-    if (token !== undefined)
-      this.wsClient = new WsClient(new WebSocket(this.ws_addr), token);
+    if (token !== undefined) {
+      // both grpc and ws client, wait for ws connection
+      this.wsClient = new WsClient(new WebSocket(this.ws_addr), token, onConnected);
+    } else {
+      // only grpc client, connection is already established
+      onConnected?.();
+    }
   }
 
   public get http_addr(): string {
@@ -131,9 +137,13 @@ export class ApiClient {
     return ApiClient.get().wsClient;
   }
 
-  static set(addr: string) {
-    const accountStore = useAccountStore();
-    ApiClient.apiClient = new ApiClient(addr, accountStore.token);
+  static set(addr: string): Promise<void> {
+    return new Promise<void>((resolve, _reject) => {
+      const accountStore = useAccountStore();
+      ApiClient.apiClient = new ApiClient(addr, accountStore.token, () => {
+        resolve();
+      });
+    });
   }
 
   static reset() {

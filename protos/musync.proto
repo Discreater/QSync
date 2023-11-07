@@ -170,7 +170,7 @@ message CreateTrackResponse {
 // Query track
 message QueryTracksRequest {
   // Query by which playlist contains the track
-  optional int32 playlist_id = 1;
+  optional int32 playlist_id = 1 [deprecated = true];
   // Query by title
   optional string title = 2;
   // Query by artist
@@ -320,6 +320,11 @@ message SearchAllResponse {
   string ncm_res = 2;
 }
 
+message RebuildIndexRequest {}
+message RebuildIndexResponse {
+  bool success = 1;
+}
+
 // Musync service
 service MusyncService {
   rpc Login(LoginRequest) returns (Token);
@@ -350,4 +355,6 @@ service MusyncService {
   rpc DeleteUsers(DeleteUsersRequest) returns (stream User);
   
   rpc SearchAll(SearchAllRequest) returns (SearchAllResponse);
+
+  rpc RebuildIndex(RebuildIndexRequest) returns (RebuildIndexResponse);
 }

@@ -11,3 +11,5 @@ source:
   user: User
   pwd: Password
   add: Add Source
+settings:
+  reindex: rebuild index

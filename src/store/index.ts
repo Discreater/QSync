@@ -1,15 +1,14 @@
 import { createPinia, defineStore } from 'pinia';
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate';
 import { usePlayerStore } from './player';
-import { ApiClient } from '~/api/client';
+import { ApiClient, WsClient } from '~/api/client';
 import type { Track } from '~/generated/protos/musync';
 import type { TrackId } from '~/model_ext/track';
 import type { LocalFolder } from '~/sources/folder';
 
 import type { JellyfinClientOptions } from '~/sources/jellyfin';
 import { mod, shuffle } from '~/utils';
-
-import { generateDeviceId, getDeviceName } from '~/utils/apphost';
+import { useLoading } from '~/logic';
 import { logger } from '~/utils/logger';
 
 export function sameTrack(a: Track | undefined, b: Track | undefined): boolean {
@@ -18,7 +17,7 @@ export function sameTrack(a: Track | undefined, b: Track | undefined): boolean {
   return a.id === b.id;
 }
 
-interface JellyfinSource {
+export interface JellyfinSource {
   deviceId: string
   deviceName: string
   clients: {
@@ -26,25 +25,36 @@ interface JellyfinSource {
   }
 }
 
-export const useConfigStore = defineStore('config', {
-  state: () => ({
-    volume: 100,
-    muted: false,
-  }),
-  persist: true,
-});
-
-export const useQSyncStore = defineStore('qsync', {
+export const useMusyncStore = defineStore('musync', {
   state: () => ({
     musicFolders: [] as LocalFolder[],
     locale: 'zh-CN' as 'zh-CN' | 'en',
     playQueue: [] as Track[],
-    jellyfinSource: {
-      deviceId: generateDeviceId(),
-      deviceName: getDeviceName(),
-    } as JellyfinSource,
+    // jellyfinSource: {
+    //   deviceId: generateDeviceId(),
+    //   deviceName: getDeviceName(),
+    // } as JellyfinSource,
   }),
   actions: {
+    async init(host: string) {
+      const loading = useLoading();
+      loading.value = true;
+
+      WsClient.listenOnUpdatePlayQueue((update) => {
+        if (!loading.value)
+          this.updatePlayQueueFromRemote(update.trackIds);
+      });
+      const playerStore = usePlayerStore();
+      WsClient.listenOnUpdatePlayer((update) => {
+        playerStore.updateFromRemote(update);
+      });
+
+      await ApiClient.set(`${host}:8396`);
+
+      await this.updateFoldersFromRemote();
+      await this.updatePlayQueueFromRemote();
+      loading.value = false;
+    },
     async addMusicFolder(folder: string) {
       if (this.musicFolders.find(v => v.path === folder))
         return;
@@ -58,6 +68,8 @@ export const useQSyncStore = defineStore('qsync', {
       await this.updateFoldersFromRemote();
     },
     async updateFoldersFromRemote() {
+      logger.trace('update folders from remote');
+      const folderUpdates: Promise<void>[] = [];
       await ApiClient.get().grpcClient.QueryLocalFolders({}).forEach((folder) => {
         let f = this.musicFolders.find(v => v.path === folder.path);
         if (!f) {
@@ -68,27 +80,35 @@ export const useQSyncStore = defineStore('qsync', {
           });
           f = this.musicFolders[this.musicFolders.length - 1];
         }
-        this.updateFolder(f);
+        folderUpdates.push(this.updateFolder(f));
       });
+      logger.trace(`Got ${folderUpdates.length} folders`);
+      await Promise.all(folderUpdates);
+      logger.trace('update folders from remote done');
     },
     async updateFolder(folder: string | LocalFolder) {
+      logger.trace('update folder');
       let f: LocalFolder | undefined;
       if (typeof folder === 'string')
-        f = this.musicFolders.find(v => v.path === folder);
+        f = this.musicFolders.find(({ path }) => path === folder);
       else
         f = folder;
 
-      if (f === undefined)
+      if (f === undefined) {
+        logger.warn(`folder ${folder} not found`);
         return;
+      }
       f.updating = true;
       f.tracks = [];
-      ApiClient.grpc().QueryTracks({}).forEach((track) => {
-        f!.tracks.push(track);
+      await ApiClient.grpc().QueryTracks({}).forEach((track) => {
+        if (track)
+          f!.tracks.push(track);
       }).then(() => {
         f!.updating = false;
       });
     },
     async removeFolder(folder: string) {
+      logger.trace('remove folder');
       const f = this.musicFolders.findIndex(v => v.path === folder);
       if (f === -1)
         return;
@@ -98,6 +118,7 @@ export const useQSyncStore = defineStore('qsync', {
       this.musicFolders.splice(f, 1);
     },
     async updatePlayQueueFromRemote(trackIds?: TrackId[]) {
+      logger.trace('update play queue from remote');
       if (!trackIds) {
         const play_queue = await ApiClient.grpc().GetPlayQueue({});
         trackIds = play_queue.trackIds;
