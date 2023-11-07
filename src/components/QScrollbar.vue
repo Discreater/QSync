@@ -2,17 +2,23 @@
 import Scrollbar from 'smooth-scrollbar';
 import { onMounted, onUnmounted, ref } from 'vue';
 
+const scrollbar = ref<Scrollbar | null>(null);
+
 const container = ref<HTMLDivElement | null>(null);
 onMounted(() => {
   if (container.value) {
-    Scrollbar.init(container.value, {
+    scrollbar.value = Scrollbar.init(container.value, {
       alwaysShowTracks: true,
     });
   }
 });
 onUnmounted(() => {
   if (container.value)
-    Scrollbar.destroy(container.value!);
+    scrollbar.value?.destroy();
+});
+
+defineExpose({
+  scrollbar,
 });
 </script>
 

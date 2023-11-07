@@ -4,7 +4,6 @@ import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
 import { ApiClient } from '~/api/client';
 import QInput from '~/components/QInput.vue';
-import H1 from '~/components/typo/H1.vue';
 import type { LocalSource, NeteaseSource, Track } from '~/generated/protos/musync';
 import Basic from '~/layouts/Basic.vue';
 
@@ -62,10 +61,7 @@ const { t } = useI18n();
 </script>
 
 <template>
-  <Basic>
-    <H1>
-      {{ t('track.track-info') }}
-    </H1>
+  <Basic :header="t('track.track-info')">
     <div v-if="!loading && editingTrack" class="grid grid-cols-[100px_minmax(0,1fr)] items-center space-y-2">
       <label for="track-info-title">{{ t('track.title') }}</label>
       <QInput id="track-info-title" v-model:value="editingTrack.title" type="text" />

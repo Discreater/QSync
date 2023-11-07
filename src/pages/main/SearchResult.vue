@@ -3,13 +3,12 @@ import { ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
 import { ApiClient } from '~/api/client';
-import H1 from '~/components/typo/H1.vue';
 import H2 from '~/components/typo/H2.vue';
 import Basic from '~/layouts/Basic.vue';
 import type { Track } from '~/generated/protos/musync';
 import type { NcmSearchResult } from '~/model_ext/ncm';
 
-const props = defineProps<{
+defineProps<{
   query: string
 }>();
 const loading = ref(true);
@@ -32,8 +31,7 @@ const { t } = useI18n();
 </script>
 
 <template>
-  <Basic>
-    <H1>{{ t('search-result.title') }} : "{{ props.query }}"</H1>
+  <Basic :header="`${t('search-result.title')} : ${query}`">
     <div v-if="loading">
       Loading
     </div>

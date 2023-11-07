@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n';
 import Basic from '~/layouts/Basic.vue';
-import H1 from '~/components/typo/H1.vue';
 import H2 from '~/components/typo/H2.vue';
 import LongButton from '~/components/LongButton.vue';
 import QButton from '~/components/QButton.vue';
@@ -30,8 +29,7 @@ async function rebuildIndex() {
 </script>
 
 <template>
-  <Basic>
-    <H1>{{ t('menu.settings') }}</H1>
+  <Basic :header="t('menu.settings')">
     <H2>{{ t("settings.user") }}</H2>
     <LongButton :icon="IconFolder" :droppable="true" :text="t('settings.music-lib-position')">
       <template #extra>

@@ -3,7 +3,6 @@ import { useI18n } from 'vue-i18n';
 import { breakpointsTailwind, useBreakpoints } from '@vueuse/core';
 import Basic from '~/layouts/Basic.vue';
 import { toggleDark } from '~/utils';
-import H1 from '~/components/typo/H1.vue';
 import { useMusyncStore } from '~/store';
 import QSelect from '~/components/QSelect.vue';
 
@@ -20,8 +19,7 @@ const current = breakPoints.current();
 </script>
 
 <template>
-  <Basic>
-    <H1>{{ t('menu.home') }}</H1>
+  <Basic :header="t('menu.home')">
     <button @click="toggleDark()">
       toggle dark
     </button>

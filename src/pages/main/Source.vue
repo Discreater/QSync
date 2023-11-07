@@ -2,7 +2,6 @@
 import { useI18n } from 'vue-i18n';
 import { ref } from 'vue';
 import Basic from '~/layouts/Basic.vue';
-import H1 from '~/components/typo/H1.vue';
 import H2 from '~/components/typo/H2.vue';
 import QButton from '~/components/QButton.vue';
 
@@ -71,11 +70,10 @@ async function addAccount() {
 </script>
 
 <template>
-  <Basic>
-    <div class="flex justify-between">
-      <H1>{{ t("menu.source") }}</H1>
+  <Basic :header="t('menu.source')" :show-model="showAddModel">
+    <template #header-extra>
       <QButton :icon="IconAdd" :text="t('source.add')" @click="showAddModel = true" />
-    </div>
+    </template>
     <H2>{{ t('source.types.local') }}</H2>
     <div>
       <LongButton
@@ -88,7 +86,7 @@ async function addAccount() {
         </template>
       </LongButton>
     </div>
-    <div v-show="showAddModel" class="absolute inset-0 bg-[#4b4b4b80] flex justify-center items-center">
+    <template #model>
       <div class="flex flex-col bg-[#1c1c1c] px-4 pb-4 pt-2 rounded gap-2">
         <H2>{{ t('source.add') }}</H2>
         <LongButton :text="t('source.type')">
@@ -113,7 +111,7 @@ async function addAccount() {
           <QButton :text="t('cancel')" @click="showAddModel = false" />
         </div>
       </div>
-    </div>
+    </template>
   </Basic>
 </template>
 

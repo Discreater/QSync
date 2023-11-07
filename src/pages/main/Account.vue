@@ -2,7 +2,6 @@
 import { useI18n } from 'vue-i18n';
 import { computed, ref } from 'vue';
 import LongButton from '~/components/LongButton.vue';
-import H1 from '~/components/typo/H1.vue';
 import H2 from '~/components/typo/H2.vue';
 import Basic from '~/layouts/Basic.vue';
 import IconConnected from '~icons/fluent/plug-connected-24-regular';
@@ -19,8 +18,7 @@ const online = computed(() => accountStore.online);
 </script>
 
 <template>
-  <Basic>
-    <H1>{{ t('menu.account') }}</H1>
+  <Basic :header="t('menu.account')">
     <H2>{{ t('account.qsync') }}</H2>
     <LongButton :icon="online ? IconConnected : IconDisconnected" :text="online ? accountStore.username : t('account.not-login')">
       <template #extra>

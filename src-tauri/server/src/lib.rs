@@ -1,6 +1,6 @@
 use std::{net::SocketAddr, path::PathBuf, sync::Arc, time::Duration};
 
-use abi::{musync_service_server::MusyncServiceServer, UpdatePlayerEvent};
+use abi::musync_service_server::MusyncServiceServer;
 use axum::{routing::get, Extension, Router};
 
 use axum_server::Handle;
