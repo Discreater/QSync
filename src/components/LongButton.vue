@@ -18,13 +18,12 @@ const toggleDropped = useToggle(dropped);
     <div
       class="group flex justify-between items-center min-w-[20rem]
          bg-[#323232] rounded select-none cursor-default hover:bg-[#3e3e3e]
-          h-[4.25rem] px-[17px] ring-1 ring-black/10" @click="toggleDropped()"
+          h-[4.25rem] px-5 ring-1 ring-black/10" @click="toggleDropped()"
     >
-      <div class="flex space-x-4 items-center">
-        <Component :is="icon" v-if="icon" class="text-2xl" />
+      <div class="flex items-center">
+        <Component :is="icon" v-if="icon" class="h-7 w-7 mr-4" />
         <span>{{ text }}</span>
       </div>
-      <div />
       <div class="flex items-center">
         <slot name="extra" />
         <button
@@ -37,6 +36,8 @@ const toggleDropped = useToggle(dropped);
         </button>
       </div>
     </div>
-    <slot v-if="dropped" name="drop" :dropped="dropped" />
+    <div v-if="dropped" class="bg-[#323232] mt-0.5 px-[60px] py-2">
+      <slot name="drop" :dropped="dropped" />
+    </div>
   </div>
 </template>

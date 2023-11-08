@@ -60,7 +60,7 @@ function handleItemClick(item: Item) {
         v-for="item in top" :key="item.key" :selected="item.key === activated" :name="t(item.name)" :only-icon="onlyIcon"
         @click="handleItemClick(item)"
       >
-        <Component :is="item.icon" class="text-xl" />
+        <Component :is="item.icon" class="text-base" />
       </MenuItem>
     </div>
     <div>
@@ -68,7 +68,7 @@ function handleItemClick(item: Item) {
         v-for="item in bottom" :key="item.key" :selected="item.key === activated" :name="t(item.name)" :only-icon="onlyIcon"
         @click="handleItemClick(item)"
       >
-        <Component :is="item.icon" class="text-xl" />
+        <Component :is="item.icon" class="text-base" />
       </MenuItem>
     </div>
   </div>

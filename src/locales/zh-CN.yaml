@@ -12,6 +12,11 @@ settings:
   lib-no-folder: 此库中不包含任何文件夹
   user: 用户
   reindex: 重建索引
+  theme: 主题
+  application_theme: 应用主题
+  theme_auto: 使用系统设置
+  theme_light: 浅色
+  theme_dark: 深色
 source:
   add: 添加源
   user: 用户

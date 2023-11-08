@@ -56,7 +56,6 @@ input[type="range"] {
   appearance: none;
   /* creating a custom design */
   width: 100%;
-  cursor: pointer;
   outline: none;
   height: 0.25rem;
   background: #ffffff80;
@@ -69,8 +68,8 @@ input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
   /* creating a custom design */
-  height: 1.5rem;
-  width: 1.5rem;
+  height: 1.4rem;
+  width: 1.4rem;
   background-color: #f97316;
   border-radius: 50%;
   border: 0.4rem solid #454545;
@@ -81,8 +80,8 @@ input[type="range"]::-webkit-slider-thumb {
 /* Thumb: Firefox */
 input[type="range"]::-moz-range-thumb {
   appearance: none;
-  height: 1.5rem;
-  width: 1.5rem;
+  height: 1.4rem;
+  width: 1.4rem;
   background-color: #f97316;
   border-radius: 50%;
   border: 0.4rem solid #454545;

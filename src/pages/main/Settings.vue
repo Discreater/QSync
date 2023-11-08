@@ -1,51 +1,49 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n';
+import { useColorMode } from '@vueuse/core';
 import Basic from '~/layouts/Basic.vue';
 import H2 from '~/components/typo/H2.vue';
 import LongButton from '~/components/LongButton.vue';
-import QButton from '~/components/QButton.vue';
 
-import IconFolder from '~icons/fluent/folder-24-regular';
-import IconFolderAdd from '~icons/fluent/folder-add-24-regular';
-
-import { open } from '~/platforms/dialog';
-import { useMusyncStore } from '~/store';
-import QList from '~/components/QList.vue';
-import { ApiClient } from '~/api/client';
+import IconPaintBrush from '~icons/fluent/paint-brush-24-regular';
 
 const { t } = useI18n();
-const store = useMusyncStore();
 
-async function handleAddMusicFolder() {
-  const _selected = await open({
-    directory: true,
-  }) as string;
-  // store.addMusicFolder(selected);
-}
-
-async function rebuildIndex() {
-  ApiClient.get().grpcClient.RebuildIndex({});
-}
+const { store, system } = useColorMode();
 </script>
 
 <template>
   <Basic :header="t('menu.settings')">
-    <H2>{{ t("settings.user") }}</H2>
-    <LongButton :icon="IconFolder" :droppable="true" :text="t('settings.music-lib-position')">
+    <H2>{{ t("settings.theme") }}</H2>
+    <LongButton :icon="IconPaintBrush" :droppable="true" :text="t('settings.application_theme')">
       <template #extra>
-        <QButton :icon="IconFolderAdd" :text="t('settings.add-folder')" @click.stop="handleAddMusicFolder()" />
+        {{ t(`settings.theme_${store}`) }}
       </template>
       <template #drop>
-        <QList :items="store.musicFolders" :key-map="({ path }) => path">
-          <template #item="{ item }">
-            <div>{{ item.path }}</div>
-          </template>
-          <template #empty>
-            {{ t('settings.lib-no-folder') }}
-          </template>
-        </QList>
+        <div class="flex flex-col justify-center">
+          <label for="theme-light">
+            <input id="theme-light" v-model="store" type="radio" name="theme" value="light">
+            {{ t('settings.theme_light') }}
+          </label>
+          <label for="theme-dark">
+            <input id="theme-dark" v-model="store" type="radio" name="theme" value="dark">
+            {{ t('settings.theme_dark') }}
+          </label>
+          <label for="theme-auto">
+            <input id="theme-auto" v-model="store" type="radio" name="theme" value="auto">{{ t('settings.theme_auto') }} :
+            {{ t(`settings.theme_${system}`) }}
+          </label>
+        </div>
       </template>
     </LongButton>
-    <QButton :text="t('settings.reindex')" @click="rebuildIndex" />
   </Basic>
 </template>
+
+<style>
+input[type="radio"] {
+  margin-right: 0.5rem;
+  width: 1rem;
+  height: 1rem;
+  background-color: transparent;
+}
+</style>

@@ -288,9 +288,9 @@ function setMediaSessionHandler() {
 </script>
 
 <template>
-  <div class="h-player flex flex-col border-solid border-t border-black/30 gap-1 p-1">
+  <div class="h-player flex flex-col border-solid border-t border-black/30 gap-1 p-0.5">
     <!-- Progress slider -->
-    <QSlider class="px-3" :value="localProgress" :min="0" :max="duration" @update:value="onSliderUpdate">
+    <QSlider class="px-3 mt-1" :value="localProgress" :min="0" :max="duration" @update:value="onSliderUpdate">
       <template #left="{ value }">
         <span class="text-xs w-14"> {{ formatTime(value, 'hh:mm:ss') }} </span>
       </template>
@@ -300,13 +300,13 @@ function setMediaSessionHandler() {
         }}</span>
       </template>
     </QSlider>
-    <div class="grow flex justify-between items-center p-1">
+    <div class="grow flex justify-between items-center p-0.5">
       <div class="flex-1 h-full flex overflow-hidden">
         <!-- Track info (cover/title/artist...) -->
-        <HoverLayer v-if="currentTrack" class="flex select-none cursor-default min-w-0" @click="onInfoCardClick()">
+        <HoverLayer v-if="currentTrack" class="flex items-center select-none cursor-default min-w-0" @click="onInfoCardClick()">
           <QImage
             v-if="showCardImg" :src="currentTrack ? ApiClient.get().cover_uri(currentTrack.id) : ''"
-            class="object-scale-down w-20 h-20 border-white/10 border"
+            class="object-scale-down w-[70px] h-[70px] border-white/10 border"
           >
             <template #failed>
               <div class="flex items-center justify-center h-full ">

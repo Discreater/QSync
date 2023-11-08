@@ -99,14 +99,17 @@ const inTauri = getPlatform() === 'tauri';
       </template>
     </QInput>
     <Teleport to="#qsync">
-      <div v-if="showMenuInPhone" class="fixed inset-x-0 top-12 bottom-player p-1 bg-menu_w_bg dark:bg-menu_d_bg" :class="inTauri ? 'mt-title' : ''">
+      <div
+        v-if="showMenuInPhone" class="fixed inset-x-0 top-12 bottom-player p-1 bg-menu_w_bg dark:bg-menu_d_bg"
+        :class="inTauri ? 'mt-title' : ''"
+      >
         <QMenu :activated="activated" :top="menu.top" :bottom="menu.bottom" @item-click="onItemClick" />
       </div>
     </Teleport>
   </div>
   <div
-    v-else
-    :class="`bg-menu_w_bg dark:bg-menu_d_bg flex flex-col sm:w-12 md:w-[23rem] px-0 sm:px-1 ${getPlatform() !== 'web' ? 'pt-14' : 'pt-2'}`"
+    v-else class="bg-menu_w_bg dark:bg-menu_d_bg flex flex-col sm:w-12 md:w-80 px-0 sm:px-1"
+    :class="getPlatform() !== 'web' ? 'pt-14' : 'pt-2'"
   >
     <QInput
       id="nav-search" v-model:value="searchText" class="mx-2.5 mb-3 hidden md:flex" type="text"
