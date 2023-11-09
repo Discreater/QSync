@@ -97,7 +97,7 @@ const inTauri = getPlatform() === 'tauri';
       @keyup.enter="search"
     >
       <template #extra>
-        <QHoverButton size="small" :disabled="!searchText" @click="search">
+        <QHoverButton size="custom" :disabled="!searchText" @click="search">
           <IconSearch clip="text-xs" />
         </QHoverButton>
       </template>
@@ -120,7 +120,7 @@ const inTauri = getPlatform() === 'tauri';
       :placeholder="t('nav.search')" @keyup.enter="search"
     >
       <template #extra>
-        <QHoverButton size="small" :disabled="!searchText" @click="search">
+        <QHoverButton size="custom" :disabled="!searchText" @click="search">
           <IconSearch text="text-xs" />
         </QHoverButton>
       </template>

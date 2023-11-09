@@ -1,15 +1,15 @@
 <script setup lang="ts">
-type Size = 'small' | 'normal';
+type Size = 'custom' | 'fixed';
 
 type Cursor = 'default' | 'pointer';
 
 const props = withDefaults(defineProps<{ disabled?: boolean; size?: Size; cursor?: Cursor }>(), {
   disabled: false,
-  size: 'normal',
+  size: 'fixed',
   cursor: 'default',
 });
 
-const buttonClass = props.size === 'small' ? 'my-0.5' : 'h-10 w-10';
+const buttonClass = props.size === 'custom' ? 'my-0.5' : 'h-10 w-10';
 </script>
 
 <template>

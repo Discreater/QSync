@@ -109,13 +109,15 @@ function handleTitleClick(track: Track) {
       <template #bodyCell="{ column, row, rowIdx }">
         <template v-if="column.key === 'actions'">
           <div class="flex">
-            <QButton class="text-passion" @click="playByIdx(rowIdx)">
-              <IconPlay />
-            </QButton>
+            <QHoverButton size="custom" class="text-passion h-8 w-8" @click="playByIdx(rowIdx)">
+              <IconPlay class="text-base" />
+            </QHoverButton>
           </div>
         </template>
         <template v-else-if="column.key === 'title'">
-          <QHoverButton :text="row.title" class="hover:text-passion text-left" @click="handleTitleClick(row)" />
+          <QHoverButton size="custom" class="hover:text-passion text-left" @click="handleTitleClick(row)">
+            {{ row.title }}
+          </QHoverButton>
         </template>
         <template v-else-if="column.key === 'artist'">
           <div>

@@ -47,7 +47,9 @@ const columns: Column[] = [
     <QTable :columns="columns" :data="views">
       <template #bodyCell="{ column, row, rowIdx }">
         <template v-if="column.key === 'actions'">
-          <QHoverButton :icon="IconPlay" class="text-passion" @click="playByIdx(rowIdx)" />
+          <QHoverButton size="custom" class="text-passion h-8 w-8" @click="playByIdx(rowIdx)">
+            <IconPlay class="text-base" />
+          </QHoverButton>
         </template>
         <template v-else-if="column.key === 'title'">
           {{ row.title }}

@@ -39,7 +39,7 @@ function clear() {
       @focusout="focus = false"
       @input="onValueChange($event)"
     >
-    <QHoverButton v-if="showValue" size="small" @click="clear()">
+    <QHoverButton v-if="showValue" size="custom" @click="clear()">
       <IconDismiss class="text-xs" />
     </QHoverButton>
     <slot name="extra" />
