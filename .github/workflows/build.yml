@@ -51,6 +51,9 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev libappindicator3-dev librsvg2-dev patchelf
+      - name: generate env file
+        run: |
+          cp env.template .env
       - name: Install dependencies
         run: pnpm install
       - name: Build web
