@@ -18,7 +18,7 @@ defineExpose({
     class="relative h-full w-full grow pb-1 overflow-auto flex flex-col px-1"
     :class="pt"
   >
-    <div class="flex justify-between px-12">
+    <div class="flex justify-between px-12 mb-3">
       <H1>{{ header }}</H1>
       <slot name="header-extra" />
     </div>

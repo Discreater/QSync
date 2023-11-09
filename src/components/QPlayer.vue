@@ -220,7 +220,7 @@ function artistAlbum(view: Track | undefined) {
     else if (view.artist)
       return view.artist;
     else if (view.album)
-      return `${t('player.unknown-artist')} • view.album`;
+      return `${t('player.unknown-artist')} • ${view.album}`;
   }
 }
 
@@ -303,7 +303,7 @@ function setMediaSessionHandler() {
     <div class="grow flex justify-between items-center p-0.5">
       <div class="flex-1 h-full flex overflow-hidden">
         <!-- Track info (cover/title/artist...) -->
-        <HoverLayer v-if="currentTrack" class="flex items-center select-none cursor-default min-w-0" @click="onInfoCardClick()">
+        <HoverLayer v-if="currentTrack" class="flex items-center select-none cursor-default min-w-[160px] h-20" @click="onInfoCardClick()">
           <QImage
             v-if="showCardImg" :src="currentTrack ? ApiClient.get().cover_uri(currentTrack.id) : ''"
             class="object-scale-down w-[70px] h-[70px] border-white/10 border"

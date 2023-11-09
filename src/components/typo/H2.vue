@@ -1,5 +1,5 @@
 <template>
-  <h1 class="text-lg mt-5 mb-2">
+  <h2 class="text-xl mt-1 mb-1">
     <slot />
-  </h1>
+  </h2>
 </template>

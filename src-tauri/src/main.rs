@@ -39,6 +39,8 @@ fn main() {
     .plugin(tauri_plugin_window_state::Builder::default().build())
     .invoke_handler(tauri::generate_handler![greet, get_server,])
     .setup(|app| {
+      let window = app.get_window("main").unwrap();
+      window_shadows::set_shadow(&window, true).expect("failed to set shadow");
       let path_resolver = app.path_resolver();
       let resource_path = path_resolver
         .resolve_resource("../.env")

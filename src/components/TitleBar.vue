@@ -3,6 +3,7 @@ import { appWindow } from '@tauri-apps/api/window';
 import { onBeforeMount, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
+import { useI18n } from 'vue-i18n';
 import IconUnmaximized from '~icons/fluent/square-multiple-16-regular';
 import IconMaximized from '~icons/fluent/maximize-16-regular';
 import IconClose from '~icons/fluent/dismiss-16-regular';
@@ -16,6 +17,8 @@ defineProps<{ dense?: boolean }>();
 
 const route = useRoute();
 const router = useRouter();
+
+const { t } = useI18n();
 
 const maximized = ref(false);
 
@@ -50,12 +53,12 @@ function onGoBack() {
 
 <template>
   <div data-tauri-drag-region class="h-title bg-transparent select-none cursor-default flex justify-start fixed top-0 inset-x-0">
-    <div :class="`flex justify-center items-center ${dense ? '' : 'h-14'} space-x-2`">
-      <div :class="`flex justify-center items-center ${dense ? '' : 'mx-1 rounded'} w-10 h-10 ${canGoBack ? 'hover:bg-gray-500/10' : 'opacity-25'}`" @click="onGoBack()">
+    <div class="flex justify-center items-center space-x-2" :class="dense ? '' : 'h-14'">
+      <div :class="`flex justify-center items-center ${dense ? 'h-title w-12' : 'h-10 w-10 mx-1 rounded'} ${canGoBack ? 'hover:bg-gray-500/10' : 'opacity-25'}`" @click="onGoBack()">
         <IconGoBack />
       </div>
       <img data-tauri-drag-region :src="QSyncIcon" class="w-6" alt="QSync logo">
-      <span data-tauri-drag-region class="text-sm leading-none">媒体播放器</span>
+      <span data-tauri-drag-region class="text-sm leading-none">{{ t('app-title') }}</span>
     </div>
     <div v-if="getPlatform() === 'tauri'" class="flex ml-auto">
       <div id="titlebar-minimize" class="titlebar-button hover:bg-gray-500/10" @click="onMinimize()">

@@ -58,7 +58,6 @@ const denseTitle = computed(() => route.name === 'lyric' || inPhone.value);
     class="w-full h-full max-h-screen flex flex-col
       text-sm text-black dark:text-white
       bg-main_w_bg dark:bg-main_d_bg"
-    :class="getPlatform() !== 'web' ? 'border-white/10 border' : ''"
   >
     <div v-if="loading" class="w-full h-full flex justify-center items-center">
       <p>
