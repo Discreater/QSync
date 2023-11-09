@@ -198,6 +198,7 @@ function onVolumeUpdate(v: number) {
     volume: v,
     muted: false,
   });
+  audio.value!.muted = false;
 }
 function onInfoCardClick() {
   if (route.name === 'lyric') {
@@ -325,8 +326,12 @@ function setMediaSessionHandler() {
         </HoverLayer>
       </div>
       <div class="flex-1 flex justify-center items-center gap-3">
-        <QHoverButton :icon="IconArrowShuffle" @click="qsyncStore.shufflePlayQueue()" />
-        <QHoverButton :icon="IconPrevious" @click="handlePrevious" />
+        <QHoverButton @click="qsyncStore.shufflePlayQueue()">
+          <IconArrowShuffle class="text-lg" />
+        </QHoverButton>
+        <QHoverButton @click="handlePrevious">
+          <IconPrevious class="text-lg" />
+        </QHoverButton>
         <button
           class="rounded-full w-14 h-14 text-2xl flex justify-center items-center bg-gradient-to-br from-orange-500 to-purple-500"
           @click="togglePlay"
@@ -334,18 +339,26 @@ function setMediaSessionHandler() {
           <IconPause v-if="playerStore.playing" />
           <IconPlay v-else />
         </button>
-        <QHoverButton :icon="IconNext" @click="handleNext" />
-        <QHoverButton :icon="IconRepeat" :disabled="true" />
+        <QHoverButton @click="handleNext">
+          <IconNext class="text-lg" />
+        </QHoverButton>
+        <QHoverButton :disabled="true">
+          <IconRepeat class="text-lg" />
+        </QHoverButton>
       </div>
       <div class="flex-1 flex justify-end items-center gap-2">
         <QPopover>
-          <QHoverButton v-if="configStore.muted" :icon="IconVolumeMute" />
-          <QHoverButton v-else :icon="IconVolume" />
+          <QHoverButton>
+            <IconVolumeMute v-if="configStore.muted" class="text-lg" />
+            <IconVolume v-else class="text-lg" />
+          </QHoverButton>
           <template #popover>
-            <QSlider :min="0" :max="100" :value="configStore.muted ? 0 : configStore.volume" @input="onVolumeUpdate">
+            <QSlider :min="0" :max="100" :value="configStore.volume" @input="onVolumeUpdate">
               <template #left>
-                <QHoverButton v-if="configStore.muted" :icon="IconVolumeMute" @click="toggleMute()" />
-                <QHoverButton v-else :icon="IconVolume" @click="toggleMute()" />
+                <QHoverButton @click="toggleMute()">
+                  <IconVolumeMute v-if="configStore.muted" class="text-lg" />
+                  <IconVolume v-else class="text-lg" />
+                </QHoverButton>
               </template>
               <template #right="{ value }">
                 <span class="text-xs text-right w-8">{{ value.toFixed(0) }}</span>
@@ -353,7 +366,9 @@ function setMediaSessionHandler() {
             </QSlider>
           </template>
         </QPopover>
-        <QHoverButton :icon="IconMore" :disabled="true" />
+        <QHoverButton :disabled="true">
+          <IconMore class="text-lg" />
+        </QHoverButton>
       </div>
     </div>
     <audio ref="audio" class="hidden" />

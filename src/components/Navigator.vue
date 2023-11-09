@@ -89,13 +89,17 @@ const inTauri = getPlatform() === 'tauri';
 
 <template>
   <div v-if="inPhone" class="w-full px-3 flex items-center" :class="inTauri ? 'mt-title' : ''">
-    <QHoverButton :icon="IconMenu" @click="showMenuInPhone = !showMenuInPhone" />
+    <QHoverButton @click="showMenuInPhone = !showMenuInPhone">
+      <IconMenu class="text-lg" />
+    </QHoverButton>
     <QInput
       id="nav-search" v-model:value="searchText" class="mx-2.5 grow" type="text" :placeholder="t('nav.search')"
       @keyup.enter="search"
     >
       <template #extra>
-        <QHoverButton :icon="IconSearch" size="small" :disabled="!searchText" @click="search" />
+        <QHoverButton size="small" :disabled="!searchText" @click="search">
+          <IconSearch clip="text-xs" />
+        </QHoverButton>
       </template>
     </QInput>
     <Teleport to="#qsync">
@@ -116,7 +120,9 @@ const inTauri = getPlatform() === 'tauri';
       :placeholder="t('nav.search')" @keyup.enter="search"
     >
       <template #extra>
-        <QHoverButton :icon="IconSearch" size="small" :disabled="!searchText" @click="search" />
+        <QHoverButton size="small" :disabled="!searchText" @click="search">
+          <IconSearch text="text-xs" />
+        </QHoverButton>
       </template>
     </QInput>
     <QMenu :activated="activated" :top="menu.top" :bottom="menu.bottom" :only-icon="onlyIcon" @item-click="onItemClick" />
