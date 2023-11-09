@@ -1,16 +1,19 @@
 <script setup lang="ts">
 import type { Component } from 'vue';
 import { ref } from 'vue';
-import { useToggle } from '@vueuse/core';
 import IconDown from '~icons/fluent/chevron-down-24-regular';
 import IconUp from '~icons/fluent/chevron-up-24-regular';
 
-withDefaults(defineProps<{ icon?: Component; text?: string; droppable?: boolean }>(), {
+const props = withDefaults(defineProps<{ icon?: Component; text?: string; droppable?: boolean }>(), {
   droppable: false,
 });
 
 const dropped = ref(false);
-const toggleDropped = useToggle(dropped);
+
+function toggleDropped() {
+  if (props.droppable)
+    dropped.value = !dropped.value;
+}
 </script>
 
 <template>

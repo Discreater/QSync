@@ -35,7 +35,8 @@ function clear() {
   >
     <input
       :id="id" :type="type" :placeholder="placeholder" :value="showValue"
-      class="bg-transparent focus:outline-none w-full" @focusin="focus = true" @focusout="focus = false"
+      class="bg-transparent focus:outline-none w-full" autocomplete="off" @focusin="focus = true"
+      @focusout="focus = false"
       @input="onValueChange($event)"
     >
     <QHoverButton v-if="showValue" :icon="IconDismiss" size="small" @click="clear()" />

@@ -2,6 +2,8 @@
 import Scrollbar from 'smooth-scrollbar';
 import { onMounted, onUnmounted, ref } from 'vue';
 
+defineProps<{ contentClass?: string }>();
+
 const scrollbar = ref<Scrollbar | null>(null);
 
 const container = ref<HTMLDivElement | null>(null);
@@ -12,6 +14,7 @@ onMounted(() => {
     });
   }
 });
+
 onUnmounted(() => {
   if (container.value)
     scrollbar.value?.destroy();
@@ -24,7 +27,9 @@ defineExpose({
 
 <template>
   <div ref="container" class="container overflow-auto">
-    <slot />
+    <div :class="contentClass">
+      <slot />
+    </div>
   </div>
 </template>
 

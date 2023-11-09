@@ -25,7 +25,7 @@ defineExpose({
     <div class="px-12">
       <slot name="actions" />
     </div>
-    <QScrollbar ref="scrollbar" class="flex-1 grow relative px-12">
+    <QScrollbar ref="scrollbar" class="flex-1 grow relative px-12 py-1" content-class="space-y-1">
       <slot />
     </QScrollbar>
     <div v-if="showModel" class="absolute bottom-0 left-0 right-0 top-title bg-[#4b4b4b80] flex justify-center items-center" :class="pt">
