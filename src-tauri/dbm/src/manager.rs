@@ -14,12 +14,11 @@ use sea_orm::{
 };
 use tracing::{info, trace, warn};
 
-use crate::{search::SearchActorHandle, DbManager, MusyncError, PlaylistId, TrackId, UserId};
+use crate::{DbManager, MusyncError, PlaylistId, TrackId, UserId};
 
 impl DbManager {
-  pub fn new(db: DatabaseConnection, data_folder: PathBuf) -> Self {
+  pub fn new(db: DatabaseConnection, _data_folder: PathBuf) -> Self {
     Self {
-      search_actor_handle: SearchActorHandle::new(db.clone(), data_folder),
       db,
     }
   }
@@ -28,10 +27,6 @@ impl DbManager {
     let db = Database::connect(db_url).await?;
     Migrator::up(&db, None).await?;
     Ok(Self::new(db, data_folder))
-  }
-
-  pub async fn re_index(&self) {
-    self.search_actor_handle.index().await;
   }
 }
 /// Playlist
@@ -206,7 +201,6 @@ impl DbManager {
       .await?;
     }
     txn.commit().await?;
-    self.search_actor_handle.index().await;
     Ok(abi::Track::from_entity(inserted))
   }
 
@@ -258,7 +252,6 @@ impl DbManager {
     }
     LocalSrc::insert_many(local_srcs).exec(&txn).await?;
     txn.commit().await?;
-    self.search_actor_handle.index().await;
     Ok(inserted.last_insert_id)
   }
 
@@ -284,7 +277,6 @@ impl DbManager {
       .exec(&txn)
       .await?;
     txn.commit().await?;
-    self.search_actor_handle.index().await;
     trace!("deleted tracks: {:?}", deleted);
     Ok(deleted.rows_affected)
   }
@@ -345,7 +337,6 @@ impl DbManager {
         inserted.insert(&self.db).await?;
       }
     }
-    self.search_actor_handle.index().await;
 
     self.track(update.id).await
   }
@@ -359,7 +350,6 @@ impl DbManager {
       .filter(entity::track::Column::Id.is_in(ids.to_owned()))
       .exec(&self.db)
       .await?;
-    self.search_actor_handle.index().await;
     Ok(deleted.rows_affected)
   }
 
@@ -399,15 +389,6 @@ impl DbManager {
       .into_iter()
       .map(|row| Ok(abi::Track::from_entity(row)))
       .collect()
-  }
-
-  pub async fn search_tracks(&self, query: &str) -> Result<Vec<abi::Track>, MusyncError> {
-    let tracks = self.search_actor_handle.search(query.to_owned()).await?;
-    let tracks = Track::find()
-      .filter(entity::track::Column::Id.is_in(tracks))
-      .all(&self.db)
-      .await?;
-    Ok(tracks.into_iter().map(abi::Track::from_entity).collect())
   }
 
   pub async fn track(&self, id: TrackId) -> Result<abi::Track, MusyncError> {

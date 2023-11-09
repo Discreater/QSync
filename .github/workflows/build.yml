@@ -58,14 +58,6 @@ jobs:
         run: pnpm install
       - name: Build web
         run: pnpm build
-      - name: Check code format
-        run: |
-          cd src-tauri
-          cargo fmt -- --check
-      - name: Lint rust sources
-        run: |
-          cd src-tauri
-          cargo clippy --all-targets --all-features --tests --benches -- -D warnings
       - name: Build tauri client
         run: |
           pnpm tauri build

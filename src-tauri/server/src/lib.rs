@@ -117,27 +117,6 @@ mod tests {
   }
 
   #[tokio::test]
-  async fn search_test() {
-    init_tracing();
-    let memory_sqlite_url = "sqlite::memory:";
-    let manager =
-      dbm::DbManager::from_url(memory_sqlite_url, PathBuf::from("../target/data/server/"))
-        .await
-        .unwrap();
-    let folder = "D:\\media\\music";
-    let tracks = crate::musync::track::get_tracks_in_folder(folder);
-    manager.re_index().await;
-    manager.create_tracks(tracks, folder).await.unwrap();
-    manager.re_index().await;
-    manager.re_index().await;
-
-    let search_res = manager.search_tracks("beyond 邓紫棋 one").await.unwrap();
-    println!("search res: {}", search_res.len());
-
-    tokio::time::sleep(Duration::from_secs(40)).await;
-  }
-
-  #[tokio::test]
   async fn main() {
     init_tracing();
     let server = {

@@ -277,8 +277,7 @@ impl abi::musync_service_server::MusyncService for GrpcServer {
     &self,
     _req: Request<RebuildIndexRequest>,
   ) -> GrpcResult<RebuildIndexResponse> {
-    self.db.re_index().await;
-    Ok(Response::new(RebuildIndexResponse { success: true }))
+    Err(Status::unimplemented("rebuild index unimplemented"))
   }
 }
 
