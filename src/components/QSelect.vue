@@ -30,7 +30,7 @@ const menuOffset = computed(() => {
   <div class="relative w-36 h-10">
     <QButton v-if="!open" :text="selected?.name" class="w-full" :dropdown="true" @click="open = !open" />
     <div
-      v-else class="absolute p-2 w-full rounded dark:bg-main_d_bg ring-2 ring-black/10" :style="{
+      v-else class="absolute p-2 w-full rounded bg-main_w_bg dark:bg-main_d_bg ring-2 ring-black/10" :style="{
         top: menuOffset,
       }"
     >

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useDark } from '@vueuse/core';
 import { computed, ref, toRefs } from 'vue';
 
 interface Props {
@@ -33,6 +34,9 @@ function onInput(e: InputEvent) {
   sliderValue.value = v;
   emit('input', v);
 }
+const isDark = useDark();
+
+const unreachedColor = computed(() => isDark.value ? '#ffffff80' : '#8a8a8a');
 </script>
 
 <template>
@@ -41,7 +45,7 @@ function onInput(e: InputEvent) {
     <input
       class="grow"
       type="range" :min="min" :max="max ?? 100" :value="showValue" :style="{
-        background: `linear-gradient(to right, #f97316 ${showValuePercent * 100}%, #ffffff80 ${showValuePercent * 100}%)`,
+        background: `linear-gradient(to right, #f97316 ${showValuePercent * 100}%, ${unreachedColor} ${showValuePercent * 100}%)`,
       }" :title="showValue?.toString()"
       @mousedown="onMouseDown" @input="onInput($event as InputEvent)" @mouseup="onMouseUp"
     >
@@ -49,7 +53,7 @@ function onInput(e: InputEvent) {
   </div>
 </template>
 
-<style scoped>
+<style lang="postcss" scoped>
 input[type="range"] {
   /* removing default appearance */
   -webkit-appearance: none;
@@ -64,27 +68,32 @@ input[type="range"] {
 
 /* Thumb: webkit */
 input[type="range"]::-webkit-slider-thumb {
+  @apply border-zinc-200 dark:border-[#454545] bg-passion;
   /* removing default appearance */
   -webkit-appearance: none;
   appearance: none;
   /* creating a custom design */
   height: 1.4rem;
   width: 1.4rem;
-  background-color: #f97316;
+
   border-radius: 50%;
-  border: 0.4rem solid #454545;
+  border-width: 0.4rem;
+  border-style: solid;
   /*  slider progress trick  */
   transition: .2s ease-in-out;
 }
 
 /* Thumb: Firefox */
 input[type="range"]::-moz-range-thumb {
+  @apply border-zinc-200 dark:border-[#454545] bg-passion;
   appearance: none;
   height: 1.4rem;
   width: 1.4rem;
-  background-color: #f97316;
+
   border-radius: 50%;
-  border: 0.4rem solid #454545;
+  border-radius: 50%;
+  border-width: 0.4rem;
+  border-style: solid;
 
   /* box-shadow: -407px 0 0 400px #f50; emove this line */
   transition: all .2s ease-in-out;

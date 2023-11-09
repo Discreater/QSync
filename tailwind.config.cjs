@@ -17,9 +17,11 @@ module.exports = {
         main_d_bg: '#272727',
         menu_w_bg: '#f3f3f3',
         menu_d_bg: '#202020',
+        hover_d: '#3e3e3e',
+        hover_w: '#f9f9f9',
         main: 'var(--main)',
         passion: '#f97316',
-        highlight: '#4b4b4b60',
+        highlight: 'var(--highlight)',
       },
       transitionProperty: {
         position: 'top, bottom',

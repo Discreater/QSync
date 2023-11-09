@@ -28,7 +28,10 @@ function clear() {
 
 <template>
   <div
-    :class="`group ${focus ? 'bg-[#1f1f1f] border-passion' : 'bg-[#323232] border-white/50'} ring-1 ring-gray-500/30 rounded border-b-2 h-8 px-2 flex`"
+    class="group ring-1 ring-gray-500/30 rounded border-b-2 h-8 px-2 flex"
+    :class="focus
+      ? 'bg-[#fff] dark:bg-[#1f1f1f] border-passion'
+      : 'bg-[#fafcfd] dark:bg-[#323232] border-gray-500 dark:border-white/50'"
   >
     <input
       :id="id" :type="type" :placeholder="placeholder" :value="showValue"
