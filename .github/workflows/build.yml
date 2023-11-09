@@ -66,3 +66,15 @@ jobs:
         run: |
           cd src-tauri
           cargo clippy --all-targets --all-features --tests --benches -- -D warnings
+      - name: Build tauri client
+        run: |
+          pnpm tauri build
+      - uses: actions/upload-artifact@v3
+        with:
+          name: msi-installer
+          path: src-tauri/target/release/bundle/msi
+      - uses: actions/upload-artifact@v3
+        with:
+          name: exe-installer
+          path: src-tauri/target/release/bundle/nsis
+        
