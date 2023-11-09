@@ -61,8 +61,9 @@ const denseTitle = computed(() => route.name === 'lyric' || inPhone.value);
 
 <template>
   <div
-    id="qsync" class="w-full h-full max-h-screen flex flex-col
-      text-sm text-black dark:text-white
+    id="qsync" class="
+      w-full h-full max-h-screen flex flex-col
+      text-sm text-black dark:text-white selection:bg-passion selection:text-white
       bg-main_w_bg dark:bg-main_d_bg"
   >
     <div v-if="loading" class="w-full h-full flex justify-center items-center">

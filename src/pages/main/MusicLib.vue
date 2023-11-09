@@ -7,7 +7,7 @@ import { useRouter } from 'vue-router';
 import IconArrowShuffle from '~icons/fluent/arrow-shuffle-24-regular';
 import Basic from '~/layouts/Basic.vue';
 import { useMusyncStore } from '~/store';
-import QButton from '~/components/QButton.vue';
+import QButtonLegacy from '~/components/QButtonLegacy.vue';
 import { formatTime, shuffle } from '~/utils';
 import QHoverButton from '~/components/QHoverButton.vue';
 import IconPlay from '~icons/fluent/play-24-regular';
@@ -93,16 +93,18 @@ function handleTitleClick(track: Track) {
   <Basic ref="layout" :header="t('music-lib.music')">
     <template #actions>
       <div class="mb-4 flex gap-2">
-        <QButton :icon="IconArrowShuffle" :text="t('btn.shuffle')" @click="shufflePlay()" />
-        <QButton :icon="IconLocation" class="text-passion" :title="t('btn.location')" @click="locateToPlaying" />
-        <QButton :icon="IconTop" class="text-passion" @click="locateToTop" />
+        <QButtonLegacy :icon="IconArrowShuffle" :text="t('btn.shuffle')" @click="shufflePlay()" />
+        <QButtonLegacy :icon="IconLocation" class="text-passion" :title="t('btn.location')" @click="locateToPlaying" />
+        <QButtonLegacy :icon="IconTop" class="text-passion" @click="locateToTop" />
       </div>
     </template>
     <QTable :columns="columns" :data="views" :row-class-name="rowClassName">
       <template #bodyCell="{ column, row, rowIdx }">
         <template v-if="column.key === 'actions'">
           <div class="flex">
-            <QHoverButton :icon="IconPlay" class="text-passion" @click="playByIdx(rowIdx)" />
+            <QButtonLegacy class="text-passion" @click="playByIdx(rowIdx)">
+              <IconPlay />
+            </QButtonLegacy>
           </div>
         </template>
         <template v-else-if="column.key === 'title'">

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import QButton from './QButton.vue';
+import QButtonLegacy from './QButtonLegacy.vue';
 import LongButton from './LongButton.vue';
 import { logger } from '~/utils/logger';
 import { open } from '~/platforms/dialog';
@@ -42,7 +42,7 @@ async function onClcickSelect() {
     <template #extra>
       <div v-if="type === 'directory'" class="flex items-center gap-3">
         <p>{{ showDir }}</p>
-        <QButton text="..." @click="onClcickSelect()" />
+        <QButtonLegacy text="..." @click="onClcickSelect()" />
       </div>
       <input
         v-else :id="id" :type="inputType" :placeholder="placeholder" :value="value"
