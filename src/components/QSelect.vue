@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import QButtonLegacy from './QButtonLegacy.vue';
+import QButton from './QButton.vue';
 import type { Item, ItemKey } from './types';
 import QMenu from './QMenu.vue';
+import IconDown from '~icons/fluent/chevron-down-24-regular';
 
 const props = defineProps<{
   value?: string
@@ -28,7 +29,10 @@ const menuOffset = computed(() => {
 
 <template>
   <div class="relative w-36 h-10">
-    <QButtonLegacy v-if="!open" :text="selected?.name" class="w-full" :dropdown="true" @click="open = !open" />
+    <QButton v-if="!open" class="w-full" @click="open = !open">
+      {{ selected?.name }}
+      <IconDown />
+    </QButton>
     <div
       v-else class="absolute p-2 w-full rounded bg-main_w_bg dark:bg-main_d_bg ring-2 ring-black/10" :style="{
         top: menuOffset,

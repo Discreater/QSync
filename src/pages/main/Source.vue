@@ -3,7 +3,7 @@ import { useI18n } from 'vue-i18n';
 import { ref } from 'vue';
 import Basic from '~/layouts/Basic.vue';
 import H2 from '~/components/typo/H2.vue';
-import QButtonLegacy from '~/components/QButtonLegacy.vue';
+import QButton from '~/components/QButton.vue';
 
 import IconAdd from '~icons/fluent/add-circle-24-regular';
 import IconSpinner from '~icons/fluent/spinner-ios-20-regular';
@@ -72,7 +72,10 @@ async function addAccount() {
 <template>
   <Basic :header="t('menu.source')" :show-model="showAddModel">
     <template #header-extra>
-      <QButtonLegacy :icon="IconAdd" :text="t('source.add')" @click="showAddModel = true" />
+      <QButton @click="showAddModel = true">
+        <IconAdd class="text-xl" />
+        {{ t('source.add') }}
+      </QButton>
     </template>
     <H2>{{ t('source.types.local') }}</H2>
     <div>
@@ -82,7 +85,9 @@ async function addAccount() {
       >
         <template #extra>
           <IconSpinner :class="dir.updating ? 'animate-spin' : ''" />
-          <QButtonLegacy :icon="IconDelete" @click="store.removeFolder(dir.path)" />
+          <QButton @click="store.removeFolder(dir.path)">
+            <IconDelete class="text-xl" />
+          </QButton>
         </template>
       </LongButton>
     </div>
@@ -107,8 +112,12 @@ async function addAccount() {
           </template>
         </div>
         <div class="flex justify-end gap-2">
-          <QButtonLegacy :text="t('confirm')" @click="addAccount()" />
-          <QButtonLegacy :text="t('cancel')" @click="showAddModel = false" />
+          <QButton @click="addAccount()">
+            {{ t('confirm') }}
+          </QButton>
+          <QButton @click="showAddModel = false">
+            {{ t('cancel') }}
+          </QButton>
         </div>
       </div>
     </template>
