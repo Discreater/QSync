@@ -289,7 +289,7 @@ function setMediaSessionHandler() {
 </script>
 
 <template>
-  <div class="h-player flex flex-col border-solid border-t border-black/30 gap-1 p-0.5">
+  <div class="h-player flex flex-col border-solid border-t border-gray-500/30 dark:border-black/30 gap-1 p-0.5">
     <!-- Progress slider -->
     <QSlider class="px-3 mt-1" :value="localProgress" :min="0" :max="duration" @update:value="onSliderUpdate">
       <template #left="{ value }">

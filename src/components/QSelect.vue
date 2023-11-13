@@ -34,7 +34,7 @@ const menuOffset = computed(() => {
       <IconDown />
     </QButton>
     <div
-      v-else class="absolute p-2 w-full rounded bg-main_w_bg dark:bg-main_d_bg ring-2 ring-black/10" :style="{
+      v-else class="absolute p-1 w-full rounded bg-main_w_bg dark:bg-main_d_bg ring-1 ring-black/10" :style="{
         top: menuOffset,
       }"
     >

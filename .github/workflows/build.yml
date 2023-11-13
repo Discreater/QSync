@@ -69,4 +69,3 @@ jobs:
         with:
           name: exe-installer
           path: src-tauri/target/release/bundle/nsis
-        

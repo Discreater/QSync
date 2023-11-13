@@ -33,19 +33,20 @@ const picture_url = computed(() => {
 
 <template>
   <main
-    :class="`track-pic-bg  h-full w-full ${getPlatform() !== 'web' ? 'mt-[32px]' : ''} bg-cover`" :style="{
+    class="track-pic-bg h-full w-full bg-cover"
+    :class="getPlatform() !== 'web' ? 'mt-[32px]' : ''" :style="{
       backgroundImage: `url(${picture_url})`,
     }"
   >
-    <div class="flex items-end bg-gray-800/60 backdrop-blur-2xl w-full h-full">
-      <QImage :src="picture_url" class="ml-5 mb-5 w-64 h-64 rounded ring-1 ring-white/10" :class="picture_url ? '' : 'invisible'">
+    <div class="flex bg-white/40 dark:bg-gray-800/60 backdrop-blur-2xl w-full h-full">
+      <QImage :src="picture_url" class="ml-5 mb-5 w-64 h-64 rounded ring-1 ring-gray-500/10 dark:ring-black/10 shadow-xl self-end" :class="picture_url ? '' : 'invisible'">
         <template #failed>
           <div class="flex items-center justify-center h-full">
             <IconMusic class="text-6xl" />
           </div>
         </template>
       </QImage>
-      <div class="grow">
+      <div class="grow h-full flex items-center justify-center">
         lyric
       </div>
     </div>

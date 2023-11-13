@@ -13,7 +13,7 @@ const inTauri = getPlatform() === 'tauri';
     </div>
     <!-- mask -->
     <div v-if="show" class="fixed inset-0 bg-transparent w-screen h-screen" :class="inTauri ? 'top-title' : ''" @click="show = false" />
-    <div v-show="show" class="absolute bottom-10 right-0 ring ring-black/10 bg-main_d_bg shadow-lg p-4 rounded transition-all">
+    <div v-show="show" class="absolute bottom-12 right-0 ring-1 ring-gray-500/10 dark:ring-black/10 bg-main_w_bg dark:bg-main_d_bg shadow-lg p-2 rounded transition-all">
       <slot name="popover" />
     </div>
   </div>
