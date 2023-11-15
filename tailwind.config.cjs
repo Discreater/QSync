@@ -13,12 +13,9 @@ module.exports = {
     },
     extend: {
       colors: {
-        main_w_bg: '#f9f9f9',
-        main_d_bg: '#272727',
-        menu_w_bg: '#f3f3f3',
-        menu_d_bg: '#202020',
-        hover_d: '#3e3e3e',
-        hover_w: '#f9f9f9',
+        main_bg: 'var(--main_bg)',
+        menu_bg: 'var(--menu_bg)',
+        hovering: 'var(--hovering)',
         main: 'var(--main)',
         passion: '#f97316',
         highlight: 'var(--highlight)',

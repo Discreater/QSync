@@ -104,7 +104,7 @@ const inTauri = getPlatform() === 'tauri';
     </QInput>
     <Teleport to="#qsync">
       <div
-        v-if="showMenuInPhone" class="fixed inset-x-0 top-12 bottom-player p-1 bg-menu_w_bg dark:bg-menu_d_bg"
+        v-if="showMenuInPhone" class="fixed inset-x-0 top-12 bottom-player p-1 bg-menu_bg"
         :class="inTauri ? 'mt-title' : ''"
       >
         <QMenu :activated="activated" :top="menu.top" :bottom="menu.bottom" @item-click="onItemClick" />
@@ -112,7 +112,7 @@ const inTauri = getPlatform() === 'tauri';
     </Teleport>
   </div>
   <div
-    v-else class="bg-menu_w_bg dark:bg-menu_d_bg flex flex-col sm:w-12 md:w-80 px-0 sm:px-1"
+    v-else class="bg-menu_bg flex flex-col sm:w-12 md:w-80 px-0 sm:px-1"
     :class="getPlatform() !== 'web' ? 'pt-14' : 'pt-2'"
   >
     <QInput

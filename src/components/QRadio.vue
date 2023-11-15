@@ -50,7 +50,7 @@ const isChecked = computed(() => props.modelValue === props.value);
 
 /* Create a custom radio button */
 .checkmark {
-  @apply bg-main_w_bg dark:bg-main_d_bg border-black/50 dark:border-white/50 border-[1.5px];
+  @apply bg-main_bg border-black/50 dark:border-white/50 border-[1.5px];
   position: absolute;
   top: 0;
   left: 0;
@@ -61,7 +61,7 @@ const isChecked = computed(() => props.modelValue === props.value);
 
 /* On mouse-over, add a grey background color */
 .wrapper:hover input~.checkmark {
-  @apply bg-white dark:bg-hover_d;
+  @apply bg-highlight;
 }
 
 .wrapper:hover input:checked~.checkmark {

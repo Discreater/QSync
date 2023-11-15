@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import { invoke } from '@tauri-apps/api';
-import { computed, onMounted, watch } from 'vue';
+import { computed, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import SmoothScrollbar from 'smooth-scrollbar';
 import { useRoute } from 'vue-router';
-import { breakpointsTailwind, useBreakpoints, useDark } from '@vueuse/core';
+import { breakpointsTailwind, useBreakpoints } from '@vueuse/core';
 import { getPlatform, inTauri } from './platforms';
 import { useMusyncStore } from './store';
 import QPlayer from './components/QPlayer.vue';
+import { useTheme } from './logic/theme';
 import TitleBar from '~/components/TitleBar.vue';
-import { defaultTheme } from '~/utils/theme';
 
 import { useLoading } from '~/logic';
 
@@ -30,21 +30,13 @@ const { t } = useI18n();
 const qsyncStore = useMusyncStore();
 
 const loading = useLoading();
-const isDark = useDark();
-const theme = defaultTheme;
-
-watch(isDark, (value) => {
-  const root = document.documentElement;
-  root.style.setProperty('--highlight', value ? theme.highlight.black : theme.highlight.white);
-});
+// create default theme
+const _theme = useTheme();
 
 onMounted(async () => {
   inTauri(async () => {
     const _result = await invoke('greet', { name: 'World' });
   });
-  const root = document.documentElement;
-  root.style.setProperty('--main', theme.main);
-  root.style.setProperty('--highlight', isDark.value ? theme.highlight.black : theme.highlight.white);
 });
 const { locale: i18nLocale } = useI18n();
 
@@ -64,7 +56,7 @@ const denseTitle = computed(() => route.name === 'lyric' || inPhone.value);
     id="qsync" class="
       w-full h-full max-h-screen flex flex-col
       text-sm text-black dark:text-white selection:bg-passion selection:text-white
-      bg-main_w_bg dark:bg-main_d_bg"
+      bg-main_bg"
   >
     <div v-if="loading" class="w-full h-full flex justify-center items-center">
       <p>

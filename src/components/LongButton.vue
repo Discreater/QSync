@@ -20,7 +20,7 @@ function toggleDropped() {
   <div>
     <div
       class="group flex justify-between items-center min-w-[20rem]
-         bg-[#fdfefe] dark:bg-[#323232] rounded select-none cursor-default hover:bg-hover_w dark:hover:bg-hover_d
+         bg-[#fdfefe] dark:bg-[#323232] rounded select-none cursor-default hover:bg-hovering
           h-[4.25rem] px-5 ring-1 ring-gray-200 dark:ring-black/10" @click="toggleDropped()"
     >
       <div class="flex items-center">

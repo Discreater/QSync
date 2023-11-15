@@ -18,7 +18,7 @@ function handleImageError() {
 
 <template>
   <img v-if="!loadFailed" :src="src" @error="handleImageError">
-  <div v-else class="bg-menu_w_bg dark:bg-menu_d_bg">
+  <div v-else class="bg-menu_bg">
     <slot name="failed" />
   </div>
 </template>
