@@ -18,7 +18,7 @@ defineProps<{ columns: Column[]; data: Row[]; showHead?: boolean; rowClassName?:
       </tr>
     </thead>
     <tbody>
-      <tr v-for="(row, rowIndex) in data" :key="rowIndex" class="even:bg-highlight odd:hover:bg-highlight h-12">
+      <tr v-for="(row, rowIndex) in data" :key="rowIndex" class="even:bg-highlight odd:hover:bg-highlight h-12" :class="rowClassName?.(row)">
         <td v-for="col in columns" :key="col.key" :data-col-key="col.key" class="border-x-2 border-transparent">
           <slot name="bodyCell" :column="col" :row="row" :row-idx="rowIndex" />
         </td>

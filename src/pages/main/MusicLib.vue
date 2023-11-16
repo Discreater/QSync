@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import type Scrollbar from 'smooth-scrollbar';
-
 import { useI18n } from 'vue-i18n';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
@@ -18,14 +16,13 @@ import type { Track } from '~/generated/protos/musync';
 import { usePlayerStore } from '~/store/player';
 import QTable from '~/components/QTable.vue';
 
+import { useInnerScrollbar } from '~/components/injects';
+
 const { t } = useI18n();
 const store = useMusyncStore();
 const playerStore = usePlayerStore();
-const layout = ref<InstanceType<typeof Basic>>();
 
-function getScrollBar(): Scrollbar | undefined {
-  return layout.value?.scrollbar?.scrollbar;
-}
+const scrollbar = useInnerScrollbar();
 
 const views = ref(store.musicFolders.flatMap(folder => folder.tracks));
 
@@ -38,11 +35,10 @@ function playByIdx(idx: number) {
 }
 
 function locateToPlaying() {
-  const scrollbar = getScrollBar();
-  if (scrollbar) {
+  if (scrollbar.value) {
     const playing = document.querySelector<HTMLElement>('.playing');
     if (playing) {
-      scrollbar.scrollIntoView(playing, {
+      scrollbar.value.scrollIntoView(playing, {
         onlyScrollIfNeeded: true,
       });
     }
@@ -50,8 +46,7 @@ function locateToPlaying() {
 }
 
 function locateToTop() {
-  const scrollbar = getScrollBar();
-  scrollbar?.scrollTo(0, 0, 600);
+  scrollbar.value?.scrollTo(0, 0, 600);
 }
 
 function rowClassName(row: Track) {
@@ -90,7 +85,7 @@ function handleTitleClick(track: Track) {
 </script>
 
 <template>
-  <Basic ref="layout" :header="t('music-lib.music')">
+  <Basic :header="t('music-lib.music')">
     <template #actions>
       <div class="mb-4 flex gap-2">
         <QButton @click="shufflePlay()">

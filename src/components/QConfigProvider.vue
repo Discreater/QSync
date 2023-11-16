@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, provide, ref, watch } from 'vue';
-import { qInjectThemeKey } from './keys';
-import type { QTheme } from '~/shared/types';
+import { qThemeKey } from './injects';
+import type { QTheme } from '~/theme';
 import { defaultTheme } from '~/theme';
 
 const props = defineProps<{ theme?: QTheme }>();
@@ -27,7 +27,7 @@ function write() {
       rootStyle.setProperty(`--${key}`, value);
   }
 }
-provide(qInjectThemeKey, props.theme);
+provide(qThemeKey, props.theme);
 </script>
 
 <template>

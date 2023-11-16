@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { inject } from 'vue';
-import { qInjectLayerLevel } from './keys';
+import { qLayerLevelKey } from './injects';
 
 withDefaults(defineProps<{ disabled?: boolean; layer?: number }>(), {
   disabled: false,
 });
 
-const _level = inject(qInjectLayerLevel, 0);
+const _level = inject(qLayerLevelKey, 0);
 </script>
 
 <template>

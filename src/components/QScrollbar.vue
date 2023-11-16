@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import Scrollbar from 'smooth-scrollbar';
-import { onMounted, onUnmounted, ref } from 'vue';
+import { inject, onMounted, onUnmounted, provide, ref } from 'vue';
+import { qScrollBarKey } from './injects';
 
 defineProps<{ contentClass?: string }>();
 
@@ -17,13 +18,17 @@ Scrollbar.use(ShiftScrollPlugin);
 
 const scrollbar = ref<Scrollbar | null>(null);
 
+const injectedScrollbar = inject<(s: Scrollbar) => void>(qScrollBarKey);
+
 const container = ref<HTMLDivElement | null>(null);
 onMounted(() => {
   if (container.value) {
-    scrollbar.value = Scrollbar.init(container.value, {
+    const sb = Scrollbar.init(container.value, {
       alwaysShowTracks: true,
       damping: 1,
     });
+    scrollbar.value = sb;
+    injectedScrollbar?.(sb);
   }
 });
 
@@ -32,9 +37,7 @@ onUnmounted(() => {
     scrollbar.value?.destroy();
 });
 
-defineExpose({
-  scrollbar,
-});
+provide(qScrollBarKey, scrollbar);
 </script>
 
 <template>
