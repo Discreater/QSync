@@ -24,7 +24,6 @@ module.exports = {
         position: 'top, bottom',
       },
       spacing: {
-        title: '32px',
         player: '118px',
       },
     },

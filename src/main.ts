@@ -1,6 +1,6 @@
 import { createApp } from 'vue';
 import { createI18n } from 'vue-i18n';
-import './style.css';
+import './style.postcss';
 import messages from '@intlify/unplugin-vue-i18n/messages';
 import { pinia, useMusyncStore } from './store';
 

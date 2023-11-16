@@ -4,7 +4,6 @@ import { onBeforeRouteUpdate } from 'vue-router';
 import { ApiClient } from '~/api/client';
 import QImage from '~/components/QImage.vue';
 import type { TrackId } from '~/model_ext/track';
-import { getPlatform } from '~/platforms';
 import IconMusic from '~icons/fluent/music-note-2-24-regular';
 
 const props = defineProps<{ id?: string | number }>();
@@ -33,8 +32,7 @@ const picture_url = computed(() => {
 
 <template>
   <main
-    class="track-pic-bg h-full w-full bg-cover"
-    :class="getPlatform() !== 'web' ? 'mt-[32px]' : ''" :style="{
+    class="track-pic-bg h-full w-full bg-cover" :style="{
       backgroundImage: `url(${picture_url})`,
     }"
   >

@@ -7,7 +7,8 @@ import { breakpointsTailwind, useBreakpoints } from '@vueuse/core';
 import { getPlatform, inTauri } from './platforms';
 import { useMusyncStore } from './store';
 import QPlayer from './components/QPlayer.vue';
-import { useTheme } from './logic/theme';
+import QConfigProvider from './components/QConfigProvider.vue';
+import { defaultTheme } from './components/types';
 import TitleBar from '~/components/TitleBar.vue';
 
 import { useLoading } from '~/logic';
@@ -17,8 +18,6 @@ const { t } = useI18n();
 const qsyncStore = useMusyncStore();
 
 const loading = useLoading();
-// create default theme
-const _theme = useTheme();
 
 onMounted(async () => {
   inTauri(async () => {
@@ -36,11 +35,12 @@ const inPhone = breakPoints.smaller('sm');
 
 const route = useRoute();
 const denseTitle = computed(() => route.name === 'lyric' || inPhone.value);
+const theme = defaultTheme;
 </script>
 
 <template>
-  <div
-    id="qsync" class="
+  <QConfigProvider
+    id="qsync" :theme="theme" class="
       w-full h-full max-h-screen flex flex-col
       text-sm text-black dark:text-white selection:bg-passion selection:text-white
       bg-main_bg"
@@ -51,9 +51,9 @@ const denseTitle = computed(() => route.name === 'lyric' || inPhone.value);
       </p>
     </div>
     <template v-else>
-      <RouterView />
       <TitleBar v-if="getPlatform() !== 'web'" :dense="denseTitle" />
+      <RouterView />
       <QPlayer class="shrink-0" />
     </template>
-  </div>
+  </QConfigProvider>
 </template>

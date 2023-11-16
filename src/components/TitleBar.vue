@@ -52,9 +52,9 @@ function onGoBack() {
 </script>
 
 <template>
-  <div data-tauri-drag-region class="h-title bg-transparent select-none cursor-default flex justify-start fixed top-0 inset-x-0">
+  <div data-tauri-drag-region class="h-title bg-transparent select-none cursor-default flex justify-start" :class="dense ? 'h-[32px]' : 'h-title'">
     <div class="flex justify-center items-center space-x-2" :class="dense ? '' : 'h-14'">
-      <div :class="`flex justify-center items-center ${dense ? 'h-title w-12' : 'h-10 w-10 mx-1 rounded'} ${canGoBack ? 'hover:bg-gray-500/10' : 'opacity-25'}`" @click="onGoBack()">
+      <div class="flex justify-center items-center" :class="`${dense ? 'h-title w-12' : 'h-10 w-10 mx-1 rounded'} ${canGoBack ? 'hover:bg-gray-500/10' : 'opacity-25'}`" @click="onGoBack()">
         <IconGoBack />
       </div>
       <img data-tauri-drag-region :src="QSyncIcon" class="w-6" alt="QSync logo">

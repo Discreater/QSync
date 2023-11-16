@@ -112,8 +112,7 @@ const inTauri = getPlatform() === 'tauri';
     </Teleport>
   </div>
   <div
-    v-else class="bg-menu_bg flex flex-col sm:w-12 md:w-80 px-0 sm:px-1"
-    :class="getPlatform() !== 'web' ? 'pt-14' : 'pt-2'"
+    v-else class="bg-menu_bg flex flex-col sm:w-12 md:w-80 px-0 sm:px-1 pt-1"
   >
     <QInput
       id="nav-search" v-model:value="searchText" class="mx-2.5 mb-3 hidden md:flex" type="text"

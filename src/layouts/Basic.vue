@@ -7,7 +7,7 @@ import QScrollbar from '~/components/QScrollbar.vue';
 defineProps<{ header: string; showModel?: boolean }>();
 
 const scrollbar = ref<VNodeRef | null>(null);
-const pt = getPlatform() !== 'web' ? 'pt-12' : 'pt-4';
+const pt = getPlatform() !== 'web' ? '' : 'pt-4';
 defineExpose({
   scrollbar,
 });
