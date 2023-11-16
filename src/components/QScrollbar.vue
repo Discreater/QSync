@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import Scrollbar from 'smooth-scrollbar';
-import { inject, onMounted, onUnmounted, provide, ref } from 'vue';
-import { qScrollBarKey } from './injects';
+import { inject, onMounted, onUnmounted, ref } from 'vue';
+import { qInnerScrollBarKey } from './injects';
 
 defineProps<{ contentClass?: string }>();
 
@@ -18,7 +18,7 @@ Scrollbar.use(ShiftScrollPlugin);
 
 const scrollbar = ref<Scrollbar | null>(null);
 
-const injectedScrollbar = inject<(s: Scrollbar) => void>(qScrollBarKey);
+const injectedScrollbar = inject<(s: Scrollbar) => void>(qInnerScrollBarKey);
 
 const container = ref<HTMLDivElement | null>(null);
 onMounted(() => {
@@ -36,8 +36,6 @@ onUnmounted(() => {
   if (container.value)
     scrollbar.value?.destroy();
 });
-
-provide(qScrollBarKey, scrollbar);
 </script>
 
 <template>
