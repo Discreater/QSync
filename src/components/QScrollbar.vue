@@ -4,6 +4,17 @@ import { onMounted, onUnmounted, ref } from 'vue';
 
 defineProps<{ contentClass?: string }>();
 
+// originally created by @DjSt3rios
+// see: https://github.com/idiotWu/smooth-scrollbar/discussions/367
+class ShiftScrollPlugin extends Scrollbar.ScrollbarPlugin {
+  static pluginName = 'ShiftScroll';
+
+  transformDelta(delta: any, fromEvent: any) {
+    return /wheel/.test(fromEvent.type) && fromEvent.shiftKey ? { x: delta.y, y: delta.x } : delta;
+  }
+}
+Scrollbar.use(ShiftScrollPlugin);
+
 const scrollbar = ref<Scrollbar | null>(null);
 
 const container = ref<HTMLDivElement | null>(null);
@@ -11,6 +22,7 @@ onMounted(() => {
   if (container.value) {
     scrollbar.value = Scrollbar.init(container.value, {
       alwaysShowTracks: true,
+      damping: 1,
     });
   }
 });
