@@ -8,7 +8,8 @@ import { getPlatform, inTauri } from './platforms';
 import { useMusyncStore } from './store';
 import QPlayer from './components/QPlayer.vue';
 import QConfigProvider from './components/QConfigProvider.vue';
-import { defaultTheme } from './components/types';
+import { isDark } from './utils';
+import { defaultDarkTheme, defaultTheme } from '~/theme.js';
 import TitleBar from '~/components/TitleBar.vue';
 
 import { useLoading } from '~/logic';
@@ -35,7 +36,9 @@ const inPhone = breakPoints.smaller('sm');
 
 const route = useRoute();
 const denseTitle = computed(() => route.name === 'lyric' || inPhone.value);
-const theme = defaultTheme;
+const theme = computed(() => {
+  return isDark.value ? defaultDarkTheme : defaultTheme;
+});
 </script>
 
 <template>

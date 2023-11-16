@@ -6,7 +6,7 @@ withDefaults(defineProps<{ disabled?: boolean; layer?: number }>(), {
   disabled: false,
 });
 
-const _level = inject(qInjectLayerLevel);
+const _level = inject(qInjectLayerLevel, 0);
 </script>
 
 <template>

@@ -1,2 +1,2 @@
 export const qInjectLayerLevel = Symbol('qInjectLayerLevel');
-export const qTheme = Symbol('qTheme');
+export const qInjectThemeKey = Symbol('qTheme');
