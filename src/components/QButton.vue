@@ -1,7 +1,12 @@
 <script setup lang="ts">
-withDefaults(defineProps<{ disabled?: boolean }>(), {
+import { inject } from 'vue';
+import { qInjectLayerLevel } from './keys';
+
+withDefaults(defineProps<{ disabled?: boolean; layer?: number }>(), {
   disabled: false,
 });
+
+const _level = inject(qInjectLayerLevel);
 </script>
 
 <template>

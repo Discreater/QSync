@@ -27,11 +27,11 @@ export const defaultTheme: QTheme = {
   main: '#4cc2ff',
   main_bg: {
     dark: '#202020',
-    light: '#000000',
+    light: '#f3f3f3',
   },
   content_bg: {
     dark: '#272727',
-    light: '#ffffff',
+    light: '#f9f9f9',
   },
   menu_bg: {
     dark: '#202020',

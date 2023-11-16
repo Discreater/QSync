@@ -88,7 +88,7 @@ const inTauri = getPlatform() === 'tauri';
 </script>
 
 <template>
-  <div v-if="inPhone" class="w-full px-3 flex items-center" :class="inTauri ? 'mt-title' : ''">
+  <div v-if="inPhone" class="w-full px-3 flex items-center">
     <QHoverButton @click="showMenuInPhone = !showMenuInPhone">
       <IconMenu class="text-lg" />
     </QHoverButton>
@@ -104,8 +104,8 @@ const inTauri = getPlatform() === 'tauri';
     </QInput>
     <Teleport to="#qsync">
       <div
-        v-if="showMenuInPhone" class="fixed inset-x-0 top-12 bottom-player p-1 bg-menu_bg"
-        :class="inTauri ? 'mt-title' : ''"
+        v-if="showMenuInPhone" class="fixed inset-x-0 top-10 bottom-player p-1 bg-menu_bg"
+        :class="inTauri ? 'mt-[32px]' : ''"
       >
         <QMenu :activated="activated" :top="menu.top" :bottom="menu.bottom" @item-click="onItemClick" />
       </div>

@@ -1,13 +1,11 @@
 <script setup lang="ts">
 import { type VNodeRef, ref } from 'vue';
-import { getPlatform } from '~/platforms';
 import H1 from '~/components/typo/H1.vue';
 import QScrollbar from '~/components/QScrollbar.vue';
 
 defineProps<{ header: string; showModel?: boolean }>();
 
 const scrollbar = ref<VNodeRef | null>(null);
-const pt = getPlatform() !== 'web' ? '' : 'pt-4';
 defineExpose({
   scrollbar,
 });
@@ -15,8 +13,7 @@ defineExpose({
 
 <template>
   <main
-    class="relative h-full w-full grow pb-1 overflow-auto flex flex-col px-1"
-    :class="pt"
+    class="relative h-full w-full grow pb-1 overflow-auto flex flex-col px-1 bg-content_bg rounded-WINDOW pt-5"
   >
     <div class="flex justify-between px-12 mb-3">
       <H1>{{ header }}</H1>
@@ -28,7 +25,7 @@ defineExpose({
     <QScrollbar ref="scrollbar" class="flex-1 grow relative px-12 py-1" content-class="space-y-1">
       <slot />
     </QScrollbar>
-    <div v-if="showModel" class="absolute bottom-0 left-0 right-0 top-title bg-[#4b4b4b80] flex justify-center items-center" :class="pt">
+    <div v-if="showModel" class="absolute bottom-0 left-0 right-0 top-title bg-[#4b4b4b80] flex justify-center items-center pt-5">
       <slot name="model" />
     </div>
   </main>

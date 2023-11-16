@@ -15,6 +15,7 @@ module.exports = {
       colors: {
         main_bg: 'var(--main_bg)',
         menu_bg: 'var(--menu_bg)',
+        content_bg: 'var(--content_bg)',
         hovering: 'var(--hovering)',
         main: 'var(--main)',
         passion: '#f97316',
