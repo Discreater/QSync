@@ -14,7 +14,8 @@
     "@iconify-json/fluent": "^1.1.40",
     "@improbable-eng/grpc-web": "^0.15.0",
     "@jellyfin/sdk": "^0.8.2",
-    "@tauri-apps/api": "^1.5.1",
+    "@tauri-apps/api": "2.0.0-alpha.11",
+    "@tauri-apps/plugin-dialog": "github:tauri-apps/tauri-plugin-dialog#v2",
     "@types/lodash": "^4.14.201",
     "@vitejs/plugin-vue-jsx": "^3.0.2",
     "@vueuse/core": "^10.5.0",
@@ -38,7 +39,7 @@
   "devDependencies": {
     "@antfu/eslint-config": "^1.1.0",
     "@intlify/unplugin-vue-i18n": "^1.5.0",
-    "@tauri-apps/cli": "^1.5.6",
+    "@tauri-apps/cli": "2.0.0-alpha.17",
     "@types/node": "^20.9.0",
     "@vitejs/plugin-basic-ssl": "^1.0.1",
     "@vitejs/plugin-vue": "^4.4.0",

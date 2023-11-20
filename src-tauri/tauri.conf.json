@@ -10,45 +10,17 @@
     "productName": "qsync",
     "version": "0.1.0"
   },
-  "tauri": {
-    "allowlist": {
-      "all": false,
-      "dialog": {
-        "all": false,
-        "ask": false,
-        "confirm": false,
-        "message": false,
-        "open": true,
-        "save": false
-      },
-      "fs": {
-        "all": false,
-        "copyFile": false,
-        "createDir": false,
-        "exists": true,
-        "readDir": true,
-        "readFile": true,
-        "removeDir": false,
-        "removeFile": false,
-        "renameFile": true,
-        "scope": ["$RESOURCE/*"],
-        "writeFile": false
-      },
-      "window": {
-        "all": false,
-        "minimize": true,
-        "maximize": true,
-        "unmaximize": true,
-        "unminimize": true,
-        "startDragging": true,
-        "close": true
-      },
-      "protocol": {
-        "all": false,
-        "asset": true,
-        "assetScope": ["**"]
-      }
+  "plugins": {
+    "fs": {
+      "scope": [
+        "$RESOURCE/*"
+      ]
     },
+    "updater": {
+      "endpoints": []
+    }
+  },
+  "tauri": {
     "bundle": {
       "active": true,
       "appimage": {
@@ -81,6 +53,9 @@
       ],
       "shortDescription": "",
       "targets": "all",
+      "updater": {
+        "active": false
+      },
       "windows": {
         "certificateThumbprint": null,
         "digestAlgorithm": "sha256",
@@ -88,22 +63,25 @@
       }
     },
     "security": {
-      "csp": "null"
-    },
-    "updater": {
-      "active": false
+      "assetProtocol": {
+        "enable": true,
+        "scope": [
+          "**"
+        ]
+      },
+      "csp": "null; connect-src ipc: http://ipc.localhost"
     },
     "windows": [
       {
+        "decorations": false,
         "fullscreen": false,
         "height": 864,
-        "width": 1152,
         "minHeight": 330,
         "minWidth": 502,
         "resizable": true,
         "title": "QSync",
-        "decorations": false,
-        "transparent": false
+        "transparent": false,
+        "width": 1152
       }
     ]
   }

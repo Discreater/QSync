@@ -34,6 +34,7 @@
 - [x] Need to consider loading time, pause local player when loading. (Preload?)
    - Renew the progress after track loaded.
 - [ ] Refactor client player (init status, error handle, etc.)
+- [ ] Use git deps of plugin window and plugin dialog in `package.json `and `Cargo.toml`, because of https://github.com/tauri-apps/plugins-workspace/issues/738.
 
 ## Tech Stack
 

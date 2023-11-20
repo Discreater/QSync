@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { appWindow } from '@tauri-apps/api/window';
+import { getCurrent } from '@tauri-apps/api/window';
 import { onBeforeMount, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
@@ -24,20 +24,20 @@ const maximized = ref(false);
 
 inTauri(() => {
   onBeforeMount(async () => {
-    maximized.value = await appWindow.isMaximized();
+    maximized.value = await getCurrent().isMaximized();
   });
 });
 
 function onMinimize() {
-  appWindow.minimize();
+  getCurrent().minimize();
 }
 async function onToggleMaxmize() {
-  await appWindow.toggleMaximize();
-  maximized.value = await appWindow.isMaximized();
+  await getCurrent().toggleMaximize();
+  maximized.value = await getCurrent().isMaximized();
 }
 
 function onClose() {
-  appWindow.close();
+  getCurrent().close();
 }
 
 const canGoBack = ref(false);

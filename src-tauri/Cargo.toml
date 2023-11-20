@@ -5,9 +5,7 @@ description = "QSync"
 authors = ["discreater"]
 license = ""
 repository = ""
-default-run = "qsync"
 edition = "2021"
-rust-version = "1.59"
 
 [workspace]
 members = [".", "abi", "dbm", "migration", "entity", "server", "utils"]
@@ -38,15 +36,16 @@ dotenvy = "0.15.7"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [build-dependencies]
-tauri-build = { version = "1.2.1", features = [] }
+tauri-build = { version = "2.0.0-alpha", features = [] }
 
 [dependencies]
 serde_json = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
-tauri = { version = "1.2.4", features = [ "protocol-asset", "fs-read-dir", "fs-rename-file", "fs-exists", "fs-read-file", "dialog-open", "window-close", "window-maximize", "window-minimize", "window-start-dragging", "window-unmaximize", "window-unminimize", "devtools"] }
+tauri = { version = "2.0.0-alpha.17", features = [ "protocol-asset", "devtools"] }
+tauri-plugin-dialog = { git = "https://github.com/tauri-apps/plugins-workspace", branch = "v2" }
+tauri-plugin-window-state = { git = "https://github.com/tauri-apps/plugins-workspace", branch = "v2" }
 dbm = { path = "dbm" }
 thiserror = { workspace = true }
-tauri-plugin-window-state = { git = "https://github.com/tauri-apps/plugins-workspace", branch = "v1" }
 abi = { path = "abi" }
 tracing = { workspace = true }
 tracing-subscriber = { workspace = true }

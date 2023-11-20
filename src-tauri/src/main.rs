@@ -6,7 +6,7 @@
 use std::net::SocketAddr;
 
 use server::Server;
-use tauri::{Manager, State};
+use tauri::{Manager, State, path::BaseDirectory};
 use tracing::{info, Level};
 use tracing_subscriber::EnvFilter;
 
@@ -36,14 +36,15 @@ fn main() {
   // load envrionment
   // dotenvy::dotenv().expect(".env file not found");
   tauri::Builder::default()
+    .plugin(tauri_plugin_dialog::init())  
     .plugin(tauri_plugin_window_state::Builder::default().build())
     .invoke_handler(tauri::generate_handler![greet, get_server,])
     .setup(|app| {
       let window = app.get_window("main").unwrap();
       window_shadows::set_shadow(&window, true).expect("failed to set shadow");
-      let path_resolver = app.path_resolver();
+      let path_resolver = app.path();
       let resource_path = path_resolver
-        .resolve_resource("../.env")
+        .resolve("../.env", BaseDirectory::Resource)
         .expect("failed to resolve `.env`");
       dotenvy::from_filename(resource_path).expect(".env file resolve failed");
       let data_dir = path_resolver

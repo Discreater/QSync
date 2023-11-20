@@ -1,11 +1,13 @@
 export function getPlatform() {
-  if (window.__TAURI_METADATA__)
+  // @ts-expect-error tauri should define this
+  if (window.__TAURI_INTERNALS__)
     return 'tauri';
   else
     return 'web';
 }
 
 export function inTauri<T>(m: () => T): T | undefined {
-  if (window.__TAURI_METADATA__)
+  // @ts-expect-error tauri should define this
+  if (window.__TAURI_INTERNALS__)
     return m();
 }

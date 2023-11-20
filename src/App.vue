@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { invoke } from '@tauri-apps/api';
+import { invoke } from '@tauri-apps/api/primitives';
 import { computed, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
