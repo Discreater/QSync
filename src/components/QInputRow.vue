@@ -15,7 +15,7 @@ function onValueChange(e: Event) {
   emit('update:value', (e.target as HTMLInputElement).value);
 }
 const showDir = ref<string | undefined>(undefined);
-async function onClcickSelect() {
+async function onClickSelect() {
   const dirs = await open({
     title: 'Select directory',
     directory: true,
@@ -24,16 +24,11 @@ async function onClcickSelect() {
   if (dirs === undefined)
     return;
   logger.trace(dirs);
-  let dir;
-  if (Array.isArray(dirs))
-    dir = dirs[0];
-  else if (dirs === null)
-    dir = '';
-  else
-    dir = dirs;
-  showDir.value = dir;
+  const dirsNonNull = dirs ?? '';
+  const dirStr = Array.isArray(dirsNonNull) ? dirsNonNull[0] : dirsNonNull;
+  showDir.value = dirStr;
 
-  emit('update:value', dir);
+  emit('update:value', dirStr);
 }
 </script>
 
@@ -42,7 +37,7 @@ async function onClcickSelect() {
     <template #extra>
       <div v-if="type === 'directory'" class="flex items-center gap-3">
         <p>{{ showDir }}</p>
-        <QButton @click="onClcickSelect()">
+        <QButton @click="onClickSelect()">
           ...
         </QButton>
       </div>

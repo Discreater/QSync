@@ -92,7 +92,7 @@ async function addAccount() {
       </LongButton>
     </div>
     <template #model>
-      <div class="flex flex-col bg-[#1c1c1c] px-4 pb-4 pt-2 rounded gap-2">
+      <div class="flex flex-col bg-white dark:bg-[#1c1c1c] px-4 pb-4 pt-2 rounded gap-2">
         <H2>{{ t('source.add') }}</H2>
         <LongButton :text="t('source.type')">
           <template #extra>

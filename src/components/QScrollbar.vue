@@ -18,7 +18,7 @@ Scrollbar.use(ShiftScrollPlugin);
 
 const scrollbar = ref<Scrollbar | null>(null);
 
-const injectedScrollbar = inject<(s: Scrollbar) => void>(qInnerScrollBarKey);
+const injectedScrollbar = inject<(s: Scrollbar) => void>(qInnerScrollBarKey, () => {});
 
 const container = ref<HTMLDivElement | null>(null);
 onMounted(() => {

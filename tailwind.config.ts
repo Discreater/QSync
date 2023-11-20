@@ -36,15 +36,23 @@ const staticColors = {
   passion: '#f97316',
 };
 
+const colors = Object.keys(defaultTheme) as (keyof QTheme)[];
 const varColors: any = {};
-for (const key of Object.keys(defaultTheme))
+for (const key of colors)
   varColors[key] = `var(--${key})`;
+
+const safelist = [
+  ...colors.map(key => `bg-${key}`),
+  ...colors.map(key => `odd:bg-${key}`),
+  ...colors.map(key => `even:bg-${key}`),
+];
 
 export default {
   content: [
     './index.html',
     './src/**/*.{vue,js,ts,jsx,tsx}',
   ],
+  safelist,
   theme: {
     borderRadius: {
       none: '0',
