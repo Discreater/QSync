@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { computed, ref, useSlots } from 'vue';
+import { computed, provide, reactive, ref } from 'vue';
 import QScrollbar from '../QScrollbar.vue';
 import QHorizontalMenu from './QHorizontalMenu.vue';
-import type { Item, ItemKey } from './types';
-import QPivotItem from './QPivotItem.vue';
+import { qPivotRegisterKey } from './types';
+import type { Item, ItemKey, PivotRegister } from './types';
 
 const props = defineProps<{
   title?: string
@@ -12,17 +12,28 @@ const props = defineProps<{
 
 const activated = ref<ItemKey>(props.value);
 
-const children = useSlots().default?.();
-const tabs = children?.filter(child => child.type === QPivotItem).map((child) => {
+const tabs: Item[] = reactive([]);
+
+provide<PivotRegister>(qPivotRegisterKey, (tab: Item) => {
+  tabs.push(tab);
+
+  if (!activated.value)
+    activate(tab);
+
   return {
-    key: child.props!.value as ItemKey,
-    name: child.props!.name as string,
+    active: computed(() => activated.value === tab.key),
+
+    unregister() {
+      const index = tabs.indexOf(tab);
+      tabs.splice(index, 1);
+
+      if (activated.value === tab.key)
+        activate(tabs[0]);
+    },
   };
-}) ?? [];
+});
 
-const activatedKey = computed(() => tabs.findIndex(i => i.key === activated.value));
-
-function onValueChange(opt: Item) {
+function activate(opt: Item) {
   activated.value = opt.key;
 }
 </script>
@@ -32,9 +43,9 @@ function onValueChange(opt: Item) {
     <h2 v-if="title" class="font-semibold">
       {{ title }}
     </h2>
-    <QHorizontalMenu :top="tabs" :activated="activated" @item-click="onValueChange" />
+    <QHorizontalMenu :top="tabs" :activated="activated" @item-click="activate" />
     <QScrollbar>
-      <component :is="children[activatedKey]" v-if="children" />
+      <slot />
       <!-- <component :is="child" v-for="(child, idx) of children" v-show="tabs[idx].key === activated" :key="idx" /> -->
     </QScrollbar>
   </div>

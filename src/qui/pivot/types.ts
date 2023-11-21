@@ -1,4 +1,4 @@
-import type { Component } from 'vue';
+import type { Component, ComputedRef } from 'vue';
 
 export interface Item {
   key: ItemKey
@@ -7,3 +7,9 @@ export interface Item {
 }
 
 export type ItemKey = string | symbol;
+
+export const qPivotRegisterKey = Symbol('qPivotRegister');
+export type PivotRegister = (tab: Item) => {
+  active: ComputedRef<boolean>
+  unregister: () => void
+};
