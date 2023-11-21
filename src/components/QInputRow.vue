@@ -23,7 +23,7 @@ async function onClickSelect() {
   });
   if (dirs === undefined)
     return;
-  logger.trace(dirs);
+  logger.trace(String(dirs));
   const dirsNonNull = dirs ?? '';
   const dirStr = Array.isArray(dirsNonNull) ? dirsNonNull[0] : dirsNonNull;
   showDir.value = dirStr;

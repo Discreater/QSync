@@ -6,9 +6,9 @@
 use std::net::SocketAddr;
 
 use server::Server;
-use tauri::{Manager, State, path::BaseDirectory};
-use tracing::{info, Level};
-use tracing_subscriber::EnvFilter;
+use tauri::{path::BaseDirectory, Manager, State};
+use tauri_plugin_log::{Target, TargetKind, fern::colors::ColoredLevelConfig};
+use log::{info, LevelFilter};
 
 mod error;
 
@@ -17,27 +17,30 @@ fn greet(name: &str) -> String {
   format!("Hello, {name}!")
 }
 
-fn init_tracing() {
-  tracing_subscriber::fmt()
-    .with_env_filter(
-      EnvFilter::from_default_env()
-        .add_directive(Level::WARN.into())
-        .add_directive("qsync=trace".parse().unwrap())
-        .add_directive("server=trace".parse().unwrap())
-        .add_directive("dbm=trace".parse().unwrap())
-        .add_directive("abi=trace".parse().unwrap())
-        .add_directive("entity=trace".parse().unwrap()),
-    )
-    .init();
-}
-
 fn main() {
-  init_tracing();
+  // init_tracing();
   // load envrionment
   // dotenvy::dotenv().expect(".env file not found");
   tauri::Builder::default()
-    .plugin(tauri_plugin_dialog::init())  
+    .plugin(tauri_plugin_dialog::init())
     .plugin(tauri_plugin_window_state::Builder::default().build())
+    .plugin(
+      tauri_plugin_log::Builder::default()
+        .with_colors(ColoredLevelConfig::default())
+        .level(LevelFilter::Warn)
+        .level_for("qsync", LevelFilter::Trace)
+        .level_for("server", LevelFilter::Trace)
+        .level_for("dbm", LevelFilter::Trace)
+        .level_for("abi", LevelFilter::Trace)
+        .level_for("entity", LevelFilter::Trace)
+        .level_for("webview", LevelFilter::Trace)
+        .targets([
+          Target::new(TargetKind::LogDir { file_name: None }),
+          Target::new(TargetKind::Stdout),
+          Target::new(TargetKind::Webview),
+        ])
+        .build(),
+    )
     .invoke_handler(tauri::generate_handler![greet, get_server,])
     .setup(|app| {
       let window = app.get_window("main").unwrap();

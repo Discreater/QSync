@@ -17,6 +17,7 @@ import { usePlayerStore } from '~/store/player';
 import QTable from '~/components/QTable.vue';
 
 import { useInnerScrollbar } from '~/components/injects';
+import { logger } from '~/utils/logger';
 
 const { t } = useI18n();
 const store = useMusyncStore();
@@ -27,6 +28,7 @@ const scrollbar = useInnerScrollbar();
 const views = ref(store.musicFolders.flatMap(folder => folder.tracks));
 
 function shufflePlay() {
+  logger.warn('shuffle play');
   store.play(shuffle([...views.value]));
 }
 

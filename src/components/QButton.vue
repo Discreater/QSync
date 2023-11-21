@@ -1,13 +1,11 @@
 <script setup lang="ts">
 import { bgLayer, useLayerLevel } from './injects';
-import { logger } from '~/utils/logger';
 
 const props = withDefaults(defineProps<{ disabled?: boolean; layer?: number }>(), {
   disabled: false,
 });
 
 const level = useLayerLevel(props.layer);
-logger.warn('level in button', level);
 </script>
 
 <template>

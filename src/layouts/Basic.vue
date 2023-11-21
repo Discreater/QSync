@@ -2,12 +2,10 @@
 import H1 from '~/components/typo/H1.vue';
 import QScrollbar from '~/components/QScrollbar.vue';
 import { bgLayer, useLayerLevel } from '~/components/injects';
-import { logger } from '~/utils/logger';
 
 const props = defineProps<{ header: string; showModel?: boolean; layer?: number }>();
 
 const level = useLayerLevel(props.layer);
-logger.warn('level in basic', level);
 </script>
 
 <template>

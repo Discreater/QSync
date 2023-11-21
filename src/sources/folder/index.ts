@@ -1,4 +1,4 @@
-import { invoke } from '@tauri-apps/api';
+import { invoke } from '@tauri-apps/api/primitives';
 import type { Track } from '~/generated/protos/musync';
 
 export interface LocalFolder {

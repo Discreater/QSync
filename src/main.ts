@@ -6,9 +6,11 @@ import { pinia, useMusyncStore } from './store';
 
 import App from './App.vue';
 import { router } from './pages/router';
+import { attachLogger } from './utils/logger';
 
 const app = createApp(App);
 
+attachLogger();
 app.use(pinia);
 
 const host = window.location.hostname.split(':')[0];

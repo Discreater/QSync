@@ -53,22 +53,22 @@ export class JellyfinClient {
 
     // Fetch the public system info
     const info = await getSystemApi(api).getPublicSystemInfo();
-    logger.info('Info => ', info.data);
+    logger.info(`Info => ${info.data}`);
 
     // Fetch the list of public users
     const users = await getUserApi(api).getPublicUsers();
-    logger.info('Users => ', users.data);
+    logger.info(`Users => ${users.data}`);
 
     // A helper method for authentication has been added to the SDK because
     // the default method exposed in the generated Axios client is rather
     // cumbersome to use.
     const auth = await api.authenticateUserByName(this.opt.user, this.opt.pwd);
-    logger.info('Auth => ', auth.data);
+    logger.info(`Auth => ${auth.data}`);
 
     // Authentication state is stored internally in the Api class, so now
     // requests that require authentication can be made normally
     const libraries = await getLibraryApi(api).getMediaFolders();
-    logger.info('Lib => ', libraries.data);
+    logger.info(`Lib => ${libraries.data}`);
 
     // A helper method for logging out the current user has been added to the
     // SDK so the internal state is updated correctly.

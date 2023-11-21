@@ -41,7 +41,11 @@ tauri-build = { version = "2.0.0-alpha", features = [] }
 [dependencies]
 serde_json = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
-tauri = { version = "2.0.0-alpha.17", features = [ "protocol-asset", "devtools"] }
+tauri = { version = "2.0.0-alpha.17", features = [
+  "protocol-asset",
+  "devtools",
+] }
+tauri-plugin-log = { version = "2.0.0-alpha", features = ["colored"] }
 tauri-plugin-dialog = { git = "https://github.com/tauri-apps/plugins-workspace", branch = "v2" }
 tauri-plugin-window-state = { git = "https://github.com/tauri-apps/plugins-workspace", branch = "v2" }
 dbm = { path = "dbm" }
@@ -52,6 +56,7 @@ tracing-subscriber = { workspace = true }
 server = { path = "server" }
 dotenvy = { workspace = true }
 window-shadows = "0.2.2"
+log = "0.4.20"
 
 [features]
 # by default Tauri runs in production mode
