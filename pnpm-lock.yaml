@@ -18,7 +18,7 @@ dependencies:
     specifier: 2.0.0-alpha.11
     version: 2.0.0-alpha.11
   '@tauri-apps/plugin-dialog':
-    specifier: github:tauri-apps/tauri-plugin-dialog#v2
+    specifier: 2.0.0-alpha.3
     version: git/github.com+tauri-apps/tauri-plugin-dialog/027310d56636db7ca63391e9da82ea8af8475041
   '@tauri-apps/plugin-log':
     specifier: 2.0.0-alpha.3

@@ -13,3 +13,8 @@ source:
   add: Add Source
 settings:
   reindex: rebuild index
+search-result:
+  title: Search result
+  local-track: Local
+  netease-result: Netease
+loading: Loading

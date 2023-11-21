@@ -66,7 +66,9 @@ export default {
         ...staticColors,
       },
       transitionProperty: {
-        position: 'top, bottom',
+        'position-x': 'left, right',
+        'position-y': 'top, bottom',
+        'shape': 'width, height',
       },
       spacing: {
         player: '118px',

@@ -1,16 +1,16 @@
 <script setup lang="ts">
 import H1 from '~/components/typo/H1.vue';
-import QScrollbar from '~/components/QScrollbar.vue';
+import QScrollbar from '~qui/QScrollbar.vue';
 import { bgLayer, useLayerLevel } from '~/components/injects';
 
-const props = defineProps<{ header: string; showModel?: boolean; layer?: number }>();
+const props = defineProps<{ header: string; showModel?: boolean; layer?: number; noScroll?: boolean }>();
 
 const level = useLayerLevel(props.layer);
 </script>
 
 <template>
   <main
-    class="relative h-full w-full grow pb-1 overflow-auto flex flex-col px-1 rounded-tl-WINDOW pt-5"
+    class="relative h-full w-full grow pb-1 flex flex-col px-1 rounded-tl-WINDOW pt-5"
     :class="bgLayer(level)"
   >
     <div class="flex justify-between px-12 mb-3">
@@ -20,7 +20,10 @@ const level = useLayerLevel(props.layer);
     <div class="px-12">
       <slot name="actions" />
     </div>
-    <QScrollbar class="flex-1 grow relative px-12 py-1" content-class="space-y-1">
+    <div v-if="noScroll" class="flex flex-col flex-1 relative px-12 py-1 overflow-auto">
+      <slot />
+    </div>
+    <QScrollbar v-else class="flex-1 relative px-12 py-1" content-class="space-y-1">
       <slot />
     </QScrollbar>
     <div v-if="showModel" class="absolute bottom-0 left-0 right-0 top-0 bg-black/20 dark:bg-[#4b4b4b80] flex justify-center items-center pt-5">
