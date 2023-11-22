@@ -2,6 +2,7 @@
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
+import { throttle } from 'lodash';
 import QHoverButton from './QHoverButton.vue';
 import QSlider from './QSlider.vue';
 import QPopover from './QPopover.vue';
@@ -151,13 +152,12 @@ onMounted(async () => {
     audio.value!.pause();
     qsyncStore.nextTrack(false);
   };
-  audio.value!.ontimeupdate = () => {
+  audio.value!.ontimeupdate = throttle(() => {
     localProgress.value = audio.value!.currentTime;
-  };
+  }, 100);
   audio.value!.onloadedmetadata = () => {
     if (audio.value!.duration === Number.POSITIVE_INFINITY)
       return;
-
     duration.value = audio.value!.duration;
   };
   audio.value!.volume = configStore.volume / 100;
@@ -307,7 +307,7 @@ function setMediaSessionHandler() {
         <HoverLayer v-if="currentTrack" class="flex items-center select-none cursor-default min-w-[160px] h-20" @click="onInfoCardClick()">
           <QImage
             v-if="showCardImg" :src="currentTrack ? ApiClient.get().cover_uri(currentTrack.id) : ''"
-            class="object-scale-down w-[70px] h-[70px] border-white/10 border"
+            class="shrink-0 object-scale-down w-[70px] h-[70px] border-white/10 border"
           >
             <template #failed>
               <div class="flex items-center justify-center h-full ">
