@@ -39,7 +39,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div ref="container" class="container overflow-auto">
+  <div ref="container" class="scroll-container overflow-auto">
     <div :class="contentClass">
       <slot />
     </div>
@@ -47,51 +47,51 @@ onUnmounted(() => {
 </template>
 
 <style>
-.container .scrollbar-track {
+.scroll-container .scrollbar-track {
   background: transparent;
   transition: all 0.2s ease;
 }
 
-.container .scrollbar-track:hover {
+.scroll-container .scrollbar-track:hover {
   background: #ffffff20;
   border-radius: 4px;
 }
 
-.container .scrollbar-track:active {
+.scroll-container .scrollbar-track:active {
   background: #ffffff20;
   border-radius: 4px;
 }
 
-.container .scrollbar-track-y:hover .scrollbar-thumb {
+.scroll-container .scrollbar-track-y:hover .scrollbar-thumb {
   width: 8px;
 }
 
-.container .scrollbar-track-y:active .scrollbar-thumb {
+.scroll-container .scrollbar-track-y:active .scrollbar-thumb {
   width: 8px;
 }
 
-.container .scrollbar-track-x:hover .scrollbar-thumb {
+.scroll-container .scrollbar-track-x:hover .scrollbar-thumb {
   height: 8px;
 }
 
-.container .scrollbar-track-x:active .scrollbar-thumb {
+.scroll-container .scrollbar-track-x:active .scrollbar-thumb {
   height: 8px;
 }
 
-.container .scrollbar-track .scrollbar-thumb {
+.scroll-container .scrollbar-track .scrollbar-thumb {
   transition: all 0.2s ease;
   margin: auto;
   background: rgb(158, 160, 163);
 }
 
-.container .scrollbar-track-y .scrollbar-thumb {
+.scroll-container .scrollbar-track-y .scrollbar-thumb {
   transition: all 0.2s ease;
   left: auto;
   right: 0;
   width: 2px;
 }
 
-.container .scrollbar-track-x .scrollbar-thumb {
+.scroll-container .scrollbar-track-x .scrollbar-thumb {
   transition: all 0.2s ease;
   top: auto;
   bottom: 0;

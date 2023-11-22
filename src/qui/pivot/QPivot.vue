@@ -39,12 +39,12 @@ function activate(opt: Item) {
 </script>
 
 <template>
-  <div class="flex flex-1 flex-col h-full rounded-WINDOW px-6 py-6 space-y-2">
+  <div class="flex flex-1 flex-col h-full rounded-WINDOW  py-6 space-y-2">
     <h2 v-if="title" class="font-semibold">
       {{ title }}
     </h2>
-    <QHorizontalMenu :top="tabs" :activated="activated" @item-click="activate" />
-    <QScrollbar>
+    <QHorizontalMenu :top="tabs" :activated="activated" class="px-6" @item-click="activate" />
+    <QScrollbar class="px-6">
       <slot />
       <!-- <component :is="child" v-for="(child, idx) of children" v-show="tabs[idx].key === activated" :key="idx" /> -->
     </QScrollbar>

@@ -3,7 +3,7 @@ import { useRoute, useRouter } from 'vue-router';
 
 import { ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { breakpointsTailwind, useBreakpoints } from '@vueuse/core';
+import { useBreakpoints } from '@vueuse/core';
 import type { Item, ItemKey } from './types';
 
 import QMenu from './QMenu.vue';
@@ -18,6 +18,7 @@ import IconAppList from '~icons/fluent/apps-list-24-regular';
 import IconSearch from '~icons/fluent/search-12-regular';
 import IconMenu from '~icons/fluent/line-horizontal-3-20-regular';
 import { getPlatform } from '~/platforms';
+import { breakpoints } from '~/theme';
 
 const { t } = useI18n();
 
@@ -58,7 +59,7 @@ const menu = {
   ],
 };
 
-const breakPoints = useBreakpoints(breakpointsTailwind);
+const breakPoints = useBreakpoints(breakpoints);
 
 const route = useRoute();
 const router = useRouter();
@@ -89,7 +90,7 @@ const inTauri = getPlatform() === 'tauri';
 
 <template>
   <div v-if="inPhone" class="w-full px-3 flex items-center">
-    <QHoverButton @click="showMenuInPhone = !showMenuInPhone">
+    <QHoverButton class="h-10 w-10" @click="showMenuInPhone = !showMenuInPhone">
       <IconMenu class="text-lg" />
     </QHoverButton>
     <QInput
@@ -97,8 +98,8 @@ const inTauri = getPlatform() === 'tauri';
       @keyup.enter="search"
     >
       <template #extra>
-        <QHoverButton size="custom" :disabled="!searchText" @click="search">
-          <IconSearch clip="text-xs" />
+        <QHoverButton class="py-1" :disabled="!searchText" @click="search">
+          <IconSearch class="text-2xs" />
         </QHoverButton>
       </template>
     </QInput>
@@ -119,8 +120,8 @@ const inTauri = getPlatform() === 'tauri';
       :placeholder="t('nav.search')" @keyup.enter="search"
     >
       <template #extra>
-        <QHoverButton size="custom" :disabled="!searchText" @click="search">
-          <IconSearch text="text-xs" />
+        <QHoverButton class="py-1" :disabled="!searchText" @click="search">
+          <IconSearch class="text-2xs" />
         </QHoverButton>
       </template>
     </QInput>

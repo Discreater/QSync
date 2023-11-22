@@ -59,5 +59,6 @@ track:
   year: 发行年份
   local-src: 本地源
   netease-src: 网易云源
+  pop: 热度
 loading: 加载中
 app-title: 媒体播放器

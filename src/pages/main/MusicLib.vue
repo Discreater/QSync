@@ -8,13 +8,14 @@ import { useMusyncStore } from '~/store';
 import QButton from '~/components/QButton.vue';
 import { formatTime, shuffle } from '~/utils';
 import QHoverButton from '~/components/QHoverButton.vue';
+import QHoverText from '~/components/QHoverText.vue';
 import IconPlay from '~icons/fluent/play-24-regular';
 import IconLocation from '~icons/fluent/my-location-24-regular';
 import IconTop from '~icons/fluent/arrow-upload-24-regular';
-import type { Column } from '~/components/QTable.vue';
+import type { Column } from '~qui/table/types';
 import type { Track } from '~/generated/protos/musync';
 import { usePlayerStore } from '~/store/player';
-import QTable from '~/components/QTable.vue';
+import QTable from '~qui/table/QTable.vue';
 
 import { useInnerScrollbar } from '~/components/injects';
 import { logger } from '~/utils/logger';
@@ -60,22 +61,53 @@ function rowClassName(row: Track) {
 const columns: Column[] = [
   {
     key: 'actions',
+    style: {
+      gridTemplateColumn: '56px',
+    },
   },
   {
     key: 'title',
     title: 'Title',
+    style: {
+      gridTemplateColumn: 'minmax(0, 1.75fr)',
+    },
   },
   {
     key: 'artist',
     title: 'Artist',
+    style: {
+    },
   },
   {
     key: 'album',
     title: 'Album',
+    style: {
+      hidePx: 576,
+    },
+  },
+  {
+    key: 'year',
+    title: 'Year',
+    style: {
+      gridTemplateColumn: 'minmax(0, 56px)',
+      textAlign: 'right',
+      hidePx: 740,
+    },
+  },
+  {
+    key: 'genre',
+    title: 'Genre',
+    style: {
+      hidePx: 704,
+    },
   },
   {
     key: 'duration',
     title: 'Duration',
+    style: {
+      gridTemplateColumn: '56px',
+      textAlign: 'right',
+    },
   },
 ];
 
@@ -102,37 +134,39 @@ function handleTitleClick(track: Track) {
         </QButton>
       </div>
     </template>
-    <QTable :columns="columns" :data="views" :row-class-name="rowClassName">
-      <template #bodyCell="{ column, row, rowIdx }">
-        <template v-if="column.key === 'actions'">
-          <div class="flex">
-            <QHoverButton size="custom" class="text-passion h-8 w-8" @click="playByIdx(rowIdx)">
-              <IconPlay class="text-base" />
-            </QHoverButton>
-          </div>
-        </template>
-        <template v-else-if="column.key === 'title'">
-          <QHoverButton size="custom" class="hover:text-passion text-left" @click="handleTitleClick(row)">
-            {{ row.title }}
+    <QTable :columns="columns" :data="views" :row-class-name="rowClassName" :row-key="(row) => row.id">
+      <template #actions="{ rowIdx }">
+        <div class="flex">
+          <QHoverButton class="text-passion h-8 w-8" @click="playByIdx(rowIdx)">
+            <IconPlay class="text-base" />
           </QHoverButton>
-        </template>
-        <template v-else-if="column.key === 'artist'">
-          <div>
-            {{ row.artist }}
-          </div>
-        </template>
-        <template v-else-if="column.key === 'album'">
+        </div>
+      </template>
+      <template #title="{ row }">
+        <QHoverText class="hover:text-passion truncate" @click="handleTitleClick(row)">
+          {{ row.title }}
+        </QHoverText>
+      </template>
+      <template #artist="{ row }">
+        <p class="truncate">
+          {{ row.artist }}
+        </p>
+      </template>
+      <template #album="{ row }">
+        <p class="truncate">
           {{ row.album }}
-        </template>
-        <template v-else-if="column.key === 'year'">
-          {{ row.year }}
-        </template>
-        <template v-else-if="column.key === 'genre'">
+        </p>
+      </template>
+      <template #year="{ row }">
+        {{ row.year }}
+      </template>
+      <template #genre="{ row }">
+        <p class="truncate">
           {{ row.genre }}
-        </template>
-        <template v-else-if="column.key === 'duration'">
-          {{ row.duration != null ? formatTime(Math.floor(row.duration / 1000)) : '' }}
-        </template>
+        </p>
+      </template>
+      <template #duration="{ row }">
+        {{ row.duration != null ? formatTime(Math.floor(row.duration / 1000)) : '' }}
       </template>
     </QTable>
   </Basic>

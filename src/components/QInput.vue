@@ -33,7 +33,7 @@ function clear() {
 
 <template>
   <div
-    class="group ring-1 ring-gray-500/30 rounded border-b-2 h-8 px-2 flex"
+    class="group ring-1 ring-gray-500/30 rounded border-b-2 h-8 px-2 flex items-center"
     :class="focus
       ? 'bg-[#fff] dark:bg-[#1f1f1f] border-passion'
       : 'bg-[#fafcfd] dark:bg-[#323232] border-gray-500 dark:border-white/50'"
@@ -44,8 +44,8 @@ function clear() {
       @focusout="focus = false"
       @input="onValueChange($event)"
     >
-    <QHoverButton v-if="showValue" size="custom" @click="clear()">
-      <IconDismiss class="text-xs" />
+    <QHoverButton v-if="showValue" class="py-1" @click="clear()">
+      <IconDismiss class="text-2xs" />
     </QHoverButton>
     <slot name="extra" />
   </div>

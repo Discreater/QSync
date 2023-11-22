@@ -47,6 +47,11 @@ const safelist = [
   ...colors.map(key => `even:bg-${key}`),
 ];
 
+export const breakpoints = {
+  sm: '674px',
+  md: '1070px',
+};
+
 export default {
   content: [
     './index.html',
@@ -54,6 +59,7 @@ export default {
   ],
   safelist,
   theme: {
+    screens: breakpoints,
     borderRadius: {
       none: '0',
       DEFAULT: '4px',
@@ -64,6 +70,9 @@ export default {
       colors: {
         ...varColors,
         ...staticColors,
+      },
+      fontSize: {
+        '2xs': '0.625rem',
       },
       transitionProperty: {
         'position-x': 'left, right',

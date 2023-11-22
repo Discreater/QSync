@@ -46,7 +46,7 @@ const unreachedColor = computed(() => isDark.value ? '#ffffff80' : '#8a8a8a');
       class="grow"
       type="range" :min="min" :max="max ?? 100" :value="showValue" :style="{
         background: `linear-gradient(to right, #f97316 ${showValuePercent * 100}%, ${unreachedColor} ${showValuePercent * 100}%)`,
-      }" :title="showValue?.toString()"
+      }"
       @mousedown="onMouseDown" @input="onInput($event as InputEvent)" @mouseup="onMouseUp"
     >
     <slot name="right" :value="showValue" />

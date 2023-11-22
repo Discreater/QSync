@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n';
-import type { Column } from '~/components/QTable.vue';
+import type { Column } from '~qui/table/types';
 import Basic from '~/layouts/Basic.vue';
 import { useMusyncStore } from '~/store';
-import QTable from '~/components/QTable.vue';
+import QTable from '~qui/table/QTable.vue';
 import QHoverButton from '~/components/QHoverButton.vue';
 import IconPlay from '~icons/fluent/play-24-regular';
 import { formatTime } from '~/utils';
@@ -22,6 +22,9 @@ function playByIdx(idx: number) {
 const columns: Column[] = [
   {
     key: 'actions',
+    style: {
+      gridTemplateColumn: '48px',
+    },
   },
   {
     key: 'title',
@@ -38,6 +41,10 @@ const columns: Column[] = [
   {
     key: 'duration',
     title: 'Duration',
+    style: {
+      gridTemplateColumn: '56px',
+      textAlign: 'right',
+    },
   },
 ];
 </script>
@@ -45,24 +52,28 @@ const columns: Column[] = [
 <template>
   <Basic :header="t('menu.play-queue')">
     <QTable :columns="columns" :data="views">
-      <template #bodyCell="{ column, row, rowIdx }">
-        <template v-if="column.key === 'actions'">
-          <QHoverButton size="custom" class="text-passion h-8 w-8" @click="playByIdx(rowIdx)">
-            <IconPlay class="text-base" />
-          </QHoverButton>
-        </template>
-        <template v-else-if="column.key === 'title'">
+      <template #actions="{ rowIdx }">
+        <QHoverButton class="text-passion h-8 w-8" @click="playByIdx(rowIdx)">
+          <IconPlay class="text-base" />
+        </QHoverButton>
+      </template>
+      <template #title="{ row }">
+        <p class="truncate">
           {{ row.title }}
-        </template>
-        <template v-else-if="column.key === 'artist'">
+        </p>
+      </template>
+      <template #artist="{ row }">
+        <p class="truncate">
           {{ row.artist }}
-        </template>
-        <template v-else-if="column.key === 'album'">
+        </p>
+      </template>
+      <template #album="{ row }">
+        <p class="truncate">
           {{ row.album }}
-        </template>
-        <template v-else-if="column.key === 'duration'">
-          {{ row.duration != null ? formatTime(TrackExt.durationInSecs(row.duration)) : '' }}
-        </template>
+        </p>
+      </template>
+      <template #duration="{ row }">
+        {{ row.duration != null ? formatTime(TrackExt.durationInSecs(row.duration)) : '' }}
       </template>
     </QTable>
   </Basic>

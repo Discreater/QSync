@@ -3,6 +3,7 @@ import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { throttle } from 'lodash';
+import { useBreakpoints } from '@vueuse/core';
 import QHoverButton from './QHoverButton.vue';
 import QSlider from './QSlider.vue';
 import QPopover from './QPopover.vue';
@@ -26,6 +27,7 @@ import { formatTime } from '~/utils';
 import { ApiClient } from '~/api/client';
 import type { Track } from '~/generated/protos/musync';
 import { TrackExt } from '~/model_ext/track';
+import { breakpoints } from '~/theme';
 
 const router = useRouter();
 const route = useRoute();
@@ -286,23 +288,27 @@ function setMediaSessionHandler() {
     });
   }
 }
+
+const breakPoints = useBreakpoints(breakpoints);
+
+const inPhone = breakPoints.smaller('sm');
 </script>
 
 <template>
-  <div class="h-player flex flex-col border-solid border-t border-gray-500/30 dark:border-black/30 gap-1 p-0.5">
+  <div class="h-player flex flex-col border-solid border-t border-gray-500/30 dark:border-black/30 gap-1 p-0.5 bg-layer_0">
     <!-- Progress slider -->
     <QSlider class="px-3 mt-1" :value="localProgress" :min="0" :max="duration" @update:value="onSliderUpdate">
       <template #left="{ value }">
         <span class="text-xs w-14"> {{ formatTime(value, 'hh:mm:ss') }} </span>
       </template>
       <template #right="{ value }">
-        <span class="text-xs text-right w-14">{{ duration && value != null ? `${formatTime(duration - value, 'hh:mm:ss')}`
+        <span class="text-xs w-14">{{ duration && value != null ? `${formatTime(duration - value, 'hh:mm:ss')}`
           : ''
         }}</span>
       </template>
     </QSlider>
-    <div class="grow flex justify-between items-center p-0.5">
-      <div class="flex-1 h-full flex overflow-hidden">
+    <div class="grow flex items-center p-0.5 max-w-full gap-3" :class="inPhone ? '' : 'justify-between'">
+      <div class="shrink-1 sm:flex-1 h-full flex overflow-hidden mr-auto sm:mr-[none]">
         <!-- Track info (cover/title/artist...) -->
         <HoverLayer v-if="currentTrack" class="flex items-center select-none cursor-default min-w-[160px] h-20" @click="onInfoCardClick()">
           <QImage
@@ -325,39 +331,41 @@ function setMediaSessionHandler() {
           </div>
         </HoverLayer>
       </div>
-      <div class="flex-1 flex justify-center items-center gap-3">
-        <QHoverButton @click="qsyncStore.shufflePlayQueue()">
-          <IconArrowShuffle class="text-lg" />
+      <div class="flex-none sm:flex-1 flex justify-center items-center gap-3">
+        <QHoverButton v-if="!inPhone" class="h-9 w-9" @click="qsyncStore.shufflePlayQueue()">
+          <IconArrowShuffle class="text-base" />
         </QHoverButton>
-        <QHoverButton @click="handlePrevious">
-          <IconPrevious class="text-lg" />
+        <QHoverButton class="h-9 w-9" @click="handlePrevious">
+          <IconPrevious class="text-base" />
         </QHoverButton>
         <button
-          class="rounded-full w-14 h-14 text-2xl flex justify-center items-center bg-gradient-to-br from-orange-500 to-purple-500"
+          class="rounded-full w-11 h-11 sm:w-[52px] sm:h-[52px] text-base sm:text-xl flex justify-center items-center bg-gradient-to-br from-orange-500 to-purple-800"
           @click="togglePlay"
         >
-          <IconPause v-if="playerStore.playing" />
-          <IconPlay v-else />
+          <div class="rounded-full w-10 h-10 sm:w-11 sm:h-11 bg-layer_0 hover:bg-layer_1 flex items-center justify-center">
+            <IconPause v-if="playerStore.playing" />
+            <IconPlay v-else />
+          </div>
         </button>
-        <QHoverButton @click="handleNext">
-          <IconNext class="text-lg" />
+        <QHoverButton class="h-9 w-9" @click="handleNext">
+          <IconNext class="text-base" />
         </QHoverButton>
-        <QHoverButton :disabled="true">
-          <IconRepeat class="text-lg" />
+        <QHoverButton v-if="!inPhone" class="h-9 w-9" :disabled="true">
+          <IconRepeat class="text-base" />
         </QHoverButton>
       </div>
-      <div class="flex-1 flex justify-end items-center gap-2">
+      <div class="flex-none sm:flex-1 flex justify-end items-center gap-2">
         <QPopover>
-          <QHoverButton>
-            <IconVolumeMute v-if="configStore.muted" class="text-lg" />
-            <IconVolume v-else class="text-lg" />
+          <QHoverButton class="h-9 w-9">
+            <IconVolumeMute v-if="configStore.muted" class="text-base" />
+            <IconVolume v-else class="text-base" />
           </QHoverButton>
           <template #popover>
             <QSlider :min="0" :max="100" :value="configStore.volume" @input="onVolumeUpdate">
               <template #left>
-                <QHoverButton @click="toggleMute()">
-                  <IconVolumeMute v-if="configStore.muted" class="text-lg" />
-                  <IconVolume v-else class="text-lg" />
+                <QHoverButton class="h-9 w-9" @click="toggleMute()">
+                  <IconVolumeMute v-if="configStore.muted" class="text-base" />
+                  <IconVolume v-else class="text-base" />
                 </QHoverButton>
               </template>
               <template #right="{ value }">
@@ -366,8 +374,8 @@ function setMediaSessionHandler() {
             </QSlider>
           </template>
         </QPopover>
-        <QHoverButton :disabled="true">
-          <IconMore class="text-lg" />
+        <QHoverButton class="h-9 w-9">
+          <IconMore class="text-base" />
         </QHoverButton>
       </div>
     </div>

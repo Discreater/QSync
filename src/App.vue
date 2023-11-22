@@ -3,12 +3,13 @@ import { invoke } from '@tauri-apps/api/primitives';
 import { computed, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
-import { breakpointsTailwind, useBreakpoints } from '@vueuse/core';
+import { useBreakpoints } from '@vueuse/core';
 import { getPlatform, inTauri } from './platforms';
 import { useMusyncStore } from './store';
 import QPlayer from './components/QPlayer.vue';
 import QConfigProvider from './components/QConfigProvider.vue';
 import { isDark } from './utils';
+import { breakpoints } from '~/theme';
 import { defaultDarkTheme, defaultTheme } from '~/theme.js';
 import TitleBar from '~/components/TitleBar.vue';
 
@@ -31,7 +32,7 @@ qsyncStore.$subscribe((_mutation, state) => {
   i18nLocale.value = state.locale;
 });
 
-const breakPoints = useBreakpoints(breakpointsTailwind);
+const breakPoints = useBreakpoints(breakpoints);
 const inPhone = breakPoints.smaller('sm');
 
 const route = useRoute();

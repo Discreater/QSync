@@ -8,6 +8,8 @@ import { ApiClient } from '~/api/client';
 import Basic from '~/layouts/Basic.vue';
 import type { Track } from '~/generated/protos/musync';
 import type { NcmSearchResult } from '~/model_ext/ncm';
+import QTable from '~qui/table/QTable.vue';
+import type { Column } from '~qui/table/types';
 
 defineProps<{
   query: string
@@ -29,6 +31,18 @@ watch(() => route.query, async () => {
 });
 
 const { t } = useI18n();
+
+const localCols: Column[] = [
+  { key: 'title', title: t('track.title') },
+  { key: 'artist', title: t('track.artist') },
+  { key: 'album', title: t('track.album') },
+];
+const ncmCols: Column[] = [
+  { key: 'title', title: t('track.title') },
+  { key: 'artist', title: t('track.artist') },
+  { key: 'album', title: t('track.album') },
+  { key: 'pop', title: t('track.pop') },
+];
 </script>
 
 <template>
@@ -39,18 +53,33 @@ const { t } = useI18n();
     <div v-else class="h-full flex-1 flex">
       <QPivot value="local" class="bg-main_bg">
         <QPivotItem value="local" :name="t('search-result.local-track')">
-          <div v-for="track in tracks" :key="track.id">
-            {{ track.title }} | {{ track.artist }} | {{ track.album }}
-          </div>
+          <QTable :columns="localCols" :data="tracks" :show-head="true" :row-key="(row) => row.id">
+            <template #title="{ row }">
+              {{ row.title }}
+            </template>
+            <template #artist="{ row }">
+              {{ row.artist }}
+            </template>
+            <template #album="{ row }">
+              {{ row.album }}
+            </template>
+          </QTable>
         </QPivotItem>
         <QPivotItem value="netease" :name="t('search-result.netease-result')">
-          <div v-if="ncmRes?.result">
-            <ol>
-              <li v-for="track in ncmRes.result.songs" :key="track.id">
-                {{ track.name }} | {{ track.ar.map(ar => ar.name).join(', ') }} | {{ track.al.name }} | {{ track.pop }}
-              </li>
-            </ol>
-          </div>
+          <QTable v-if="ncmRes?.result" :columns="ncmCols" :show-head="true" :data="ncmRes.result.songs" :row-key="(row) => row.id">
+            <template #title="{ row }">
+              {{ row.name }}
+            </template>
+            <template #artist="{ row }">
+              {{ row.ar.map(ar => ar.name).join(', ') }}
+            </template>
+            <template #album="{ row }">
+              {{ row.al.name }}
+            </template>
+            <template #pop="{ row }">
+              {{ row.pop }}
+            </template>
+          </QTable>
         </QPivotItem>
       </QPivot>
     </div>
