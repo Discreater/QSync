@@ -2,6 +2,8 @@
 
 ![playing](docs/img/playing.png)
 
+You can download the prebuilt installer from the newest successful build of the [Github Actions](https://github.com/Discreater/QSync/actions). (Only Windows is supported now)
+
 ## Roadmap
 
 ### MuSync
