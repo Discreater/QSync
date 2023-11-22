@@ -3,7 +3,12 @@ export interface Column {
   key: string
   title?: string
 };
-const props = defineProps<{ columns: Column[]; data: Row[]; showHead?: boolean; rowClassName?: (row: Row) => string }>();
+const props = defineProps<{
+  columns: Column[]
+  data: Row[]
+  showHead?: boolean
+  rowClassName?: (row: Row) => string
+}>();
 
 function rowClass(row: Row) {
   return `${props.rowClassName?.(row)} odd:bg-layer_1 even:hover:bg-layer_1`;

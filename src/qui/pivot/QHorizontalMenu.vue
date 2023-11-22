@@ -20,8 +20,8 @@ const localActivated = ref(props.defaultActivated);
 const activated = computed(() => _activated?.value ?? localActivated.value);
 
 const noActivated = computed(() => (props.top.findIndex(i => i.key === activated.value) === -1
-                            && (props.bottom?.findIndex(i => i.key === activated.value) === -1))
-                            ?? false);
+  && (props.bottom?.findIndex(i => i.key === activated.value) === -1))
+  ?? false);
 
 const topContainer = ref<HTMLDivElement>();
 const bottomContainer = ref<HTMLDivElement>();
@@ -58,10 +58,8 @@ watchEffect(() => {
     if (idx !== -1) {
       handlerWidth.value = widthOf(bottomContainer, idx);
       handlerLeft.value = leftOf(bottomContainer, idx);
-      return;
     }
   }
-  return 0;
 });
 
 function handleItemClick(item: Item) {

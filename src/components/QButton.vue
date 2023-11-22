@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { bgLayer, useLayerLevel } from './injects';
 
-const props = withDefaults(defineProps<{ disabled?: boolean; layer?: number }>(), {
+const props = withDefaults(defineProps<{
+  disabled?: boolean
+  layer?: number
+}>(), {
   disabled: false,
 });
 

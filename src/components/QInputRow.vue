@@ -5,7 +5,13 @@ import LongButton from './LongButton.vue';
 import { logger } from '~/utils/logger';
 import { open } from '~/platforms/dialog';
 
-const props = defineProps<{ id: string; type: 'url' | 'directory' | 'text' | 'password'; placeholder?: string; value?: string; label?: string }>();
+const props = defineProps<{
+  id: string
+  type: 'url' | 'directory' | 'text' | 'password'
+  placeholder?: string
+  value?: string
+  label?: string
+}>();
 const emit = defineEmits<{
   (e: 'update:value', value: string): void
 }>();

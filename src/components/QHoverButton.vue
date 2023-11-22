@@ -3,7 +3,11 @@ type Size = 'custom' | 'fixed';
 
 type Cursor = 'default' | 'pointer';
 
-const props = withDefaults(defineProps<{ disabled?: boolean; size?: Size; cursor?: Cursor }>(), {
+const props = withDefaults(defineProps<{
+  disabled?: boolean
+  size?: Size
+  cursor?: Cursor
+}>(), {
   disabled: false,
   size: 'fixed',
   cursor: 'default',

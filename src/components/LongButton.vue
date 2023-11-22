@@ -5,7 +5,12 @@ import { bgLayer, useLayerLevel } from './injects';
 import IconDown from '~icons/fluent/chevron-down-24-regular';
 import IconUp from '~icons/fluent/chevron-up-24-regular';
 
-const props = withDefaults(defineProps<{ icon?: Component; text?: string; droppable?: boolean; layer?: number }>(), {
+const props = withDefaults(defineProps<{
+  icon?: Component
+  text?: string
+  droppable?: boolean
+  layer?: number
+}>(), {
   droppable: false,
 });
 

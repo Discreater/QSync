@@ -56,7 +56,7 @@ function debounce<T extends (...args: any) => any>(fn: T, wait: number, options?
   trailing?: boolean
 }): T & { cancel: () => void; flush: () => void; pending: () => boolean } {
   const leading = options?.leading ?? false;
-  const maxing = options?.maxWait !== undefined ?? false;
+  const maxing = options?.maxWait !== undefined;
   const maxWait = options?.maxWait !== undefined ? Math.max(options?.maxWait ?? 0, wait) : undefined;
   const trailing = options?.trailing ?? true;
   let lastArgs: any[] | undefined;

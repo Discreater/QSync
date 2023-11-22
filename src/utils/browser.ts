@@ -22,7 +22,7 @@ function isWeb0s() {
   const userAgent = navigator.userAgent.toLowerCase();
 
   return userAgent.includes('netcast')
-      || userAgent.includes('web0s');
+    || userAgent.includes('web0s');
 }
 
 function isMobile(userAgent: string) {
@@ -181,24 +181,24 @@ const uaMatch = function (ua: string) {
   ua = ua.toLowerCase();
 
   const match = /(edg)[ /]([\w.]+)/.exec(ua)
-      || /(edga)[ /]([\w.]+)/.exec(ua)
-      || /(edgios)[ /]([\w.]+)/.exec(ua)
-      || /(edge)[ /]([\w.]+)/.exec(ua)
-      || /(opera)[ /]([\w.]+)/.exec(ua)
-      || /(opr)[ /]([\w.]+)/.exec(ua)
-      || /(chrome)[ /]([\w.]+)/.exec(ua)
-      || /(safari)[ /]([\w.]+)/.exec(ua)
-      || /(firefox)[ /]([\w.]+)/.exec(ua)
-      || (!ua.includes('compatible') && /(mozilla)(?:.*? rv:([\w.]+)|)/.exec(ua))
-      || [];
+    || /(edga)[ /]([\w.]+)/.exec(ua)
+    || /(edgios)[ /]([\w.]+)/.exec(ua)
+    || /(edge)[ /]([\w.]+)/.exec(ua)
+    || /(opera)[ /]([\w.]+)/.exec(ua)
+    || /(opr)[ /]([\w.]+)/.exec(ua)
+    || /(chrome)[ /]([\w.]+)/.exec(ua)
+    || /(safari)[ /]([\w.]+)/.exec(ua)
+    || /(firefox)[ /]([\w.]+)/.exec(ua)
+    || (!ua.includes('compatible') && /(mozilla)(?:.*? rv:([\w.]+)|)/.exec(ua))
+    || [];
 
   const versionMatch = /(version)[ /]([\w.]+)/.exec(ua);
 
   let platform_match: RegExpExecArray | string[] = /(ipad)/.exec(ua)
-      || /(iphone)/.exec(ua)
-      || /(windows)/.exec(ua)
-      || /(android)/.exec(ua)
-      || [];
+    || /(iphone)/.exec(ua)
+    || /(windows)/.exec(ua)
+    || /(android)/.exec(ua)
+    || [];
 
   let browser = match[1] || '';
 

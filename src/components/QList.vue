@@ -1,5 +1,8 @@
 <script setup lang="ts" generic="T">
-defineProps<{ items: T[]; keyMap: (t: T) => string }>();
+defineProps<{
+  items: T[]
+  keyMap: (t: T) => string
+}>();
 </script>
 
 <template>

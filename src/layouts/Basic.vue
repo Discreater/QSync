@@ -3,7 +3,12 @@ import H1 from '~/components/typo/H1.vue';
 import QScrollbar from '~qui/QScrollbar.vue';
 import { bgLayer, useLayerLevel } from '~/components/injects';
 
-const props = defineProps<{ header: string; showModel?: boolean; layer?: number; noScroll?: boolean }>();
+const props = defineProps<{
+  header: string
+  showModel?: boolean
+  layer?: number
+  noScroll?: boolean
+}>();
 
 const level = useLayerLevel(props.layer);
 </script>
