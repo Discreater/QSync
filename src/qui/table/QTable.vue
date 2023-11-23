@@ -69,7 +69,8 @@ function rowKeyMap(row: Row, idx: number) {
     </div>
     <div
       v-for="(row, rowIdx) in data" :key="rowKeyMap(row, rowIdx)"
-      class="flex-table items-center rounded px-2 h-12 even:bg-layer_1 even:ring-1 even:ring-black/10 odd:hover:bg-layer_1"
+      class="group flex-table items-center rounded px-2 h-12 even:bg-layer_1 even:ring-1 even:ring-black/10 odd:hover:bg-layer_1"
+      :class="rowClassName?.(row) ?? ''"
       role="rowgroup"
     >
       <div

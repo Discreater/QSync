@@ -41,7 +41,10 @@ const ncmCols: Column[] = [
   { key: 'title', title: t('track.title') },
   { key: 'artist', title: t('track.artist') },
   { key: 'album', title: t('track.album') },
-  { key: 'pop', title: t('track.pop') },
+  { key: 'pop', title: t('track.pop'), style: {
+    textAlign: 'right',
+    gridTemplateColumn: '24px',
+  } },
 ];
 </script>
 

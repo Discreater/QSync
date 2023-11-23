@@ -136,7 +136,7 @@ function handleTitleClick(track: Track) {
     </template>
     <QTable :columns="columns" :data="views" :row-class-name="rowClassName" :row-key="(row) => row.id">
       <template #actions="{ rowIdx }">
-        <div class="flex">
+        <div class="flex invisible group-hover:visible">
           <QHoverButton class="text-passion h-8 w-8" @click="playByIdx(rowIdx)">
             <IconPlay class="text-base" />
           </QHoverButton>
@@ -173,15 +173,7 @@ function handleTitleClick(track: Track) {
 </template>
 
 <style scoped>
-:deep(.playing td) {
+:deep(.playing) {
   color: rgb(249 115 22);
-}
-
-:deep(td[data-col-key="actions"] button) {
-  visibility: hidden;
-}
-
-:deep(tr:hover td[data-col-key="actions"] button) {
-  visibility: visible;
 }
 </style>

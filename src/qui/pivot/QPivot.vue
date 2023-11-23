@@ -45,7 +45,7 @@ function activate(opt: Item) {
       {{ title }}
     </h2>
     <QHorizontalMenu :top="tabs" :activated="activated" class="px-6" @item-click="activate" />
-    <QScrollbar class="px-6">
+    <QScrollbar class="px-6 mr-1">
       <slot />
       <!-- <component :is="child" v-for="(child, idx) of children" v-show="tabs[idx].key === activated" :key="idx" /> -->
     </QScrollbar>

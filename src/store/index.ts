@@ -1,6 +1,7 @@
 import { createPinia, defineStore } from 'pinia';
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate';
 import { usePlayerStore } from './player';
+import { useAccountStore } from './user';
 import { ApiClient, WsClient } from '~/api/client';
 import type { Track } from '~/generated/protos/musync';
 import type { TrackId } from '~/model_ext/track';
@@ -50,6 +51,12 @@ export const useMusyncStore = defineStore('musync', {
       });
 
       await ApiClient.set(`${host}:8396`);
+
+      const account = useAccountStore();
+      if (!account.online) {
+        loading.value = false;
+        return;
+      }
 
       await this.updateFoldersFromRemote();
       await this.updatePlayQueueFromRemote();
