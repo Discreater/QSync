@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useRoute, useRouter } from 'vue-router';
 
-import { ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useBreakpoints } from '@vueuse/core';
 import type { Item, ItemKey } from './types';
@@ -71,26 +71,57 @@ watch(
     activated.value = name ?? undefined;
   },
 );
-const showMenuInPhone = ref(false);
+
+const searchText = ref('');
+
+const inTauri = getPlatform() === 'tauri';
+
+const sizeSm = breakPoints.smaller('sm');
+const sizeMd = breakPoints.between('sm', 'md');
+const sizeLg = breakPoints.greater('md');
+
+// valid when sizeSm
+const showMenu = ref(false);
+// valid when sizeMd
+const expandMenu = ref(false);
+// valid when sizeLg
+const shrinkMenu = ref(false);
+
+function onMenuScale() {
+  if (sizeLg.value)
+    shrinkMenu.value = !shrinkMenu.value;
+  else if (sizeMd.value)
+    expandMenu.value = !expandMenu.value;
+}
+const onlyIcon = computed(() => { return sizeLg.value && shrinkMenu.value || sizeMd.value && !expandMenu.value; });
+
+const delayedOnlyIcon = ref(onlyIcon.value);
+watch(onlyIcon, (value, oldValue) => {
+  if (oldValue && !value) {
+    setTimeout(() => {
+      delayedOnlyIcon.value = false;
+    }, 100);
+  } else {
+    delayedOnlyIcon.value = value;
+  }
+});
 
 function onItemClick(item: Item) {
   router.push({ name: item.key });
-  showMenuInPhone.value = false;
+  showMenu.value = false;
+  expandMenu.value = false;
 }
 
-const searchText = ref('');
 function search() {
   router.push({ name: 'search-result', query: { q: searchText.value } });
+  showMenu.value = false;
+  expandMenu.value = false;
 }
-
-const onlyIcon = breakPoints.sm;
-const inPhone = breakPoints.smaller('sm');
-const inTauri = getPlatform() === 'tauri';
 </script>
 
 <template>
-  <div v-if="inPhone" class="w-full px-3 flex items-center">
-    <QHoverButton class="h-10 w-10" @click="showMenuInPhone = !showMenuInPhone">
+  <div v-if="sizeSm" class="w-full px-3 flex items-center">
+    <QHoverButton class="h-10 w-10" @click="showMenu = !showMenu">
       <IconMenu class="text-lg" />
     </QHoverButton>
     <QInput
@@ -105,7 +136,7 @@ const inTauri = getPlatform() === 'tauri';
     </QInput>
     <Teleport to="#qsync">
       <div
-        v-if="showMenuInPhone" class="fixed inset-x-0 top-10 bottom-player p-1 bg-menu_bg"
+        v-if="showMenu" class="fixed inset-x-0 top-10 bottom-player p-1 bg-menu_bg"
         :class="inTauri ? 'mt-[32px]' : ''"
       >
         <QMenu :activated="activated" :top="menu.top" :bottom="menu.bottom" @item-click="onItemClick" />
@@ -113,18 +144,36 @@ const inTauri = getPlatform() === 'tauri';
     </Teleport>
   </div>
   <div
-    v-else class="bg-menu_bg flex flex-col sm:w-12 md:w-80 px-0 sm:px-1 pt-1"
+    v-else class="shrink-0 bg-menu_bg flex flex-col space-y-2 px-1 transition-shape"
+    :class="`
+    ${sizeLg ? (shrinkMenu ? 'w-12' : 'w-80')
+    : sizeMd ? (expandMenu ? 'w-80' : 'w-12')
+    : 'w-0'}
+    ${sizeMd && expandMenu ? 'bg-[#fafafa] dark:bg-[#2d2d2d] ring-1 ring-black/10 rounded-r-WINDOW' : ''}
+        `"
   >
-    <QInput
-      id="nav-search" v-model:value="searchText" class="mx-2.5 mb-3 hidden md:flex" type="text"
-      :placeholder="t('nav.search')" @keyup.enter="search"
-    >
-      <template #extra>
-        <QHoverButton class="py-1" :disabled="!searchText" @click="search">
-          <IconSearch class="text-2xs" />
-        </QHoverButton>
-      </template>
-    </QInput>
-    <QMenu :activated="activated" :top="menu.top" :bottom="menu.bottom" :only-icon="onlyIcon" @item-click="onItemClick" />
+    <QHoverButton class="shrink-0 h-9 w-10" @click="onMenuScale">
+      <IconMenu class="text-base" />
+    </QHoverButton>
+    <div class="shrink-0 h-10 flex items-center">
+      <QInput
+        v-if="!onlyIcon"
+        id="nav-search" v-model:value="searchText" class="mx-2.5 w-full" type="text"
+        :placeholder="t('nav.search')" @keyup.enter="search"
+      >
+        <template #extra>
+          <QHoverButton class="py-1" :disabled="!searchText" @click="search">
+            <IconSearch class="text-2xs" />
+          </QHoverButton>
+        </template>
+      </QInput>
+      <QHoverButton v-else class="h-10 w-10" @click="onMenuScale">
+        <IconSearch class="text-sm" />
+      </QHoverButton>
+    </div>
+    <QMenu
+      class="mt-4" :activated="activated" :top="menu.top" :bottom="menu.bottom"
+      :only-icon="delayedOnlyIcon" @item-click="onItemClick"
+    />
   </div>
 </template>

@@ -15,7 +15,7 @@ const level = useLayerLevel(props.layer);
 
 <template>
   <main
-    class="relative h-full w-full grow pb-1 flex flex-col px-1 rounded-tl-WINDOW pt-5"
+    class="relative h-full w-full grow pb-1 flex flex-col px-1 rounded-none sm:rounded-tl-WINDOW ring-1 ring-black/10 pt-5"
     :class="bgLayer(level)"
   >
     <div class="flex justify-between px-14 mb-3">

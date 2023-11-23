@@ -34,7 +34,8 @@ provide<PivotRegister>(qPivotRegisterKey, (tab: Item) => {
 });
 
 function activate(opt: Item) {
-  activated.value = opt.key;
+  if (opt)
+    activated.value = opt.key;
 }
 </script>
 

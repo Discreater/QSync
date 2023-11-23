@@ -10,7 +10,7 @@ withDefaults(defineProps<{
   <button
     :disabled="disabled"
     class="hover:enabled:bg-black/10 dark:hover:enabled:bg-white/10 disabled:opacity-25
-           flex items-center justify-between
+           flex items-center justify-center
            rounded px-2 cursor-default"
   >
     <slot />

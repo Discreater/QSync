@@ -52,11 +52,18 @@ function onGoBack() {
 </script>
 
 <template>
-  <div data-tauri-drag-region class="h-title bg-transparent select-none cursor-default flex justify-start" :class="dense ? 'h-[32px]' : 'h-[48px]'">
-    <div class="flex justify-center items-center space-x-2" :class="dense ? '' : 'h-[48px]'">
-      <div class="flex justify-center items-center" :class="`${dense ? 'h-[48px] w-12' : 'h-10 w-10 mx-1 rounded'} ${canGoBack ? 'hover:bg-gray-500/10' : 'opacity-25'}`" @click="onGoBack()">
-        <IconGoBack />
-      </div>
+  <div data-tauri-drag-region class="h-title bg-transparent select-none cursor-default flex justify-start" :class="dense ? 'h-8' : 'h-12'">
+    <div class="flex justify-center items-center space-x-2" :class="dense ? '' : 'h-12'">
+      <button
+        :disabled="!canGoBack"
+        class="hover:enabled:bg-black/10 dark:hover:enabled:bg-white/10 disabled:opacity-25
+                flex justify-center items-center cursor-default px-2"
+        :class="`${dense ? 'h-12 w-12' : 'h-9 w-10 mx-1 rounded'}`"
+        :title="t('titlebar.go-back')"
+        @click="onGoBack()"
+      >
+        <IconGoBack class="text-sm" />
+      </button>
       <img data-tauri-drag-region :src="QSyncIcon" class="w-6" alt="QSync logo">
       <span data-tauri-drag-region class="text-sm leading-none">{{ t('app-title') }}</span>
     </div>

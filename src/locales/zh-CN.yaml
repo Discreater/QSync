@@ -62,3 +62,5 @@ track:
   pop: 热度
 loading: 加载中
 app-title: 媒体播放器
+titlebar:
+  go-back: 返回
