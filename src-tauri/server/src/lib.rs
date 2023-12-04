@@ -9,7 +9,6 @@ use http::{
   header::{ACCEPT, AUTHORIZATION, CONTENT_TYPE},
   HeaderName, Request,
 };
-use hyper::Body;
 use tokio::task::JoinHandle;
 use tonic_web::GrpcWebLayer;
 use tower::{make::Shared, steer::Steer, BoxError, ServiceExt};
@@ -76,7 +75,7 @@ impl Server {
 
     let hybrid_service = Steer::new(
       vec![http_service, grpc_service],
-      |req: &Request<Body>, _svcs: &[_]| {
+      |req: &Request<hyper::body::Incoming>, _svcs: &[_]| {
         let content_type = req.headers().get(CONTENT_TYPE).map(|v| v.as_bytes());
         if content_type != Some(b"application/grpc")
           && content_type != Some(b"application/grpc-web")
@@ -106,8 +105,11 @@ impl Server {
 
 #[cfg(test)]
 mod tests {
-  use hyper::{body::HttpBody, Body, Method, Request};
-
+  use hyper::{Method, Request};
+  use hyper_util::client::legacy::connect::HttpConnector;
+  use http_body_util::BodyExt;
+  use axum::body::Body;
+  
   use super::*;
 
   fn init_tracing() {
@@ -131,7 +133,9 @@ mod tests {
       .unwrap()
     };
     let client = tokio::spawn(async move {
-      let client = hyper::Client::new();
+      let client =
+        hyper_util::client::legacy::Client::builder(hyper_util::rt::TokioExecutor::new())
+          .build(HttpConnector::new());
       let req = Request::builder()
         .method(Method::POST)
         .uri("http://127.0.0.1:8396/api/musync/folders")
@@ -149,10 +153,11 @@ mod tests {
       let res = client.request(req).await.unwrap();
       assert_eq!(res.status(), 200);
       let mut response_body = String::new();
-      let mut body = res.into_body();
-      while let Some(chunk) = body.data().await {
-        let chunk = chunk.unwrap();
-        response_body.push_str(std::str::from_utf8(&chunk).unwrap());
+      while let Some(next) = res.frame().await {
+        let frame = next.unwrap();
+        if let Some(chunk) = frame.data_ref() {
+          response_body.push_str(std::str::from_utf8(&chunk).unwrap());
+        }
       }
       let tracks: Vec<abi::musync::Track> = serde_json::from_str(&response_body).unwrap();
       assert!(!tracks.is_empty())
