@@ -4,40 +4,6 @@
 
 You can download the prebuilt installer from the newest successful build of the [Github Actions](https://github.com/Discreater/QSync/actions). (Only Windows is supported now)
 
-## Roadmap
-
-### MuSync
-- [x] Music Player
-- [x] Local Music Library
-- [x] Sync play through websocket
-- [x] Unified Track ID
-- [x] [Media Session API](https://developer.mozilla.org/en-US/docs/Web/API/MediaSession)
-- Search Music
-   - [x] Local
-   - [ ] Remote
-- [ ] Remote Music Library
-   - Netease
-   - QQ Music
-   - Bilibili
-   - Migu
-   - Youtube
-- [ ] Lyric
-- [ ] Download metadata
-
-### Common
-
-- [x] User Management
-   - token auth
-- [x] Websocket Message
-- [ ] Add client id (Each websocket connection has a unique client id)
-
-
-## FIXME
-- [ ] Login logic(frontend)
-- [ ] Refactor client player
-   - Player mute state wrong.
-   - May use `APlayer`?
-
 ## Tech Stack
 
 - Server
@@ -46,8 +12,8 @@ You can download the prebuilt installer from the newest successful build of the 
    - sea-orm: orm
    - sqlite: database
 - Frontend
-   - Vite
    - Vue
+   - Vite
    - Typescript
    - TailwindCSS
 
@@ -59,13 +25,18 @@ You can download the prebuilt installer from the newest successful build of the 
    JWT_SECRET=JJJWWW
    ```
 
-- Generate typescript protobuf client, if you change the proto files in `protos/`. Rust grpc server code will audo generated when building.
+- Generate typescript protobuf client, if you have modified the proto files in `protos/`. Rust grpc server code will audo generated when building.
    ```bash
    # windows
    protoc --plugin=protoc-gen-ts_proto=".\\node_modules\\.bin\\protoc-gen-ts_proto.cmd" --ts_proto_out=./src/generated --ts_proto_opt=esModuleInterop=true --ts_proto_opt=outputClientImpl=grpc-web ./protos/musync.proto
    # others
    protoc --plugin=./node_modules/.bin/protoc-gen-ts_proto --ts_proto_out=./src/generated --ts_proto_opt=esModuleInterop=true --ts_proto_opt=outputClientImpl=grpc-web ./protos/musync.proto
    ```
+
+## Run in Tauri client
+```
+pnpm tauri dev
+```
 
 ## Run in Web
 
@@ -82,9 +53,4 @@ cargo run --example server
 ### Web
 ```
 pnpm dev
-```
-
-## Run in Tauri client
-```
-pnpm tauri dev
 ```
