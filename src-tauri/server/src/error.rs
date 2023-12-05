@@ -53,7 +53,7 @@ impl From<Error> for tonic::Status {
   fn from(e: Error) -> Self {
     error!("error: {e}");
     match e {
-      Error::Hyper(h) => tonic::Status::internal(h.message().to_string()),
+      Error::Hyper(h) => tonic::Status::internal(h.to_string()),
       Error::Dbm(e) => e.into(),
       Error::NcmApi(e) => tonic::Status::not_found(e.to_string()),
     }

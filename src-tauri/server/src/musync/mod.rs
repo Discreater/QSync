@@ -1,5 +1,5 @@
 use axum::{
-  body::StreamBody,
+  body::Body,
   extract::{Path, State},
   response::{AppendHeaders, IntoResponse},
 };
@@ -24,7 +24,7 @@ pub async fn get_track(
       .await
       .map_err(|_| HttpError::Internal)?;
     let stream = ReaderStream::new(file);
-    let body = StreamBody::new(stream);
+    let body = Body::from_stream(stream);
     let headers = AppendHeaders([
       (
         CONTENT_TYPE,
