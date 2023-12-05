@@ -67,6 +67,8 @@ message Track {
 message NeteaseSource {
   // id of the track in netease
   string id = 1;
+  // popularity of the track
+  optional float pop = 2;
 }
 
 // LocalSource
@@ -315,9 +317,10 @@ message SearchAllRequest {
 }
 
 message SearchAllResponse {
+  reserved 2;
   repeated Track db_tracks = 1;
   // netease music search result
-  string ncm_res = 2;
+  repeated Track ncm_tracks = 3;
 }
 
 message RebuildIndexRequest {}

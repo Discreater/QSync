@@ -96,6 +96,9 @@ pub struct NeteaseSource {
   /// id of the track in netease
   #[prost(string, tag = "1")]
   pub id: ::prost::alloc::string::String,
+  /// popularity of the track
+  #[prost(float, optional, tag = "2")]
+  pub pop: ::core::option::Option<f32>,
 }
 /// LocalSource
 #[derive(serde::Serialize, serde::Deserialize)]
@@ -526,8 +529,8 @@ pub struct SearchAllResponse {
   #[prost(message, repeated, tag = "1")]
   pub db_tracks: ::prost::alloc::vec::Vec<Track>,
   /// netease music search result
-  #[prost(string, tag = "2")]
-  pub ncm_res: ::prost::alloc::string::String,
+  #[prost(message, repeated, tag = "3")]
+  pub ncm_tracks: ::prost::alloc::vec::Vec<Track>,
 }
 #[derive(serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]

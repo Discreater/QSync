@@ -8,7 +8,6 @@ import QPivotItem from '~qui/pivot/QPivotItem.vue';
 import { ApiClient } from '~/api/client';
 import Basic from '~/layouts/Basic.vue';
 import type { Track } from '~/generated/protos/musync';
-import type { NcmSearchResult } from '~/model_ext/ncm';
 import QTable from '~qui/table/QTable.vue';
 import type { Column } from '~qui/table/types';
 
@@ -21,14 +20,14 @@ defineProps<{
 const loading = ref(true);
 
 const tracks = ref<Track[]>([]);
-const ncmRes = ref<NcmSearchResult>();
+const ncmTracks = ref<Track[]>();
 
 const route = useRoute();
 watch(() => route.query, async () => {
   loading.value = true;
   const resp = await ApiClient.grpc().SearchAll({ query: route.query.q as string });
   tracks.value = resp.dbTracks;
-  ncmRes.value = JSON.parse(resp.ncmRes);
+  ncmTracks.value = resp.ncmTracks;
   loading.value = false;
 }, {
   immediate: true,
@@ -42,19 +41,32 @@ const localCols: Column[] = [
   { key: 'title', title: t('track.title') },
   { key: 'artist', title: t('track.artist') },
   { key: 'album', title: t('track.album') },
+  { key: 'duration', title: t('track.duration'), style: { gridTemplateColumn: '48px' } },
 ];
 const ncmCols: Column[] = [
   { key: 'title', title: t('track.title') },
   { key: 'artist', title: t('track.artist') },
   { key: 'album', title: t('track.album') },
-  { key: 'duration', title: t('track.duration'), style: {
-    gridTemplateColumn: '48px',
-  } },
-  { key: 'pop', title: t('track.pop'), style: {
-    textAlign: 'right',
-    gridTemplateColumn: '24px',
-  } },
+  {
+    key: 'duration',
+    title: t('track.duration'),
+    style: {
+      gridTemplateColumn: '48px',
+    },
+  },
+  {
+    key: 'pop',
+    title: t('track.pop'),
+    style: {
+      textAlign: 'right',
+      gridTemplateColumn: '24px',
+    },
+  },
 ];
+
+function formatDuration(track: Track) {
+  return track.duration ? formatTime(track.duration! / 1000) : '';
+}
 </script>
 
 <template>
@@ -75,24 +87,27 @@ const ncmCols: Column[] = [
             <template #album="{ row }">
               {{ row.album }}
             </template>
+            <template #duration="{ row }">
+              {{ formatDuration(row) }}
+            </template>
           </QTable>
         </QPivotItem>
         <QPivotItem value="netease" :name="t('search-result.netease-result')">
-          <QTable v-if="ncmRes?.result" :columns="ncmCols" :show-head="true" :data="ncmRes.result.songs" :row-key="(row) => row.id">
+          <QTable v-if="ncmTracks" :columns="ncmCols" :show-head="true" :data="ncmTracks" :row-key="(row) => row.id">
             <template #title="{ row }">
-              {{ row.name }}
+              {{ row.title }}
             </template>
             <template #artist="{ row }">
-              {{ row.ar.map(ar => ar.name).join(', ') }}
+              {{ row.artist }}
             </template>
             <template #album="{ row }">
-              {{ row.al.name }}
+              {{ row.album }}
             </template>
             <template #duration="{ row }">
-              {{ formatTime(row.dt / 1000) }}
+              {{ formatDuration(row) }}
             </template>
             <template #pop="{ row }">
-              {{ row.pop }}
+              {{ row.neteaseSrc?.pop }}
             </template>
           </QTable>
         </QPivotItem>

@@ -15,7 +15,7 @@ use chrono::{Days, Utc};
 use dbm::UserId;
 use futures::Stream;
 
-use ncmapi::NcmApi;
+use ncmapi::{types::SearchSongResp, NcmApi};
 use tonic::{Extensions, Request, Response, Status};
 use tracing::{error, trace};
 use utils::WithError;
@@ -78,7 +78,7 @@ impl abi::musync_service_server::MusyncService for GrpcServer {
 
     let tracks = musync::track::get_tracks_in_folder(&req.path);
     let len = tracks.len();
-    self.db.create_tracks(tracks, &req.path).await?;
+    self.db.create_local_tracks(tracks, &req.path).await?;
 
     Ok(Response::new(AddLocalFolderResponse {
       added_tracks: len as u32,
@@ -264,13 +264,25 @@ impl abi::musync_service_server::MusyncService for GrpcServer {
       ..Default::default()
     });
     let ncm_search = self.ncm_api.search(&query, None);
-    let (db_tracks, ncm_res) = tokio::join!(db_search, ncm_search);
+    let (db_tracks, ncm_resp) = tokio::join!(db_search, ncm_search);
     let db_tracks = db_tracks?;
-    let ncm_res = match ncm_res {
-      Ok(res) => String::from_utf8_lossy(res.data()).into_owned(),
-      Err(e) => e.to_string(),
-    };
-    Ok(Response::new(SearchAllResponse { db_tracks, ncm_res }))
+
+    let api_resp =
+      ncm_resp.map_err(|e| Status::internal(format!("ncm api error: {}", e)))?;
+
+    let parsed_resp = serde_json::from_slice::<SearchSongResp>(api_resp.data())
+      .map_err(|_| Status::internal("ncm api response parse failed"))?;
+    let result = parsed_resp.result.ok_or_else(|| {
+      Status::internal(format!(
+        "ncm api response error, ncm code: {}",
+        parsed_resp.code
+      ))
+    })?;
+    let ncm_tracks = self.db.create_ncm_tracks(&result.songs).await?;
+    Ok(Response::new(SearchAllResponse {
+      db_tracks,
+      ncm_tracks,
+    }))
   }
 
   async fn rebuild_index(

@@ -2,27 +2,19 @@
 
 use sea_orm::entity::prelude::*;
 
-#[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq)]
-#[sea_orm(table_name = "play_queue_track")]
+#[derive(Clone, Debug, PartialEq, DeriveEntityModel)]
+#[sea_orm(table_name = "netease_src")]
 pub struct Model {
   #[sea_orm(primary_key, auto_increment = false)]
-  pub play_queue_id: i32,
-  #[sea_orm(primary_key, auto_increment = false)]
   pub track_id: i32,
-  #[sea_orm(primary_key, auto_increment = false)]
-  pub position: u32,
+  pub netease_id: String,
+  #[sea_orm(column_type = "Double", nullable)]
+  pub pop: Option<f64>,
+  pub raw_json: Option<String>,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
 pub enum Relation {
-  #[sea_orm(
-    belongs_to = "super::play_queue::Entity",
-    from = "Column::PlayQueueId",
-    to = "super::play_queue::Column::Id",
-    on_update = "NoAction",
-    on_delete = "Cascade"
-  )]
-  PlayQueue,
   #[sea_orm(
     belongs_to = "super::track::Entity",
     from = "Column::TrackId",
@@ -31,12 +23,6 @@ pub enum Relation {
     on_delete = "Cascade"
   )]
   Track,
-}
-
-impl Related<super::play_queue::Entity> for Entity {
-  fn to() -> RelationDef {
-    Relation::PlayQueue.def()
-  }
 }
 
 impl Related<super::track::Entity> for Entity {

@@ -467,7 +467,7 @@ impl MigrationTrait for Migration {
 }
 
 #[derive(DeriveIden)]
-enum Track {
+pub(crate) enum Track {
   Table,
   Id,
   Title,

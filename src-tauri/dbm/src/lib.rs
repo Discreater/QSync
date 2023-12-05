@@ -1,5 +1,9 @@
 pub mod error;
 mod manager;
+mod playlist;
+mod track;
+mod player;
+mod user;
 
 pub use error::MusyncError;
 use sea_orm::DatabaseConnection;

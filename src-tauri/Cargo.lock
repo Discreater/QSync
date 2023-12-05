@@ -1320,6 +1320,7 @@ version = "0.1.0"
 dependencies = [
  "abi",
  "anyhow",
+ "async-stream",
  "async-trait",
  "chrono",
  "debounced",
@@ -1327,6 +1328,7 @@ dependencies = [
  "futures-channel",
  "futures-util",
  "migration",
+ "ncmapi",
  "sea-orm",
  "thiserror",
  "tokio",

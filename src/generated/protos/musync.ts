@@ -92,6 +92,8 @@ export interface Track {
 export interface NeteaseSource {
   /** id of the track in netease */
   id: string;
+  /** popularity of the track */
+  pop?: number | undefined;
 }
 
 /** LocalSource */
@@ -408,7 +410,7 @@ export interface SearchAllRequest {
 export interface SearchAllResponse {
   dbTracks: Track[];
   /** netease music search result */
-  ncmRes: string;
+  ncmTracks: Track[];
 }
 
 export interface RebuildIndexRequest {
@@ -951,13 +953,16 @@ export const Track = {
 };
 
 function createBaseNeteaseSource(): NeteaseSource {
-  return { id: "" };
+  return { id: "", pop: undefined };
 }
 
 export const NeteaseSource = {
   encode(message: NeteaseSource, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.id !== "") {
       writer.uint32(10).string(message.id);
+    }
+    if (message.pop !== undefined) {
+      writer.uint32(21).float(message.pop);
     }
     return writer;
   },
@@ -976,6 +981,13 @@ export const NeteaseSource = {
 
           message.id = reader.string();
           continue;
+        case 2:
+          if (tag !== 21) {
+            break;
+          }
+
+          message.pop = reader.float();
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -986,13 +998,19 @@ export const NeteaseSource = {
   },
 
   fromJSON(object: any): NeteaseSource {
-    return { id: isSet(object.id) ? globalThis.String(object.id) : "" };
+    return {
+      id: isSet(object.id) ? globalThis.String(object.id) : "",
+      pop: isSet(object.pop) ? globalThis.Number(object.pop) : undefined,
+    };
   },
 
   toJSON(message: NeteaseSource): unknown {
     const obj: any = {};
     if (message.id !== "") {
       obj.id = message.id;
+    }
+    if (message.pop !== undefined) {
+      obj.pop = message.pop;
     }
     return obj;
   },
@@ -1003,6 +1021,7 @@ export const NeteaseSource = {
   fromPartial<I extends Exact<DeepPartial<NeteaseSource>, I>>(object: I): NeteaseSource {
     const message = createBaseNeteaseSource();
     message.id = object.id ?? "";
+    message.pop = object.pop ?? undefined;
     return message;
   },
 };
@@ -3961,7 +3980,7 @@ export const SearchAllRequest = {
 };
 
 function createBaseSearchAllResponse(): SearchAllResponse {
-  return { dbTracks: [], ncmRes: "" };
+  return { dbTracks: [], ncmTracks: [] };
 }
 
 export const SearchAllResponse = {
@@ -3969,8 +3988,8 @@ export const SearchAllResponse = {
     for (const v of message.dbTracks) {
       Track.encode(v!, writer.uint32(10).fork()).ldelim();
     }
-    if (message.ncmRes !== "") {
-      writer.uint32(18).string(message.ncmRes);
+    for (const v of message.ncmTracks) {
+      Track.encode(v!, writer.uint32(26).fork()).ldelim();
     }
     return writer;
   },
@@ -3989,12 +4008,12 @@ export const SearchAllResponse = {
 
           message.dbTracks.push(Track.decode(reader, reader.uint32()));
           continue;
-        case 2:
-          if (tag !== 18) {
+        case 3:
+          if (tag !== 26) {
             break;
           }
 
-          message.ncmRes = reader.string();
+          message.ncmTracks.push(Track.decode(reader, reader.uint32()));
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -4008,7 +4027,7 @@ export const SearchAllResponse = {
   fromJSON(object: any): SearchAllResponse {
     return {
       dbTracks: globalThis.Array.isArray(object?.dbTracks) ? object.dbTracks.map((e: any) => Track.fromJSON(e)) : [],
-      ncmRes: isSet(object.ncmRes) ? globalThis.String(object.ncmRes) : "",
+      ncmTracks: globalThis.Array.isArray(object?.ncmTracks) ? object.ncmTracks.map((e: any) => Track.fromJSON(e)) : [],
     };
   },
 
@@ -4017,8 +4036,8 @@ export const SearchAllResponse = {
     if (message.dbTracks?.length) {
       obj.dbTracks = message.dbTracks.map((e) => Track.toJSON(e));
     }
-    if (message.ncmRes !== "") {
-      obj.ncmRes = message.ncmRes;
+    if (message.ncmTracks?.length) {
+      obj.ncmTracks = message.ncmTracks.map((e) => Track.toJSON(e));
     }
     return obj;
   },
@@ -4029,7 +4048,7 @@ export const SearchAllResponse = {
   fromPartial<I extends Exact<DeepPartial<SearchAllResponse>, I>>(object: I): SearchAllResponse {
     const message = createBaseSearchAllResponse();
     message.dbTracks = object.dbTracks?.map((e) => Track.fromPartial(e)) || [];
-    message.ncmRes = object.ncmRes ?? "";
+    message.ncmTracks = object.ncmTracks?.map((e) => Track.fromPartial(e)) || [];
     return message;
   },
 };
