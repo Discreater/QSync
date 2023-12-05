@@ -93,6 +93,18 @@ function onMenuScale() {
   else if (sizeMd.value)
     expandMenu.value = !expandMenu.value;
 }
+
+function onMenuScaleFromSearchButton() {
+  if (sizeLg.value)
+    shrinkMenu.value = true;
+  else if (sizeMd.value)
+    expandMenu.value = true;
+
+  setTimeout(() => {
+    const input = document.getElementById('nav-search') as HTMLInputElement;
+    input?.focus();
+  }, 100);
+}
 const onlyIcon = computed(() => { return sizeLg.value && shrinkMenu.value || sizeMd.value && !expandMenu.value; });
 
 const delayedOnlyIcon = ref(onlyIcon.value);
@@ -167,7 +179,7 @@ function search() {
           </QHoverButton>
         </template>
       </QInput>
-      <QHoverButton v-else class="h-10 w-10" @click="onMenuScale">
+      <QHoverButton v-else class="h-10 w-10" @click="onMenuScaleFromSearchButton">
         <IconSearch class="text-sm" />
       </QHoverButton>
     </div>

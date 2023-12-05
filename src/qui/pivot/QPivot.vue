@@ -10,6 +10,10 @@ const props = defineProps<{
   value: ItemKey
 }>();
 
+const emit = defineEmits<{
+  'update:value': [value: ItemKey]
+}>();
+
 const activated = ref<ItemKey>(props.value);
 
 const tabs: Item[] = reactive([]);
@@ -34,8 +38,10 @@ provide<PivotRegister>(qPivotRegisterKey, (tab: Item) => {
 });
 
 function activate(opt: Item) {
-  if (opt)
+  if (opt) {
     activated.value = opt.key;
+    emit('update:value', opt.key);
+  }
 }
 </script>
 

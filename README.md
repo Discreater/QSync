@@ -33,9 +33,10 @@ You can download the prebuilt installer from the newest successful build of the 
 
 
 ## FIXME
+- [ ] Login logic(frontend)
 - [ ] Refactor client player
-   - Use `APlayer`
-- [x] Use git deps of and plugin dialog in `package.json `and `Cargo.toml`, because of https://github.com/tauri-apps/plugins-workspace/issues/738.
+   - Player mute state wrong.
+   - May use `APlayer`?
 
 ## Tech Stack
 

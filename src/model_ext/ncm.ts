@@ -26,6 +26,7 @@ export interface NcmSong {
   cp: number
   crbt: unknown
   djld: number
+  /** duration time in millisecond (Maybe?) */
   dt: number
   entertainmentTags: unknown
   fee: number

@@ -2,6 +2,7 @@
 import { ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
+import { useStorage } from '@vueuse/core';
 import QPivot from '~qui/pivot/QPivot.vue';
 import QPivotItem from '~qui/pivot/QPivotItem.vue';
 import { ApiClient } from '~/api/client';
@@ -11,9 +12,12 @@ import type { NcmSearchResult } from '~/model_ext/ncm';
 import QTable from '~qui/table/QTable.vue';
 import type { Column } from '~qui/table/types';
 
+import { formatTime } from '~/utils';
+
 defineProps<{
   query: string
 }>();
+
 const loading = ref(true);
 
 const tracks = ref<Track[]>([]);
@@ -32,6 +36,8 @@ watch(() => route.query, async () => {
 
 const { t } = useI18n();
 
+const pivotValue = useStorage('search-result-pivot', 'local');
+
 const localCols: Column[] = [
   { key: 'title', title: t('track.title') },
   { key: 'artist', title: t('track.artist') },
@@ -41,6 +47,9 @@ const ncmCols: Column[] = [
   { key: 'title', title: t('track.title') },
   { key: 'artist', title: t('track.artist') },
   { key: 'album', title: t('track.album') },
+  { key: 'duration', title: t('track.duration'), style: {
+    gridTemplateColumn: '48px',
+  } },
   { key: 'pop', title: t('track.pop'), style: {
     textAlign: 'right',
     gridTemplateColumn: '24px',
@@ -54,7 +63,7 @@ const ncmCols: Column[] = [
       {{ t('loading') }}
     </div>
     <div v-else class="h-full flex-1 flex">
-      <QPivot value="local" class="bg-main_bg">
+      <QPivot v-model:value="pivotValue" class="bg-main_bg">
         <QPivotItem value="local" :name="t('search-result.local-track')">
           <QTable :columns="localCols" :data="tracks" :show-head="true" :row-key="(row) => row.id">
             <template #title="{ row }">
@@ -78,6 +87,9 @@ const ncmCols: Column[] = [
             </template>
             <template #album="{ row }">
               {{ row.al.name }}
+            </template>
+            <template #duration="{ row }">
+              {{ formatTime(row.dt / 1000) }}
             </template>
             <template #pop="{ row }">
               {{ row.pop }}

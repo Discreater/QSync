@@ -60,6 +60,7 @@ track:
   local-src: 本地源
   netease-src: 网易云源
   pop: 热度
+  duration: 时长
 loading: 加载中
 app-title: 媒体播放器
 titlebar:
