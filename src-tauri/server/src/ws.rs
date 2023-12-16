@@ -35,9 +35,12 @@ impl Default for WsState {
   }
 }
 
+type ClientId = usize;
+
 #[derive(Debug, Clone)]
 pub enum BroadcastMsg {
   UpdatePlayer {
+    source: ClientId,
     user_id: UserId,
     update: UpdatePlayerEvent,
   },
@@ -83,15 +86,19 @@ async fn handle_socket(
       .with_err(|e| error!("close socket failed: {}", e));
     return;
   };
-  socket
-    .send(Message::Item(ServerMsg::AuthSuccess))
-    .await
-    .with_err(|e| error!("send auth response failed: {e:?}"));
 
-  {
+  let client_id = {
     let mut client_num = state.clients.entry(user_id).or_insert(0);
+    let client_id = *client_num;
+
+    socket
+      .send(Message::Item(ServerMsg::AuthSuccess(client_id)))
+      .await
+      .with_err(|e| error!("send auth response failed: {e:?}"));
+
     client_num.add_assign(1);
-  }
+    client_id
+  };
 
   // send player status
   if let Ok(play_queue) = db.get_user_play_queue(user_id).await {
@@ -126,11 +133,17 @@ async fn handle_socket(
     while let Some(data) = receiver.next().await {
       match data {
         Ok(Message::Item(cm)) => {
-          handle_message(cm, Arc::clone(&state_in_recv), db_in_recv.clone(), user_id)
-            .await
-            .with_err(|e| {
-              error!("error handling message: {:?}", e);
-            });
+          handle_message(
+            cm,
+            Arc::clone(&state_in_recv),
+            db_in_recv.clone(),
+            user_id,
+            client_id,
+          )
+          .await
+          .with_err(|e| {
+            error!("error handling message: {:?}", e);
+          });
         }
         Ok(Message::Ping(i)) => {
           sender_in_recv
@@ -160,10 +173,11 @@ async fn handle_socket(
     while let Ok(msg) = rx.recv().await {
       let send_msg = match msg.as_ref() {
         BroadcastMsg::UpdatePlayer {
-          user_id: id,
+          source,
+          user_id: uid,
           update,
         } => {
-          if *id == user_id {
+          if *uid == user_id && *source != client_id {
             Some(Message::Item(ServerMsg::UpdatePlayer(update.clone())))
           } else {
             None
@@ -235,17 +249,19 @@ async fn handle_message(
   msg: ClientMsg,
   state: Arc<WsState>,
   db: DbManager,
-  id: UserId,
+  uid: UserId,
+  cid: ClientId,
 ) -> Result<(), HttpError> {
   match msg {
     ClientMsg::UpdatePlayer(update) => {
-      let updated = db.update_player(&update, id).await?;
+      let updated = db.update_player(&update, uid).await?;
       if update.manul {
         if let Some(updated) = updated {
           state
             .tx
             .send(Arc::new(BroadcastMsg::UpdatePlayer {
-              user_id: id,
+              source: cid,
+              user_id: uid,
               update: updated,
             }))
             .with_err(|e| {
@@ -261,7 +277,7 @@ async fn handle_message(
 
 #[derive(Debug, Serialize)]
 pub enum ServerMsg {
-  AuthSuccess,
+  AuthSuccess(ClientId),
   UpdatePlayer(UpdatePlayerEvent),
   UpdatePlayQueue(UpdatePlayQueueEvent),
 }

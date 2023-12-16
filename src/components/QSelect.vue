@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
+import { onClickOutside } from '@vueuse/core';
 import QButton from './QButton.vue';
 import type { Item, ItemKey } from './types';
 import QMenu from './QMenu.vue';
@@ -25,6 +26,12 @@ const menuOffset = computed(() => {
   const idx = props.options.findIndex(opt => opt.key === selected.value?.key);
   return `-${(idx * 11) / 4 + 0.5}rem`;
 });
+
+const menuRef = ref(null);
+
+onClickOutside(menuRef, () => {
+  open.value = false;
+});
 </script>
 
 <template>
@@ -34,7 +41,7 @@ const menuOffset = computed(() => {
       <IconDown />
     </QButton>
     <div
-      v-else class="absolute p-1 w-full rounded bg-main_bg ring-1 ring-black/10" :style="{
+      v-else ref="menuRef" class="absolute p-1 w-full rounded bg-main_bg ring-1 ring-black/10" :style="{
         top: menuOffset,
       }"
     >

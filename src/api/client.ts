@@ -4,7 +4,9 @@ import type { Token, UpdatePlayQueueEvent, UpdatePlayerEvent, UpdatePlayerReques
 import { useAccountStore } from '~/store/user';
 import { logger } from '~/utils/logger';
 
-type ServerMsg = 'AuthSuccess' | {
+type ClientId = number;
+
+type ServerMsg = { AuthSuccess: ClientId } | {
   UpdatePlayer: UpdatePlayerEvent
 } | {
   UpdatePlayQueue: UpdatePlayQueueEvent
@@ -21,6 +23,7 @@ export class WsClient {
 
   authed: boolean = false;
   msgQueue: ClientMsg[] = [];
+  clientId: ClientId = -1;
   constructor(private wsClient: WebSocket, token: Token, onConnected?: () => void) {
     this.wsClient.onopen = () => {
       this.wsClient.send(JSON.stringify({
@@ -31,8 +34,9 @@ export class WsClient {
       (e.data as Blob).text().then((data) => {
         const msg = JSON.parse(data) as ServerMsg;
         logger.trace(`ws got message: ${data}`);
-        if (msg === 'AuthSuccess') {
+        if ('AuthSuccess' in msg) {
           this.authed = true;
+          this.clientId = msg.AuthSuccess;
           this.msgQueue.forEach((msg) => {
             logger.trace(`ws send message in message queue: ${JSON.stringify(msg)}`);
             this.wsClient.send(JSON.stringify(msg));
