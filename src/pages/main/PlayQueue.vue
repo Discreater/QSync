@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n';
-import type { Column } from '~qui/table/types';
+import type { QTableColumn } from '~qui';
 import Basic from '~/layouts/Basic.vue';
 import { useMusyncStore } from '~/store';
-import QTable from '~qui/table/QTable.vue';
+import { QTable } from '~qui';
 import QHoverButton from '~/components/QHoverButton.vue';
 import IconPlay from '~icons/fluent/play-24-regular';
 import { formatTime } from '~/utils';
@@ -19,7 +19,7 @@ function playByIdx(idx: number) {
   playerStore.play(idx);
 }
 
-const columns: Column[] = [
+const columns: QTableColumn[] = [
   {
     key: 'actions',
     style: {

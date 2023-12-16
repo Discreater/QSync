@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import H1 from '~/components/typo/H1.vue';
-import QScrollbar from '~qui/QScrollbar.vue';
+import { QScrollbar } from '~qui';
 import { bgLayer, useLayerLevel } from '~/components/injects';
 
 const props = defineProps<{

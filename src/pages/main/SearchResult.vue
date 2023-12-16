@@ -3,13 +3,11 @@ import { ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
 import { useStorage } from '@vueuse/core';
-import QPivot from '~qui/pivot/QPivot.vue';
-import QPivotItem from '~qui/pivot/QPivotItem.vue';
+import { QPivot, QPivotItem, QTable } from '~qui';
 import { ApiClient } from '~/api/client';
 import Basic from '~/layouts/Basic.vue';
 import type { Track } from '~/generated/protos/musync';
-import QTable from '~qui/table/QTable.vue';
-import type { Column } from '~qui/table/types';
+import type { QTableColumn } from '~qui';
 
 import { formatTime } from '~/utils';
 
@@ -37,13 +35,13 @@ const { t } = useI18n();
 
 const pivotValue = useStorage('search-result-pivot', 'local');
 
-const localCols: Column[] = [
+const localCols: QTableColumn[] = [
   { key: 'title', title: t('track.title') },
   { key: 'artist', title: t('track.artist') },
   { key: 'album', title: t('track.album') },
   { key: 'duration', title: t('track.duration'), style: { gridTemplateColumn: '48px' } },
 ];
-const ncmCols: Column[] = [
+const ncmCols: QTableColumn[] = [
   { key: 'title', title: t('track.title') },
   { key: 'artist', title: t('track.artist') },
   { key: 'album', title: t('track.album') },

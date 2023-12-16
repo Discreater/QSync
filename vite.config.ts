@@ -17,7 +17,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '~/': `${path.resolve(__dirname, 'src')}/`,
-      '~qui/': `${path.resolve(__dirname, 'src/qui')}/`,
+      '~qui': `${path.resolve(__dirname, 'src/qui')}`,
     },
   },
   clearScreen: false,

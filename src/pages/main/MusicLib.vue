@@ -12,10 +12,10 @@ import QHoverText from '~/components/QHoverText.vue';
 import IconPlay from '~icons/fluent/play-24-regular';
 import IconLocation from '~icons/fluent/my-location-24-regular';
 import IconTop from '~icons/fluent/arrow-upload-24-regular';
-import type { Column } from '~qui/table/types';
+import type { QTableColumn } from '~qui';
 import type { Track } from '~/generated/protos/musync';
 import { usePlayerStore } from '~/store/player';
-import QTable from '~qui/table/QTable.vue';
+import { QTable } from '~qui';
 
 import { useInnerScrollbar } from '~/components/injects';
 import { logger } from '~/utils/logger';
@@ -58,7 +58,7 @@ function rowClassName(row: Track) {
   return '';
 }
 
-const columns: Column[] = [
+const columns: QTableColumn[] = [
   {
     key: 'actions',
     style: {

@@ -1,4 +1,4 @@
-export interface Column {
+export interface QTableColumn {
   key: string
   title?: string
   style?: {

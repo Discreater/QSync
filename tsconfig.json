@@ -9,7 +9,7 @@
     "moduleResolution": "Node",
     "paths": {
       "~/*": ["src/*"],
-      "~qui/*": ["src/qui/*"]
+      "~qui": ["src/qui"]
     },
     "resolveJsonModule": true,
     "types": [

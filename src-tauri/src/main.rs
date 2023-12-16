@@ -5,10 +5,10 @@
 
 use std::net::SocketAddr;
 
+use log::{info, LevelFilter};
 use server::Server;
 use tauri::{path::BaseDirectory, Manager, State};
-use tauri_plugin_log::{Target, TargetKind, fern::colors::ColoredLevelConfig};
-use log::{info, LevelFilter};
+use tauri_plugin_log::{fern::colors::ColoredLevelConfig, Target, TargetKind};
 
 mod error;
 
@@ -43,8 +43,11 @@ fn main() {
     )
     .invoke_handler(tauri::generate_handler![greet, get_server,])
     .setup(|app| {
-      let window = app.get_window("main").unwrap();
-      window_shadows::set_shadow(&window, true).expect("failed to set shadow");
+      #[cfg(any(windows, target_os = "macos"))]
+      {
+        let window = app.get_window("main").unwrap();
+        window_shadows::set_shadow(&window, true).expect("failed to set shadow");
+      }
       let path_resolver = app.path();
       let resource_path = path_resolver
         .resolve("../.env", BaseDirectory::Resource)

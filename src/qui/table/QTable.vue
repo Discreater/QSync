@@ -2,17 +2,17 @@
 import type { StyleValue } from 'vue';
 import { computed, onMounted, onUnmounted, ref } from 'vue';
 import { throttle } from 'lodash';
-import type { Column } from './types';
+import type { QTableColumn } from './types';
 
 const props = defineProps<{
-  columns: Column[]
+  columns: QTableColumn[]
   data: Row[]
   showHead?: boolean
   rowClassName?: (row: Row) => string
   rowKey?: (row: Row) => string | number | symbol
 }>();
 
-function columnStyle(col: Column): StyleValue {
+function columnStyle(col: QTableColumn): StyleValue {
   const style: StyleValue = {};
   if (col.style) {
     if (col.style.textAlign)
