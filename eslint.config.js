@@ -3,11 +3,11 @@ import antfu from '@antfu/eslint-config';
 
 export default await antfu({ vue: true, typescript: true, ignores: [
   '**/generated/**',
+  '**/gen/**',
   '**/target/**',
 ] }, {
   rules: {
-    'style/brace-style': 'off',
-    'ts/brace-style': [
+    'style/brace-style': [
       'error',
       '1tbs',
       {
@@ -18,21 +18,27 @@ export default await antfu({ vue: true, typescript: true, ignores: [
       'error',
       'always',
     ],
-    'ts/semi': [
-      'error',
-      'always',
-    ],
-    'style/quotes': 'off',
-    'ts/quotes': [
+    'style/quotes': [
       'error',
       'single',
       {
         avoidEscape: true,
       },
     ],
+    'unused-imports/no-unused-vars': [
+      'error',
+      {
+        caughtErrorsIgnorePattern: '^_',
+        destructuredArrayIgnorePattern: '^_',
+        argsIgnorePattern: '^_',
+        varsIgnorePattern: '^_',
+      },
+    ],
     'ts/no-unused-vars': [
       'error',
       {
+        caughtErrorsIgnorePattern: '^_',
+        destructuredArrayIgnorePattern: '^_',
         argsIgnorePattern: '^_',
         varsIgnorePattern: '^_',
       },

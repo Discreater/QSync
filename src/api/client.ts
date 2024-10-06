@@ -1,6 +1,6 @@
 import { grpc } from '@improbable-eng/grpc-web';
 import { GrpcWebImpl, MusyncServiceClientImpl } from '~/generated/protos/musync';
-import type { Token, UpdatePlayQueueEvent, UpdatePlayerEvent, UpdatePlayerRequest } from '~/generated/protos/musync';
+import type { Token, UpdatePlayerEvent, UpdatePlayerRequest, UpdatePlayQueueEvent } from '~/generated/protos/musync';
 import { useAccountStore } from '~/store/user';
 import { logger } from '~/utils/logger';
 

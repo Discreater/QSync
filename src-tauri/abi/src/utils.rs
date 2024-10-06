@@ -1,5 +1,5 @@
 use crate::google::protobuf::Timestamp;
-use chrono::{DateTime, NaiveDateTime, Utc};
+use chrono::{DateTime, Utc};
 
 pub fn convert_to_timestamp(dt: &DateTime<Utc>) -> Timestamp {
   Timestamp {
@@ -9,6 +9,5 @@ pub fn convert_to_timestamp(dt: &DateTime<Utc>) -> Timestamp {
 }
 
 pub fn convert_from_timestamp(t: &Timestamp) -> Option<DateTime<Utc>> {
-  let naive_dt = NaiveDateTime::from_timestamp_opt(t.seconds, t.nanos as u32);
-  naive_dt.map(|t| DateTime::<Utc>::from_naive_utc_and_offset(t, Utc))
+  DateTime::from_timestamp(t.seconds, t.nanos as u32)
 }

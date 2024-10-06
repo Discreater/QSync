@@ -49,7 +49,10 @@ pub async fn get_cover(
   let covers = get_track_pictures_internal(&track);
   if let Some(cover) = covers.into_iter().next() {
     let headers = AppendHeaders([
-      (CONTENT_TYPE, cover.mime_type().to_string()),
+      (
+        CONTENT_TYPE,
+        cover.mime_type().map(|t| t.to_string()).unwrap_or_default(),
+      ),
       (CACHE_CONTROL, "max-age=3600".to_owned()),
     ]);
     return Ok((headers, cover.data().to_owned()));

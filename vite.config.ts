@@ -1,10 +1,10 @@
 import path from 'node:path';
-import { defineConfig } from 'vite';
-import vue from '@vitejs/plugin-vue';
 import VueI18nPlugin from '@intlify/unplugin-vue-i18n/vite';
-import Icons from 'unplugin-icons/vite';
-import webfontDownload from 'vite-plugin-webfont-dl';
+import vue from '@vitejs/plugin-vue';
 import vueJsx from '@vitejs/plugin-vue-jsx';
+import Icons from 'unplugin-icons/vite';
+import { defineConfig } from 'vite';
+import webfontDownload from 'vite-plugin-webfont-dl';
 
 // https://vitejs.dev/config/
 export default defineConfig({

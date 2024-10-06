@@ -1,6 +1,9 @@
 use std::{borrow::Cow, fs};
 
-use lofty::{Accessor, AudioFile, ItemKey, TaggedFileExt};
+use lofty::{
+  file::{AudioFile, TaggedFileExt},
+  tag::{Accessor, ItemKey},
+};
 use tracing::warn;
 
 pub(crate) fn get_track_info(path: &str) -> Option<abi::Track> {
@@ -14,7 +17,7 @@ pub(crate) fn get_track_info(path: &str) -> Option<abi::Track> {
     let filename = std::path::Path::new(path).file_name().unwrap();
     filename.to_str().unwrap().to_string()
   };
-  if let Ok(probe) = lofty::Probe::open(path) {
+  if let Ok(probe) = lofty::probe::Probe::open(path) {
     if let Ok(tagged_file) = probe.read() {
       let properties = tagged_file.properties();
       song.duration = Some(properties.duration().as_millis() as u32);
@@ -43,11 +46,11 @@ pub(crate) fn get_track_info(path: &str) -> Option<abi::Track> {
   Some(song)
 }
 
-pub(crate) fn get_track_pictures_internal(track: &abi::Track) -> Vec<lofty::Picture> {
+pub(crate) fn get_track_pictures_internal(track: &abi::Track) -> Vec<lofty::picture::Picture> {
   let mut pictures = vec![];
   if let Some(src) = track.local_src.as_ref() {
-    let path = &src.path;
-    if let Ok(probe) = lofty::Probe::open(path) {
+    let path: &String = &src.path;
+    if let Ok(probe) = lofty::probe::Probe::open(path) {
       if let Ok(tagged_file) = probe.read() {
         if let Some(tag) = tagged_file.primary_tag() {
           pictures = tag.pictures().to_owned();
@@ -67,7 +70,7 @@ pub(crate) fn get_track_pictures(track: &abi::Track) -> Vec<abi::Picture> {
       let data_base64: String = general_purpose::STANDARD_NO_PAD.encode(p.data());
       abi::Picture {
         pic_type: p.pic_type().as_ape_key().map(str::to_owned),
-        mime_type: p.mime_type().to_string(),
+        mime_type: p.mime_type().map(|t| t.to_string()).unwrap_or_default(),
         description: p.description().map(str::to_owned),
         data: data_base64,
       }
