@@ -1,16 +1,16 @@
 import { createPinia, defineStore } from 'pinia';
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate';
-import { usePlayerStore } from './player';
-import { useAccountStore } from './user';
 import { ApiClient, WsClient } from '~/api/client';
 import type { Track } from '~/generated/protos/musync';
+import { useLoading } from '~/logic';
 import type { TrackId } from '~/model_ext/track';
 import type { LocalFolder } from '~/sources/folder';
-
 import type { JellyfinClientOptions } from '~/sources/jellyfin';
+
 import { mod, shuffle } from '~/utils';
-import { useLoading } from '~/logic';
 import { logger } from '~/utils/logger';
+import { usePlayerStore } from './player';
+import { useAccountStore } from './user';
 
 export function sameTrack(a: Track | undefined, b: Track | undefined): boolean {
   if (!a || !b)
@@ -127,8 +127,13 @@ export const useMusyncStore = defineStore('musync', {
     async updatePlayQueueFromRemote(trackIds?: TrackId[]) {
       logger.trace('update play queue from remote');
       if (!trackIds) {
-        const play_queue = await ApiClient.grpc().GetPlayQueue({});
-        trackIds = play_queue.trackIds;
+        try {
+          const play_queue = await ApiClient.grpc().GetPlayQueue({});
+          trackIds = play_queue.trackIds;
+        } catch (e) {
+          console.error(e);
+          return;
+        }
       }
       const tracks = trackIds
         .map(id =>
