@@ -81,15 +81,9 @@ importers:
       '@antfu/eslint-config':
         specifier: ^3.7.3
         version: 3.7.3(@typescript-eslint/utils@8.8.0(eslint@9.12.0(jiti@2.3.1))(typescript@5.6.2))(@vue/compiler-sfc@3.5.11)(eslint@9.12.0(jiti@2.3.1))(typescript@5.6.2)(vitest@2.1.2(@types/node@22.7.4)(sass@1.79.4))
-      '@bufbuild/buf':
-        specifier: ^1.44.0
-        version: 1.44.0
       '@bufbuild/protobuf':
         specifier: ^2.1.0
         version: 2.1.0
-      '@bufbuild/protoc-gen-es':
-        specifier: ^2.1.0
-        version: 2.1.0(@bufbuild/protobuf@2.1.0)
       '@intlify/unplugin-vue-i18n':
         specifier: ^5.2.0
         version: 5.2.0(@vue/compiler-dom@3.5.11)(eslint@9.12.0(jiti@2.3.1))(rollup@4.24.0)(typescript@5.6.2)(vue-i18n@10.0.3(vue@3.5.11(typescript@5.6.2)))(vue@3.5.11(typescript@5.6.2))(webpack-sources@3.2.3)
@@ -328,62 +322,8 @@ packages:
     resolution: {integrity: sha512-vwIVdXG+j+FOpkwqHRcBgHLYNL7XMkufrlaFvL9o6Ai9sJn9+PdyIL5qa0XzTZw084c+u9LOls53eoZWP/W5WQ==}
     engines: {node: '>=6.9.0'}
 
-  '@bufbuild/buf-darwin-arm64@1.44.0':
-    resolution: {integrity: sha512-TZIorkTCICvVKYukkWeUFOMceaGWBrmKVOkXDC1Lusw3bRAdotQRZcwUHEW+XhHjOFFrrqcow4e7UKmk3Qekiw==}
-    engines: {node: '>=12'}
-    cpu: [arm64]
-    os: [darwin]
-
-  '@bufbuild/buf-darwin-x64@1.44.0':
-    resolution: {integrity: sha512-0ygdEIYBUvvyJtNP7RWI1sgpsNaXX8f0JlMhG/y0IdozT+hQtDF9PSrw8+pz+ywpCJdiLzDwj4drZ+GuurQm8Q==}
-    engines: {node: '>=12'}
-    cpu: [x64]
-    os: [darwin]
-
-  '@bufbuild/buf-linux-aarch64@1.44.0':
-    resolution: {integrity: sha512-8NRfpF/x3G5S3fZ4/OIOewxYs2/gnmYMhd0U6gKPrGQz7XblZNfY3Hfmx/5sWv6kybJJ8Iz2P7IVRyKP8net/Q==}
-    engines: {node: '>=12'}
-    cpu: [arm64]
-    os: [linux]
-
-  '@bufbuild/buf-linux-x64@1.44.0':
-    resolution: {integrity: sha512-AjLw7WiqrzvJPA6NLLP3HIOv5bHAJB115qqOzVewsppBvtaCGDj6Du/cpccbSOJTuu88XUdVnJZa85+bnVxdIQ==}
-    engines: {node: '>=12'}
-    cpu: [x64]
-    os: [linux]
-
-  '@bufbuild/buf-win32-arm64@1.44.0':
-    resolution: {integrity: sha512-jlS3zbDI6pFXo0VuK8oxIAfpulWBiEW/l5I4LPT0AR5+q1Pfkn004GKox8znypXCLDV/xNh4/ZqrpL3c4ZAwjg==}
-    engines: {node: '>=12'}
-    cpu: [arm64]
-    os: [win32]
-
-  '@bufbuild/buf-win32-x64@1.44.0':
-    resolution: {integrity: sha512-CRCeVVFssfLlXDzSBlI2y9b+xL/qP6umDp77HWg3iQugqONqy2ccSsDJNyxRATqaE5mixK5++Em/kqbnuhbKEA==}
-    engines: {node: '>=12'}
-    cpu: [x64]
-    os: [win32]
-
-  '@bufbuild/buf@1.44.0':
-    resolution: {integrity: sha512-5xdNiEUzI3Je5rFK9UzJl+gyKAv3fG1HdSlChqQXjTNZ3DZgeeuM7VdyHnr2QC/qgZfZ9L8PRKhJYbXZWYLVUg==}
-    engines: {node: '>=12'}
-    hasBin: true
-
   '@bufbuild/protobuf@2.1.0':
     resolution: {integrity: sha512-+2Mx67Y3skJ4NCD/qNSdBJNWtu6x6Qr53jeNg+QcwiL6mt0wK+3jwHH2x1p7xaYH6Ve2JKOVn0OxU35WsmqI9A==}
-
-  '@bufbuild/protoc-gen-es@2.1.0':
-    resolution: {integrity: sha512-xGadPol0k8cdDNSbMdHMo0QEK0JvebxGD6KQl5hCVfLTFbpMM4dfMiubyT9gdcwqfwstRe5Tin0Us3dyOzHtag==}
-    engines: {node: '>=14'}
-    hasBin: true
-    peerDependencies:
-      '@bufbuild/protobuf': 2.1.0
-    peerDependenciesMeta:
-      '@bufbuild/protobuf':
-        optional: true
-
-  '@bufbuild/protoplugin@2.1.0':
-    resolution: {integrity: sha512-8bE6/bAA0UCDa7ZplKhJq4TU/YFgIH04U4x6hhCQP1FXGuTtRk/FH5tiS7y+3kbjpM97Zlk9DwmFhW0BusF4ew==}
 
   '@clack/core@0.3.4':
     resolution: {integrity: sha512-H4hxZDXgHtWTwV3RAVenqcC4VbJZNegbBjlPvzOzCouXtS2y3sDvlO3IsbrPNWuLWPPlYVYPghQdSF64683Ldw==}
@@ -1056,11 +996,6 @@ packages:
   '@typescript-eslint/visitor-keys@8.8.0':
     resolution: {integrity: sha512-8mq51Lx6Hpmd7HnA2fcHQo3YgfX1qbccxQOgZcb4tvasu//zXRaA1j5ZRFeCw/VRAdFi4mRM9DnZw0Nu0Q2d1g==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
-
-  '@typescript/vfs@1.6.0':
-    resolution: {integrity: sha512-hvJUjNVeBMp77qPINuUvYXj4FyWeeMMKZkxEATEU3hqBAQ7qdTBCUFT7Sp0Zu0faeEtFf+ldXxMEDr/bk73ISg==}
-    peerDependencies:
-      typescript: '*'
 
   '@vitejs/plugin-basic-ssl@1.1.0':
     resolution: {integrity: sha512-wO4Dk/rm8u7RNhOf95ZzcEmC9rYOncYgvq4z3duaJrCgjN8BxAnDVyndanfcJZ0O6XZzHz6Q0hTimxTg8Y9g/A==}
@@ -2918,11 +2853,6 @@ packages:
     resolution: {integrity: sha512-4dbzIzqvjtgiM5rw1k5rEHtBANKmdudhGyBEajN01fEyhaAIhsoKNy6y7+IN93IfpFtwY9iqi7kD+xwKhQsNJA==}
     engines: {node: '>=8'}
 
-  typescript@5.4.5:
-    resolution: {integrity: sha512-vcI4UpRgg81oIRUFwR0WSIHKt11nJ7SAVlYNIu+QpqeyXP+gpQJy/Z4+F0aGxSE4MqwjyXvW/TzgkLAx2AGHwQ==}
-    engines: {node: '>=14.17'}
-    hasBin: true
-
   typescript@5.6.2:
     resolution: {integrity: sha512-NW8ByodCSNCwZeghjN3o+JX5OFH0Ojg6sadjEKY4huZ52TqbJTJnDo5+Tw98lSy63NZvi4n+ez5m2u5d4PkZyw==}
     engines: {node: '>=14.17'}
@@ -3432,50 +3362,7 @@ snapshots:
       '@babel/helper-validator-identifier': 7.25.7
       to-fast-properties: 2.0.0
 
-  '@bufbuild/buf-darwin-arm64@1.44.0':
-    optional: true
-
-  '@bufbuild/buf-darwin-x64@1.44.0':
-    optional: true
-
-  '@bufbuild/buf-linux-aarch64@1.44.0':
-    optional: true
-
-  '@bufbuild/buf-linux-x64@1.44.0':
-    optional: true
-
-  '@bufbuild/buf-win32-arm64@1.44.0':
-    optional: true
-
-  '@bufbuild/buf-win32-x64@1.44.0':
-    optional: true
-
-  '@bufbuild/buf@1.44.0':
-    optionalDependencies:
-      '@bufbuild/buf-darwin-arm64': 1.44.0
-      '@bufbuild/buf-darwin-x64': 1.44.0
-      '@bufbuild/buf-linux-aarch64': 1.44.0
-      '@bufbuild/buf-linux-x64': 1.44.0
-      '@bufbuild/buf-win32-arm64': 1.44.0
-      '@bufbuild/buf-win32-x64': 1.44.0
-
   '@bufbuild/protobuf@2.1.0': {}
-
-  '@bufbuild/protoc-gen-es@2.1.0(@bufbuild/protobuf@2.1.0)':
-    dependencies:
-      '@bufbuild/protoplugin': 2.1.0
-    optionalDependencies:
-      '@bufbuild/protobuf': 2.1.0
-    transitivePeerDependencies:
-      - supports-color
-
-  '@bufbuild/protoplugin@2.1.0':
-    dependencies:
-      '@bufbuild/protobuf': 2.1.0
-      '@typescript/vfs': 1.6.0(typescript@5.4.5)
-      typescript: 5.4.5
-    transitivePeerDependencies:
-      - supports-color
 
   '@clack/core@0.3.4':
     dependencies:
@@ -4063,13 +3950,6 @@ snapshots:
     dependencies:
       '@typescript-eslint/types': 8.8.0
       eslint-visitor-keys: 3.4.3
-
-  '@typescript/vfs@1.6.0(typescript@5.4.5)':
-    dependencies:
-      debug: 4.3.7
-      typescript: 5.4.5
-    transitivePeerDependencies:
-      - supports-color
 
   '@vitejs/plugin-basic-ssl@1.1.0(vite@5.4.8(@types/node@22.7.4)(sass@1.79.4))':
     dependencies:
@@ -6177,8 +6057,6 @@ snapshots:
   type-fest@0.6.0: {}
 
   type-fest@0.8.1: {}
-
-  typescript@5.4.5: {}
 
   typescript@5.6.2: {}
 
